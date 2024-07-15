@@ -1,0 +1,36 @@
+:root {
+    --rnp-green: #2ecc71;
+    --rnp-dark-green: #27ae60;
+    --rnp-light-green: #a3e4b7;
+  }
+  
+  .background-image {
+    background: linear-gradient(rgba(46, 204, 113, 0.8), rgba(39, 174, 96, 0.8)), url('/assets/background.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .login-form {
+    max-width: 400px;
+    width: 100%;
+  }
+  
+  .btn-primary {
+    background-color: black;
+    border-color: var(--rnp-green);
+  }
+  
+  .btn-primary:hover {
+    background-color: gray;
+    border-color: var(--rnp-dark-green);
+  }
+  
+  .form-control:focus {
+    border-color: var(--rnp-light-green);
+    box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+  }
+  
+  .form-check-input:checked {
+    background-color: var(--rnp-green);
+    border-color: var(--rnp-green);
+  }
