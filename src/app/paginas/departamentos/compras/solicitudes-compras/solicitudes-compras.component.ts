@@ -6,6 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 
+
 interface Solicitud {
   id: string;
   tipo: 'Enviada' | 'Recibida';
@@ -15,14 +16,20 @@ interface Solicitud {
 }
 
 
+
 @Component({
-  selector: 'app-solicitudes-informatica',
+  selector: 'app-solicitudes-compras',
   standalone: true,
-  imports: [CommonModule,FormsModule],
-  templateUrl: './solicitudes-informatica.component.html',
-  styleUrl: './solicitudes-informatica.component.css'
+  imports: [ CommonModule, FormsModule ],
+  templateUrl: './solicitudes-compras.component.html',
+  styleUrl: './solicitudes-compras.component.css'
 })
-export class SolicitudesInformaticaComponent implements OnInit{
+
+
+
+
+
+export class SolicitudesComprasComponent implements OnInit{
 
 
 

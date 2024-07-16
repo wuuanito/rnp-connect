@@ -6,6 +6,9 @@ import { LayoutInformaticaComponent } from './paginas/departamentos/informatica/
 import { BolsahorasInformaticaComponent } from './paginas/departamentos/informatica/bolsahoras-informatica/bolsahoras-informatica.component';
 import { SolicitudesInformaticaComponent } from './paginas/departamentos/informatica/solicitudes-informatica/solicitudes-informatica.component';
 import { InicioInformaticaComponent } from './paginas/departamentos/informatica/inicio-informatica/inicio-informatica.component';
+import { LayoutComprasComponent } from './paginas/departamentos/compras/layout-compras/layout-compras.component';
+import { InicioComprasComponent } from './paginas/departamentos/compras/inicio-compras/inicio-compras.component';
+import { SolicitudesComprasComponent } from './paginas/departamentos/compras/solicitudes-compras/solicitudes-compras.component';
 
 export const routes: Routes = [
 
@@ -48,6 +51,20 @@ export const routes: Routes = [
 
             }
 
+            ]
+          },
+          {
+            path:'compras',
+            component:LayoutComprasComponent,
+            children:[
+              {
+                path:'inicio-compras',
+                component:InicioComprasComponent
+              },
+              {
+                path:'solicitudes-compras',
+                component:SolicitudesComprasComponent
+              }
             ]
           }
         ]
