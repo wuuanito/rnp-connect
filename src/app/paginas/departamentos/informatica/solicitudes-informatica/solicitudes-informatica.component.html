@@ -1,0 +1,98 @@
+<div class="container-fluid py-4">
+  <h1 class="mb-4">Mis Solicitudes</h1>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Resumen de Solicitudes</h5>
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="text-center">
+                <h6>Total</h6>
+                <p class="h3">{{ resumen.total }}</p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="text-center">
+                <h6>Enviadas</h6>
+                <p class="h3">{{ resumen.enviadas }}</p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="text-center">
+                <h6>Recibidas</h6>
+                <p class="h3">{{ resumen.recibidas }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Filtros</h5>
+          <form (ngSubmit)="aplicarFiltros()">
+            <div class="row">
+              <div class="col-sm-6 mb-3">
+                <label for="typeSelect" class="form-label">Tipo</label>
+                <select class="form-select" id="typeSelect" [(ngModel)]="tipoFiltro" name="tipoFiltro">
+                  <option value="">Todas</option>
+                  <option value="Enviada">Enviadas</option>
+                  <option value="Recibida">Recibidas</option>
+                </select>
+              </div>
+              <div class="col-sm-6 mb-3">
+                <label for="statusSelect" class="form-label">Estado</label>
+                <select class="form-select" id="statusSelect" [(ngModel)]="estadoFiltro" name="estadoFiltro">
+                  <option value="">Todos</option>
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Aprobada">Aprobada</option>
+                  <option value="Rechazada">Rechazada</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="card-title">Listado de Solicitudes</h5>
+        <button class="btn btn-primary" (click)="nuevaSolicitud()">Nueva Solicitud</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tipo</th>
+              <th>Asunto</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let solicitud of solicitudesFiltradas">
+              <td>{{ solicitud.id }}</td>
+              <td><span class="badge" [ngClass]="{'bg-primary': solicitud.tipo === 'Enviada', 'bg-success': solicitud.tipo === 'Recibida'}">{{ solicitud.tipo }}</span></td>
+              <td>{{ solicitud.asunto }}</td>
+              <td>{{ solicitud.fecha }}</td>
+              <td><span class="badge" [ngClass]="{'bg-warning': solicitud.estado === 'Pendiente', 'bg-success': solicitud.estado === 'Aprobada', 'bg-danger': solicitud.estado === 'Rechazada'}">{{ solicitud.estado }}</span></td>
+              <td>
+                <button class="btn btn-sm btn-info">Ver</button>
+                <button *ngIf="solicitud.tipo === 'Enviada' && solicitud.estado === 'Pendiente'" class="btn btn-sm btn-danger">Cancelar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

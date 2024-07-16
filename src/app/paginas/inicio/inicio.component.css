@@ -1,0 +1,28 @@
+
+
+.landing-page {
+  font-family: 'Roboto', sans-serif;
+}
+
+header {
+  background-image: linear-gradient(to right, #14b12e, #11a01d);
+}
+
+.card {
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: translateY(-10px);
+  }
+}
+
+.btn-lg {
+  padding: 15px 30px;
+  font-size: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .display-2 {
+    font-size: 3rem;
+  }
+}

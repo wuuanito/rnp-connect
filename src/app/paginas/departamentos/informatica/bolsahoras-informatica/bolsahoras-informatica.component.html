@@ -1,0 +1,102 @@
+<div class="container-fluid py-4">
+  <h1 class="mb-4">Bolsa de Horas - Proveedores</h1>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Resumen de Horas</h5>
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="text-center">
+                <h6>Total Horas</h6>
+                <p class="h3">1000</p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="text-center">
+                <h6>Horas Usadas</h6>
+                <p class="h3">450</p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="text-center">
+                <h6>Horas Disponibles</h6>
+                <p class="h3">550</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Registrar Horas</h5>
+          <form>
+            <div class="mb-3">
+              <label for="providerSelect" class="form-label">Proveedor</label>
+              <select class="form-select" id="providerSelect">
+                <option selected>Seleccionar proveedor</option>
+                <option value="1">Proveedor A</option>
+                <option value="2">Proveedor B</option>
+                <option value="3">Proveedor C</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="hoursInput" class="form-label">Horas</label>
+              <input type="number" class="form-control" id="hoursInput" min="0">
+            </div>
+            <div class="mb-3">
+              <label for="descriptionInput" class="form-label">Descripción</label>
+              <textarea class="form-control" id="descriptionInput" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Registrar Horas</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Detalle de Proveedores</h5>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Proveedor</th>
+              <th>Horas Contratadas</th>
+              <th>Horas Usadas</th>
+              <th>Horas Disponibles</th>
+              <th>Última Actualización</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Proveedor A</td>
+              <td>500</td>
+              <td>200</td>
+              <td>300</td>
+              <td>2024-07-15</td>
+            </tr>
+            <tr>
+              <td>Proveedor B</td>
+              <td>300</td>
+              <td>150</td>
+              <td>150</td>
+              <td>2024-07-14</td>
+            </tr>
+            <tr>
+              <td>Proveedor C</td>
+              <td>200</td>
+              <td>100</td>
+              <td>100</td>
+              <td>2024-07-13</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

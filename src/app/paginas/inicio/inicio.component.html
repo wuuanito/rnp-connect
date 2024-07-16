@@ -1,0 +1,52 @@
+<!-- rnp-connect-landing.component.html -->
+<div class="landing-page">
+  <header class="bg-primary text-white text-center py-5">
+    <div class="container">
+      <h1 class="display-2 mb-4 fw-bold">RNP CONNECT</h1>
+      <p class="lead mb-5">RNP Connect es la herramienta definitiva para impulsar la innovación y la colaboración en tiempo real dentro de tu empresa. Descubre cómo podemos transformar tu forma de trabajar, optimizando la comunicación entre departamentos y potenciando la eficiencia operativa.</p>
+    </div>
+  </header>
+
+  <section class="bg-light py-5">
+    <div class="container">
+      <h2 class="text-center mb-5">Características principales</h2>
+      <div class="row">
+        <div class="col-md-6 col-lg-3 mb-4" *ngFor="let feature of features">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center">
+              <i class="fas {{ feature.icon }} fa-3x text-primary mb-3"></i>
+              <h5 class="card-title">{{ feature.title }}</h5>
+              <p class="card-text">{{ feature.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-5">
+    <div class="container">
+      <h2 class="text-center mb-5">Cómo usar RNP Connect</h2>
+      <div class="row align-items-center">
+        <div class="col-md-6 order-md-2 mb-4 mb-md-0">
+          <img src="../../../assets/imagenes/logoVerti.png" alt="Usando RNP Connect" class="img-fluid rounded shadow" style="width: 200px;">
+        </div>
+        <div class="col-md-6 order-md-1">
+          <ol class="list-unstyled">
+            <li class="mb-3"><strong>1.</strong> Regístrate en nuestra plataforma</li>
+            <li class="mb-3"><strong>2.</strong> Conecta tus dispositivos RNP</li>
+            <li class="mb-3"><strong>3.</strong> Configura tus preferencias de red</li>
+            <li class="mb-3"><strong>4.</strong> Monitorea y optimiza tu red en tiempo real</li>
+            <li><strong>5.</strong> Disfruta de una gestión de red sin complicaciones</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-dark text-white text-center py-3">
+    <div class="container">
+      <p>&copy; 2024 RNP Connect. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+</div>

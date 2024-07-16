@@ -26,7 +26,7 @@ export class LoginComponent {
     console.log('Remember Me:', this.rememberMe);
     // Por ejemplo, llamar a un servicio de autenticación corporativo
   //redirigir a la página de inicio
-  this.router.navigateByUrl('layout');
+  this.router.navigateByUrl('layout/inicio');
 
   }
 }
