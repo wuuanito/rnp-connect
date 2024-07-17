@@ -72,28 +72,45 @@
         <table class="table table-hover">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Tipo</th>
-              <th>Asunto</th>
+              <th>ID Solicitud</th>
+              <th>Nombre Solicitud</th>
               <th>Fecha</th>
+              <th>Tipo</th>
               <th>Estado</th>
+              <th>Prioridad</th>
+              <th>Descripción</th>
+              <th>Respuesta</th>
+              <th>ID Departamento</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let solicitud of solicitudesFiltradas">
-              <td>{{ solicitud.id }}</td>
-              <td><span class="badge" [ngClass]="{'bg-primary': solicitud.tipo === 'Enviada', 'bg-success': solicitud.tipo === 'Recibida'}">{{ solicitud.tipo }}</span></td>
-              <td>{{ solicitud.asunto }}</td>
+              <td>{{ solicitud.id_solicitud }}</td>
+              <td>{{ solicitud.nombre_solicitud }}</td>
               <td>{{ solicitud.fecha }}</td>
-              <td><span class="badge" [ngClass]="{'bg-warning': solicitud.estado === 'Pendiente', 'bg-success': solicitud.estado === 'Aprobada', 'bg-danger': solicitud.estado === 'Rechazada'}">{{ solicitud.estado }}</span></td>
+              <td>
+                <span class="badge" [ngClass]="{'bg-primary': solicitud.tipo === 'Compra', 'bg-success': solicitud.tipo !== 'Compra'}">
+                  {{ solicitud.tipo }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="{'bg-warning': solicitud.estado === 'Pendiente', 'bg-success': solicitud.estado === 'Aprobada', 'bg-danger': solicitud.estado === 'Rechazada'}">
+                  {{ solicitud.estado }}
+                </span>
+              </td>
+              <td>{{ solicitud.prioridad }}</td>
+              <td>{{ solicitud.descripcion }}</td>
+              <td>{{ solicitud.respuesta }}</td>
+              <td>{{ solicitud.id_departamento }}</td>
               <td>
                 <button class="btn btn-sm btn-info">Ver</button>
-                <button *ngIf="solicitud.tipo === 'Enviada' && solicitud.estado === 'Pendiente'" class="btn btn-sm btn-danger">Cancelar</button>
+                <button *ngIf="solicitud.estado === 'Pendiente'" class="btn btn-sm btn-danger">Cancelar</button>
               </td>
             </tr>
           </tbody>
         </table>
+
       </div>
     </div>
   </div>
@@ -116,12 +133,17 @@
         <!-- Formulario -->
         <form id="formularioSolicitud">
           <div class="form-group">
-            <label for="nombre">Nombre:</label>
+            <label for="nombre">Nombre de la Solicitud:</label>
             <input type="text" class="form-control" id="nombre" placeholder="Ingrese su nombre">
           </div>
           <div class="form-group">
-            <label for="email">Correo electrónico:</label>
-            <input type="email" class="form-control" id="email" placeholder="Ingrese su correo electrónico">
+            <label for="email">Tipo:</label>
+            <select class="form-select" id="tipo" name="tipo">
+              <option value="Compra">Compra</option>
+              <option value="Desarrollo">Desarrollo</option>
+              <option value="Error">Error</option>
+              <option value="Otro">Otro</option>
+            </select>
           </div>
           <div class="form-group">
             <label for="mensaje">Mensaje:</label>

@@ -22,4 +22,10 @@
       </main>
     </div>
   </div>
+  <app-app-notification
+  [message]="notificationMessage"
+  [show]="showNotification"
+  (closed)="closeNotification()">
+  </app-app-notification>
 </div>
+
