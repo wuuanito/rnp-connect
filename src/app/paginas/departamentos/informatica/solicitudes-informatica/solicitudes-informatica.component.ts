@@ -7,11 +7,14 @@ import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Observable, from, of } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { EventService } from '../../../../core/events/events.service';
+import { ModalsolicitudesComponent } from "../../../../modals/modalsolicitudes/modalsolicitudes.component";
+import bootstrap from '../../../../../main.server';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-solicitudes-informatica',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ModalsolicitudesComponent],
   templateUrl: './solicitudes-informatica.component.html',
   styleUrl: './solicitudes-informatica.component.css'
 })
@@ -19,9 +22,13 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
   solicitudes: Solicitud[] = [];
   solicitudesFiltradas: Solicitud[] = [];
   private socket$: BehaviorSubject<Socket | null> = new BehaviorSubject<Socket | null>(null);
+  departamentoActual: number = 1; // Asume que el departamento actual es 1
+  solicitudesRecibidas: Solicitud[] = [];
+  solicitudesEnviadas: Solicitud[] = [];
+  currentView: 'recibidas' | 'enviadas' = 'recibidas';
 
   tipoFiltro: string = '';
-  estadoFiltro: string = '';
+  estadoFiltro: string = ''
 
   resumen = {
     total: 0,
@@ -55,7 +62,7 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
 
   private inicializarSocket(): Observable<void | null> {
     return new Observable<void>(observer => {
-      const socket = io('http://192.168.11.19:4000', {
+      const socket = io('http://localhost:3000', {
         transports: ['websocket'],
         timeout: 10000
       });
@@ -91,7 +98,6 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
     return from(this.solicitudesService.getSolicitudes()).pipe(
       tap(data => {
         this.solicitudes = data;
-        this.solicitudesFiltradas = this.solicitudes;
         this.aplicarFiltros();
       }),
       catchError(error => {
@@ -100,7 +106,6 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
       })
     );
   }
-
   private escucharNuevasSolicitudes(): void {
     const socket = this.socket$.getValue();
     if (socket) {
@@ -111,22 +116,59 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
       });
     }
   }
-
   aplicarFiltros(): void {
-    this.solicitudesFiltradas = this.solicitudes.filter(solicitud =>
+    this.solicitudesRecibidas = this.solicitudes.filter(solicitud =>
+      solicitud.enviado_por !== this.departamentoActual &&
       (this.tipoFiltro === '' || solicitud.tipo === this.tipoFiltro) &&
       (this.estadoFiltro === '' || solicitud.estado === this.estadoFiltro)
     );
+
+    this.solicitudesEnviadas = this.solicitudes.filter(solicitud =>
+      solicitud.enviado_por === this.departamentoActual &&
+      (this.tipoFiltro === '' || solicitud.tipo === this.tipoFiltro) &&
+      (this.estadoFiltro === '' || solicitud.estado === this.estadoFiltro)
+    );
+
     this.actualizarResumen();
   }
 
   actualizarResumen(): void {
-    this.resumen.total = this.solicitudesFiltradas.length;
-    this.resumen.enviadas = this.solicitudesFiltradas.filter(s => s.tipo === 'Estado').length;
-    this.resumen.recibidas = this.solicitudesFiltradas.filter(s => s.tipo === 'Recibida').length;
+    this.resumen.recibidas = this.solicitudesRecibidas.length;
+    this.resumen.enviadas = this.solicitudesEnviadas.length;
+    this.resumen.total = this.resumen.recibidas + this.resumen.enviadas;
   }
+
+ 
 
   nuevaSolicitud(): void {
     console.log('Crear nueva solicitud');
+  }
+
+
+  selectedSolicitud: Solicitud | null = null;
+
+
+  openModal(solicitudId: number) {
+    this.selectedSolicitud = null;
+    this.solicitudesService.getSolicitudById(solicitudId).subscribe(data => {
+      this.selectedSolicitud = data;
+    }, error => {
+      console.error('Error al obtener la solicitud', error);
+    });
+  }
+  submitSolicitud(form: NgForm) {
+
+  }
+  setView(view: 'recibidas' | 'enviadas') {
+    this.currentView = view;
+    this.aplicarFiltros();
+  }
+
+  getTipoSolicitud(solicitud: Solicitud): string {
+    return solicitud.enviado_por === this.departamentoActual ? 'Enviada' : 'Recibida';
+  }
+
+  esSolicitudEnviada(solicitud: Solicitud): boolean {
+    return solicitud.enviado_por === this.departamentoActual;
   }
 }

@@ -10,7 +10,7 @@ export class WebsocketService {
   socket: any;
 
   constructor() {
-    this.socket = io('http://192.168.11.19:4000');
+    this.socket = io('http://localhost:3000');
   }
 
   listen(eventName: string) {

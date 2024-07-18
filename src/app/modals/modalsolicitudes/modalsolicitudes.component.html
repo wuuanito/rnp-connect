@@ -1,0 +1,25 @@
+<!-- solicitud-modal.component.html -->
+<div class="modal fade" id="solicitudModal" tabindex="-1" aria-labelledby="solicitudModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="solicitudModalLabel">Detalles de la Solicitud</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>ID Solicitud:</strong> {{ solicitud?.id_solicitud }}</p>
+        <p><strong>Nombre Solicitud:</strong> {{ solicitud?.nombre_solicitud }}</p>
+        <p><strong>Fecha:</strong> {{ solicitud?.fecha }}</p>
+        <p><strong>Tipo:</strong> {{ solicitud?.tipo }}</p>
+        <p><strong>Estado:</strong> {{ solicitud?.estado }}</p>
+        <p><strong>Prioridad:</strong> {{ solicitud?.prioridad }}</p>
+        <p><strong>Descripción:</strong> {{ solicitud?.descripcion }}</p>
+        <p><strong>Respuesta:</strong> {{ solicitud?.respuesta }}</p>
+        <p><strong>ID Departamento:</strong> {{ solicitud?.id_departamento }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

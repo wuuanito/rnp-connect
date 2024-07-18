@@ -9,4 +9,6 @@ export interface Solicitud {
   descripcion: string;
   respuesta: string | null;
   id_departamento: number;
+  enviado_por: number;
+  enviado_a: number;
 }

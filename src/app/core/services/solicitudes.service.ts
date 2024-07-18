@@ -9,7 +9,7 @@ import { isPlatformServer } from '@angular/common';
   providedIn: 'root'
 })
 export class SolicitudesService {
-  private apiUrl = 'http://192.168.11.19:4000/solicitudes';
+  private apiUrl = 'http://localhost:3000/solicitudes';
   private cachedSolicitudes: Solicitud[] | null = null;
 
   constructor(
@@ -40,4 +40,12 @@ export class SolicitudesService {
       })
     );
   }
+
+  getSolicitudById(id_solicitud: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${id_solicitud}`);
+  }
+
+
+  
+
 }
