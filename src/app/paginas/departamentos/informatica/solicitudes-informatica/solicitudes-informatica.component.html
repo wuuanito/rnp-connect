@@ -115,7 +115,7 @@
                 <td>{{ solicitud.respuesta }}</td>
                 <td>{{ solicitud.enviado_por }}</td>
                 <td>
-                  <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#solicitudModal" (click)="openModal(solicitud.id_solicitud)">Ver</button>
+                  <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#solicitudRecibidaModal" (click)="openModalRecibida(solicitud.id_solicitud)">Ver</button>
                   <button *ngIf="solicitud.estado === 'Pendiente'" class="btn btn-sm btn-danger">Cancelar</button>
                 </td>
               </tr>
@@ -163,7 +163,9 @@
                 <td>{{ solicitud.respuesta }}</td>
                 <td>{{ solicitud.enviado_a }}</td>
                 <td>
-                  <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#solicitudModal" (click)="openModal(solicitud.id_solicitud)">Ver</button>
+                  <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#solicitudEnviadaModal" (click)="openModalEnviada(solicitud.id_solicitud)">Ver</button>
+
+
                   <button *ngIf="solicitud.estado === 'Pendiente'" class="btn btn-sm btn-danger">Cancelar</button>
                 </td>
               </tr>
@@ -174,32 +176,7 @@
     </div>
   </div>
 
-  <!-- Modal para ver detalles de la solicitud -->
-  <div class="modal fade" id="solicitudModal" tabindex="-1" aria-labelledby="solicitudModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="solicitudModalLabel">Detalles de la Solicitud</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" *ngIf="selectedSolicitud">
-          <p><strong>ID:</strong> {{ selectedSolicitud.id_solicitud }}</p>
-          <p><strong>Nombre:</strong> {{ selectedSolicitud.nombre_solicitud }}</p>
-          <p><strong>Fecha:</strong> {{ selectedSolicitud.fecha }}</p>
-          <p><strong>Tipo:</strong> {{ selectedSolicitud.tipo }}</p>
-          <p><strong>Estado:</strong> {{ selectedSolicitud.estado }}</p>
-          <p><strong>Prioridad:</strong> {{ selectedSolicitud.prioridad }}</p>
-          <p><strong>Descripción:</strong> {{ selectedSolicitud.descripcion }}</p>
-          <p><strong>Respuesta:</strong> {{ selectedSolicitud.respuesta || 'Sin respuesta' }}</p>
-          <p><strong>Enviado por:</strong> {{ selectedSolicitud.enviado_por }}</p>
-          <p><strong>Enviado a:</strong> {{ selectedSolicitud.enviado_a }}</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
   <!-- Modal para nueva solicitud -->
   <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -296,49 +273,93 @@
 
 
 <!-- Modal SOLICITUDES -->
-<div class="modal fade" id="solicitudModal" tabindex="-1" aria-labelledby="solicitudModalLabel" aria-hidden="true">
+<div class="modal fade" id="solicitudRecibidaModal" tabindex="-1" aria-labelledby="solicitudRecibidaModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="solicitudModalLabel">Detalles de la Solicitud</h5>
+        <h5 class="modal-title" id="solicitudRecibidaModalLabel">Detalles de la Solicitud Recibida</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div *ngIf="selectedSolicitud">
-          <form #solicitudForm="ngForm" (ngSubmit)="submitSolicitud(solicitudForm)">
+          <form #solicitudForm="ngForm" >
             <div class="mb-3">
-              <label for="idSolicitud" class="form-label"><strong>ID Solicitud:</strong></label>
-              <input type="text" class="form-control" id="idSolicitud" [value]="selectedSolicitud.id_solicitud" disabled>
+              <label for="idSolicitudRecibida" class="form-label"><strong>ID Solicitud:</strong></label>
+              <input type="text" class="form-control" id="idSolicitudRecibida" [value]="selectedSolicitud.id_solicitud" disabled>
             </div>
             <div class="mb-3">
-              <label for="nombreSolicitud" class="form-label"><strong>Nombre Solicitud:</strong></label>
-              <input type="text" class="form-control" id="nombreSolicitud" [value]="selectedSolicitud.nombre_solicitud" disabled>
+              <label for="nombreSolicitudRecibida" class="form-label"><strong>Nombre Solicitud:</strong></label>
+              <input type="text" class="form-control" id="nombreSolicitudRecibida" [value]="selectedSolicitud.nombre_solicitud" disabled>
             </div>
             <div class="mb-3">
-              <label for="estadoSolicitud" class="form-label"><strong>Estado:</strong></label>
-              <select id="estadoSolicitud" class="form-select" [(ngModel)]="selectedSolicitud.estado" name="estado" required>
+              <label for="estadoSolicitudRecibida" class="form-label"><strong>Estado:</strong></label>
+              <select id="estadoSolicitudRecibida" class="form-select" [(ngModel)]="selectedSolicitud.estado" name="estado" required>
                 <option value="Pendiente">Pendiente</option>
                 <option value="Aprobada">Aprobada</option>
                 <option value="Rechazada">Rechazada</option>
               </select>
             </div>
             <div class="mb-3">
-              <label for="respuestaSolicitud" class="form-label"><strong>Respuesta:</strong></label>
-              <textarea id="respuestaSolicitud" class="form-control" [(ngModel)]="selectedSolicitud.respuesta" name="respuesta" required></textarea>
+              <label for="respuestaSolicitudRecibida" class="form-label"><strong>Respuesta:</strong></label>
+              <textarea id="respuestaSolicitudRecibida" class="form-control" [(ngModel)]="selectedSolicitud.respuesta" name="respuesta" required></textarea>
             </div>
             <div class="mb-3">
-              <label for="descripcionSolicitud" class="form-label"><strong>Descripción:</strong></label>
-              <textarea id="descripcionSolicitud" class="form-control" [value]="selectedSolicitud.descripcion" disabled></textarea>
+              <label for="descripcionSolicitudRecibida" class="form-label"><strong>Descripción:</strong></label>
+              <textarea id="descripcionSolicitudRecibida" class="form-control" [value]="selectedSolicitud.descripcion" disabled></textarea>
             </div>
             <div class="mb-3">
-              <label for="idDepartamento" class="form-label"><strong>ID Departamento:</strong></label>
-              <input type="text" class="form-control" id="idDepartamento" [value]="selectedSolicitud.id_departamento" disabled>
+              <label for="idDepartamentoRecibida" class="form-label"><strong>ID Departamento:</strong></label>
+              <input type="text" class="form-control" id="idDepartamentoRecibida" [value]="selectedSolicitud.id_departamento" disabled>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
               <button type="submit" class="btn btn-primary">Guardar Cambios</button>
             </div>
           </form>
+        </div>
+        <div *ngIf="!selectedSolicitud">
+          Cargando datos...
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="solicitudEnviadaModal" tabindex="-1" aria-labelledby="solicitudEnviadaModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="solicitudEnviadaModalLabel">Detalles de la Solicitud Enviada</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="selectedSolicitud">
+          <div class="mb-3">
+            <label for="idSolicitudEnviada" class="form-label"><strong>ID Solicitud:</strong></label>
+            <input type="text" class="form-control" id="idSolicitudEnviada" [value]="selectedSolicitud.id_solicitud" disabled>
+          </div>
+          <div class="mb-3">
+            <label for="nombreSolicitudEnviada" class="form-label"><strong>Nombre Solicitud:</strong></label>
+            <input type="text" class="form-control" id="nombreSolicitudEnviada" [value]="selectedSolicitud.nombre_solicitud" disabled>
+          </div>
+          <div class="mb-3">
+            <label for="estadoSolicitudEnviada" class="form-label"><strong>Estado:</strong></label>
+            <input type="text" class="form-control" id="estadoSolicitudEnviada" [value]="selectedSolicitud.estado" disabled>
+          </div>
+          <div class="mb-3">
+            <label for="respuestaSolicitudEnviada" class="form-label"><strong>Respuesta:</strong></label>
+            <textarea id="respuestaSolicitudEnviada" class="form-control" [value]="selectedSolicitud.respuesta" disabled></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="descripcionSolicitudEnviada" class="form-label"><strong>Descripción:</strong></label>
+            <textarea id="descripcionSolicitudEnviada" class="form-control" [value]="selectedSolicitud.descripcion" disabled></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="idDepartamentoEnviada" class="form-label"><strong>ID Departamento:</strong></label>
+            <input type="text" class="form-control" id="idDepartamentoEnviada" [value]="selectedSolicitud.id_departamento" disabled>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
         </div>
         <div *ngIf="!selectedSolicitud">
           Cargando datos...

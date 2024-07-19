@@ -138,7 +138,7 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
     this.resumen.total = this.resumen.recibidas + this.resumen.enviadas;
   }
 
- 
+
 
   nuevaSolicitud(): void {
     console.log('Crear nueva solicitud');
@@ -171,4 +171,34 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
   esSolicitudEnviada(solicitud: Solicitud): boolean {
     return solicitud.enviado_por === this.departamentoActual;
   }
+
+
+  openModalRecibida(solicitudId: number) {
+    this.selectedSolicitud = null;
+    this.solicitudesService.getSolicitudById(solicitudId).subscribe(
+      data => {
+        this.selectedSolicitud = data;
+        // Aquí puedes agregar lógica adicional específica para solicitudes recibidas
+        console.log('Abriendo modal de solicitud recibida:', this.selectedSolicitud);
+      },
+      error => {
+        console.error('Error al obtener la solicitud recibida', error);
+      }
+    );
+  }
+
+  openModalEnviada(solicitudId: number) {
+    this.selectedSolicitud = null;
+    this.solicitudesService.getSolicitudById(solicitudId).subscribe(
+      data => {
+        this.selectedSolicitud = data;
+        // Aquí puedes agregar lógica adicional específica para solicitudes enviadas
+        console.log('Abriendo modal de solicitud enviada:', this.selectedSolicitud);
+      },
+      error => {
+        console.error('Error al obtener la solicitud enviada', error);
+      }
+    );
+  }
+
 }
