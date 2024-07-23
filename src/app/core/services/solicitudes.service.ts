@@ -45,7 +45,20 @@ export class SolicitudesService {
     return this.http.get(`${this.apiUrl}/${id_solicitud}`);
   }
 
+  createSolicitud(solicitudData: Solicitud): Observable<Solicitud> {
+    return this.http.post<Solicitud>(this.apiUrl, solicitudData).pipe(
+      tap((newSolicitud: Solicitud) => {
+        // Si hay caché, agregamos la nueva solicitud a la caché
+        if (this.cachedSolicitudes) {
+          this.cachedSolicitudes.push(newSolicitud);
+        }
+      }),
+      catchError(error => {
+        console.error('Error creating solicitud', error);
+        return of(null as any);
+      })
+    );
+  }
 
-  
 
 }

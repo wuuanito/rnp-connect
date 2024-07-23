@@ -29,37 +29,57 @@
         </div>
       </div>
     </div>
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Filtros</h5>
-          <form (ngSubmit)="aplicarFiltros()">
-            <div class="row">
-              <div class="col-sm-6 mb-3">
-                <label for="typeSelect" class="form-label">Tipo</label>
-                <select class="form-select" id="typeSelect" [(ngModel)]="tipoFiltro" name="tipoFiltro">
-                  <option value="">Todas</option>
-                  <option value="Enviada">Enviadas</option>
-                  <option value="Recibida">Recibidas</option>
-                </select>
-              </div>
-              <div class="col-sm-6 mb-3">
-                <label for="statusSelect" class="form-label">Estado</label>
-                <select class="form-select" id="statusSelect" [(ngModel)]="estadoFiltro" name="estadoFiltro">
-                  <option value="">Todos</option>
-                  <option value="Pendiente">Pendiente</option>
-                  <option value="Aprobada">Aprobada</option>
-                  <option value="Rechazada">Rechazada</option>
-                </select>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
-          </form>
+   <!-- Filtros -->
+<div class="col-md-6">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Filtros</h5>
+      <form (ngSubmit)="aplicarFiltros()">
+        <div class="row">
+          <div class="col-sm-6 mb-3">
+            <label for="typeSelect" class="form-label">Tipo</label>
+            <select class="form-select" id="typeSelect" [(ngModel)]="tipoFiltro" name="tipoFiltro">
+              <option value="">Todos</option>
+              <option value="Compra">Compra</option>
+              <option value="Error">Error</option>
+              <option value="Desarrollo">Desarrollo</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="col-sm-6 mb-3">
+            <label for="statusSelect" class="form-label">Estado</label>
+            <select class="form-select" id="statusSelect" [(ngModel)]="estadoFiltro" name="estadoFiltro">
+              <option value="">Todos</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Aprobada">Aprobada</option>
+              <option value="Rechazada">Rechazada</option>
+            </select>
+          </div>
         </div>
-      </div>
+        <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+      </form>
     </div>
   </div>
+</div>
+<!-- Buscador -->
+<div class="col-md-6 mb-3">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Buscar Solicitudes</h5>
+      <form (ngSubmit)="aplicarBusqueda()">
+        <div class="mb-3">
+          <label for="searchInput" class="form-label">Buscar por Nombre</label>
+          <input type="text" class="form-control" id="searchInput" [(ngModel)]="searchQuery" name="searchQuery" placeholder="Buscar...">
+        </div>
+        <button type="submit" class="btn btn-primary">Buscar</button>
+      </form>
+    </div>
+  </div>
+</div>
 
+
+
+  </div>
   <div class="card">
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -76,6 +96,7 @@
           </button>
         </div>
       </div>
+
       <!-- Tabla de Solicitudes Recibidas -->
       <div *ngIf="currentView === 'recibidas'">
         <h6>Solicitudes Recibidas</h6>
@@ -96,7 +117,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let solicitud of solicitudesRecibidas">
+              <tr *ngFor="let solicitud of solicitudesRecibidas | paginate: { itemsPerPage: 10, currentPage: pageRecibidas }">
                 <td>{{ solicitud.id_solicitud }}</td>
                 <td>{{ solicitud.nombre_solicitud }}</td>
                 <td>{{ solicitud.fecha }}</td>
@@ -113,14 +134,14 @@
                 <td>{{ solicitud.prioridad }}</td>
                 <td>{{ solicitud.descripcion }}</td>
                 <td>{{ solicitud.respuesta }}</td>
-                <td>{{ solicitud.enviado_por }}</td>
+                <td>{{ getNombreDepartamento(solicitud.enviado_por) }}</td>
                 <td>
                   <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#solicitudRecibidaModal" (click)="openModalRecibida(solicitud.id_solicitud)">Ver</button>
-                  <button *ngIf="solicitud.estado === 'Pendiente'" class="btn btn-sm btn-danger">Cancelar</button>
                 </td>
               </tr>
             </tbody>
           </table>
+          <pagination-controls (pageChange)="pageRecibidas = $event"></pagination-controls>
         </div>
       </div>
 
@@ -144,7 +165,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let solicitud of solicitudesEnviadas">
+              <tr *ngFor="let solicitud of solicitudesEnviadas | paginate: { itemsPerPage: 10, currentPage: pageEnviadas }">
                 <td>{{ solicitud.id_solicitud }}</td>
                 <td>{{ solicitud.nombre_solicitud }}</td>
                 <td>{{ solicitud.fecha }}</td>
@@ -161,72 +182,86 @@
                 <td>{{ solicitud.prioridad }}</td>
                 <td>{{ solicitud.descripcion }}</td>
                 <td>{{ solicitud.respuesta }}</td>
-                <td>{{ solicitud.enviado_a }}</td>
+                <td>{{ getNombreDepartamento(solicitud.enviado_a) }}</td>
                 <td>
                   <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#solicitudEnviadaModal" (click)="openModalEnviada(solicitud.id_solicitud)">Ver</button>
-
-
-                  <button *ngIf="solicitud.estado === 'Pendiente'" class="btn btn-sm btn-danger">Cancelar</button>
                 </td>
               </tr>
             </tbody>
           </table>
+          <pagination-controls (pageChange)="pageEnviadas = $event"></pagination-controls>
         </div>
       </div>
     </div>
   </div>
+
 
 
 
   <!-- Modal para nueva solicitud -->
-  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Nueva Solicitud</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Formulario para nueva solicitud -->
-          <form (ngSubmit)="submitSolicitud(solicitudForm)" #solicitudForm="ngForm">
-            <div class="mb-3">
-              <label for="nombre_solicitud" class="form-label">Nombre de la Solicitud</label>
-              <input type="text" class="form-control" id="nombre_solicitud" name="nombre_solicitud" ngModel required>
-            </div>
-            <div class="mb-3">
-              <label for="tipo" class="form-label">Tipo</label>
-              <select class="form-select" id="tipo" name="tipo" ngModel required>
-                <option value="Compra">Compra</option>
-                <option value="Servicio">Servicio</option>
-                <!-- Agrega más opciones según tus tipos de solicitud -->
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="prioridad" class="form-label">Prioridad</label>
-              <select class="form-select" id="prioridad" name="prioridad" ngModel required>
-                <option value="Baja">Baja</option>
-                <option value="Media">Media</option>
-                <option value="Alta">Alta</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="descripcion" class="form-label">Descripción</label>
-              <textarea class="form-control" id="descripcion" name="descripcion" rows="3" ngModel required></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="enviado_a" class="form-label">Enviar a Departamento</label>
-              <select class="form-select" id="enviado_a" name="enviado_a" ngModel required>
-                <option value="2">Departamento 2</option>
-                <option value="3">Departamento 3</option>
-                <!-- Agrega más opciones según tus departamentos -->
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Enviar Solicitud</button>
-          </form>
-        </div>
+<!-- Modal para nueva solicitud -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Nueva Solicitud</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Formulario para nueva solicitud -->
+        <form (ngSubmit)="submitSolicitud(solicitudForm)" #solicitudForm="ngForm">
+          <div class="mb-3">
+            <label for="nombre_solicitud" class="form-label">Nombre de la Solicitud</label>
+            <input type="text" class="form-control" id="nombre_solicitud" name="nombre_solicitud" ngModel required>
+          </div>
+          <div class="mb-3">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input type="date" class="form-control" id="fecha" name="fecha" ngModel required>
+          </div>
+          <div class="mb-3">
+            <label for="tipo" class="form-label">Tipo</label>
+            <select class="form-select" id="tipo" name="tipo" ngModel required>
+              <option value="Compra">Compra</option>
+              <option value="Error">Error</option>
+              <option value="Desarrollo">Desarrollo</option>
+              <option value="Otro">Otro</option>
+              <!-- Agrega más opciones según tus tipos de solicitud -->
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="prioridad" class="form-label">Prioridad</label>
+            <select class="form-select" id="prioridad" name="prioridad" ngModel required>
+              <option value="Baja">Baja</option>
+              <option value="Media">Media</option>
+              <option value="Alta">Alta</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" ngModel required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="enviado_a" class="form-label">Enviar a Departamento</label>
+            <select class="form-select" id="enviado_a" name="enviado_a" ngModel required>
+              <option value="1">INFORMATICA</option>
+              <option value="4">ADMINISTRACION</option>
+              <option value="2">COMPRAS</option>
+              <option value="9">LABORATORIO/CALIDAD</option>
+              <option value="7">OFICINA TECNICA</option>
+              <option value="10">PRODUCCION</option>
+              <option value="3">GERENCIA</option>
+              <option value="5">LOGISTICA</option>
+              <option value="6">MANTENIMIENTO</option>
+              <option value="8">RRHH</option>
+
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Enviar Solicitud</button>
+        </form>
       </div>
     </div>
   </div>
+</div>
 
 
 
@@ -354,8 +389,8 @@
             <textarea id="descripcionSolicitudEnviada" class="form-control" [value]="selectedSolicitud.descripcion" disabled></textarea>
           </div>
           <div class="mb-3">
-            <label for="idDepartamentoEnviada" class="form-label"><strong>ID Departamento:</strong></label>
-            <input type="text" class="form-control" id="idDepartamentoEnviada" [value]="selectedSolicitud.id_departamento" disabled>
+            <label for="idDepartamentoEnviada" class="form-label"><strong>Enviado a:</strong></label>
+            <input type="text" class="form-control" id="idDepartamentoEnviada" [value]="getNombreDepartamento(selectedSolicitud.enviado_a)" disabled>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

@@ -10,15 +10,36 @@ import { EventService } from '../../../../core/events/events.service';
 import { ModalsolicitudesComponent } from "../../../../modals/modalsolicitudes/modalsolicitudes.component";
 import bootstrap from '../../../../../main.server';
 import { NgForm } from '@angular/forms';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-solicitudes-informatica',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalsolicitudesComponent],
+  imports: [CommonModule, FormsModule, ModalsolicitudesComponent,NgxPaginationModule],
   templateUrl: './solicitudes-informatica.component.html',
   styleUrl: './solicitudes-informatica.component.css'
 })
 export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
+  pageRecibidas: number = 1;
+  pageEnviadas: number = 1;
+
+  departamentoMap: { [key: number]: string } = {
+    1: "INFORMATICA",
+    2: "COMPRAS",
+    3: "GERENCIA",
+    4: "ADMINISTRACION",
+    5: "LOGISTICA",
+    6: "MANTENIMIENTO",
+    7: "OFICINA TECNICA",
+    8: "RRHH",
+    9: "LABORATORIO/CALIDAD",
+    10: "PRODUCCION"
+  };
+
+  getNombreDepartamento(id: number): string {
+    return this.departamentoMap[id] || 'Desconocido'; // Valor predeterminado en caso de que el id no esté en el mapeo
+  }
+
   solicitudes: Solicitud[] = [];
   solicitudesFiltradas: Solicitud[] = [];
   private socket$: BehaviorSubject<Socket | null> = new BehaviorSubject<Socket | null>(null);
@@ -130,6 +151,25 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
     );
 
     this.actualizarResumen();
+
+  }
+
+
+
+  searchQuery: string = '';
+
+  aplicarBusqueda(): void {
+    if (this.searchQuery) {
+      this.solicitudesRecibidas = this.solicitudesRecibidas.filter(solicitud =>
+        solicitud.nombre_solicitud.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+
+      this.solicitudesEnviadas = this.solicitudesEnviadas.filter(solicitud =>
+        solicitud.nombre_solicitud.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    } else {
+      this.aplicarFiltros(); // Re-aplica los filtros si la búsqueda está vacía
+    }
   }
 
   actualizarResumen(): void {
@@ -156,9 +196,40 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
       console.error('Error al obtener la solicitud', error);
     });
   }
-  submitSolicitud(form: NgForm) {
+  mensaje: string | null = null; // Para manejar el mensaje de alerta
 
+  submitSolicitud(form: NgForm) {
+    if (form.valid) {
+      const solicitudData: Solicitud = {
+        id_solicitud: 0, // o algún valor predeterminado, si tu backend lo ignora o lo genera automáticamente
+        nombre_solicitud: form.value.nombre_solicitud,
+        fecha: new Date().toISOString().split('T')[0], // o la fecha que quieras asignar
+        tipo: form.value.tipo,
+        prioridad: form.value.prioridad,
+        descripcion: form.value.descripcion,
+        id_departamento: this.departamentoActual,
+        enviado_por: 1, // o el valor que corresponda
+        enviado_a: form.value.enviado_a,
+        estado: 'Pendiente',
+        respuesta: '' // o algún valor predeterminado
+      };
+
+      this.solicitudesService.createSolicitud(solicitudData).subscribe(
+        (newSolicitud) => {
+          console.log('Solicitud creada exitosamente', newSolicitud);
+          this.mensaje = 'Solicitud enviada exitosamente';
+          setTimeout(() => {
+            window.location.reload(); // Recarga la página
+          }, 500);
+        },
+        (error) => {
+          console.error('Error al crear la solicitud', error);
+          this.mensaje = 'Error al enviar la solicitud';
+        }
+      );
+    }
   }
+
   setView(view: 'recibidas' | 'enviadas') {
     this.currentView = view;
     this.aplicarFiltros();

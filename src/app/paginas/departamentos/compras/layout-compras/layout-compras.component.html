@@ -9,6 +9,7 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="inicio-compras">INICIO</a>
           </li>
+
           <li class="nav-item">
             <a class="nav-link" routerLink="solicitudes-compras">SOLICITUDES</a>
           </li>
@@ -19,4 +20,10 @@
       </main>
     </div>
   </div>
+  <app-app-notification
+  [message]="notificationMessage"
+  [show]="showNotification"
+  (closed)="closeNotification()">
+  </app-app-notification>
 </div>
+

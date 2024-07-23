@@ -1,26 +1,22 @@
-import { Component,OnInit  } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
-
-
-
-interface Solicitud {
-  id: string;
-  tipo: 'Enviada' | 'Recibida';
-  asunto: string;
-  fecha: string;
-  estado: 'Pendiente' | 'Aprobada' | 'Rechazada';
-}
+import { Solicitud } from '../../../../core/interfaces/solicitud.mode';
+import { SolicitudesService } from '../../../../core/services/solicitudes.service';
+import { io, Socket } from 'socket.io-client';
+import { BehaviorSubject, Observable, from, of } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
+import { EventService } from '../../../../core/events/events.service';
+import { ModalsolicitudesComponent } from "../../../../modals/modalsolicitudes/modalsolicitudes.component";
+import bootstrap from '../../../../../main.server';
+import { NgForm } from '@angular/forms';
 
 
 
 @Component({
   selector: 'app-solicitudes-compras',
   standalone: true,
-  imports: [ CommonModule, FormsModule ],
+  imports: [CommonModule, FormsModule, ModalsolicitudesComponent],
   templateUrl: './solicitudes-compras.component.html',
   styleUrl: './solicitudes-compras.component.css'
 })
@@ -29,21 +25,35 @@ interface Solicitud {
 
 
 
-export class SolicitudesComprasComponent implements OnInit{
+export class SolicitudesComprasComponent implements OnInit, OnDestroy {
 
+  departamentoMap: { [key: number]: string } = {
+    1: "INFORMATICA",
+    2: "COMPRAS",
+    3: "GERENCIA",
+    4: "ADMINISTRACION",
+    5: "LOGISTICA",
+    6: "MANTENIMIENTO",
+    7: "OFICINA TECNICA",
+    8: "RRHH",
+    9: "LABORATORIO/CALIDAD",
+    10: "PRODUCCION"
+  };
 
+  getNombreDepartamento(id: number): string {
+    return this.departamentoMap[id] || 'Desconocido'; // Valor predeterminado en caso de que el id no esté en el mapeo
+  }
 
-
-
-  solicitudes: Solicitud[] = [
-    { id: '001', tipo: 'Enviada', asunto: 'Solicitud de vacaciones', fecha: '2024-07-15', estado: 'Pendiente' },
-    { id: '002', tipo: 'Recibida', asunto: 'Aprobación de presupuesto', fecha: '2024-07-14', estado: 'Aprobada' },
-    { id: '003', tipo: 'Enviada', asunto: 'Solicitud de equipo nuevo', fecha: '2024-07-13', estado: 'Rechazada' },
-  ];
-
+  solicitudes: Solicitud[] = [];
   solicitudesFiltradas: Solicitud[] = [];
+  private socket$: BehaviorSubject<Socket | null> = new BehaviorSubject<Socket | null>(null);
+  departamentoActual: number = 2; // Asume que el departamento actual es 1
+  solicitudesRecibidas: Solicitud[] = [];
+  solicitudesEnviadas: Solicitud[] = [];
+  currentView: 'recibidas' | 'enviadas' = 'recibidas';
+
   tipoFiltro: string = '';
-  estadoFiltro: string = '';
+  estadoFiltro: string = ''
 
   resumen = {
     total: 0,
@@ -51,29 +61,219 @@ export class SolicitudesComprasComponent implements OnInit{
     recibidas: 0
   };
 
-  ngOnInit() {
-    this.aplicarFiltros();
+  constructor(
+    private solicitudesService: SolicitudesService,
+    private eventService: EventService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
+
+  ngOnInit(): void {
+    this.cargarSolicitudes().subscribe();
+
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => {
+        this.inicializarSocket()
+          .pipe(
+            tap(() => this.escucharNuevasSolicitudes())
+          )
+          .subscribe();
+      }, 0);
+    }
   }
 
-  aplicarFiltros() {
-    this.solicitudesFiltradas = this.solicitudes.filter(solicitud =>
+  ngOnDestroy(): void {
+    this.desconectarSocket();
+  }
+
+  private inicializarSocket(): Observable<void | null> {
+    return new Observable<void>(observer => {
+      const socket = io('http://localhost:3000', {
+        transports: ['websocket'],
+        timeout: 10000
+      });
+
+      socket.on('connect', () => {
+        console.log('Socket conectado');
+        this.socket$.next(socket);
+        observer.next();
+        observer.complete();
+      });
+
+      socket.on('connect_error', (error) => {
+        console.error('Error de conexión del socket:', error);
+        observer.error(error);
+      });
+    }).pipe(
+      catchError(error => {
+        console.error('Error al inicializar el socket:', error);
+        return of(null);
+      })
+    );
+  }
+
+  private desconectarSocket(): void {
+    const socket = this.socket$.getValue();
+    if (socket) {
+      socket.disconnect();
+    }
+    this.socket$.next(null);
+  }
+
+  private cargarSolicitudes(): Observable<Solicitud[]> {
+    return from(this.solicitudesService.getSolicitudes()).pipe(
+      tap(data => {
+        this.solicitudes = data;
+        this.aplicarFiltros();
+      }),
+      catchError(error => {
+        console.error('Error fetching solicitudes', error);
+        return of([]);
+      })
+    );
+  }
+  private escucharNuevasSolicitudes(): void {
+    const socket = this.socket$.getValue();
+    if (socket) {
+      socket.on('nuevaSolicitud', (nuevaSolicitud: Solicitud) => {
+        this.solicitudes.push(nuevaSolicitud);
+        this.aplicarFiltros();
+        this.eventService.emitNuevaSolicitud(nuevaSolicitud);
+      });
+    }
+  }
+  aplicarFiltros(): void {
+    this.solicitudesRecibidas = this.solicitudes.filter(solicitud =>
+      solicitud.enviado_por !== this.departamentoActual &&
       (this.tipoFiltro === '' || solicitud.tipo === this.tipoFiltro) &&
       (this.estadoFiltro === '' || solicitud.estado === this.estadoFiltro)
     );
+
+    this.solicitudesEnviadas = this.solicitudes.filter(solicitud =>
+      solicitud.enviado_por === this.departamentoActual &&
+      (this.tipoFiltro === '' || solicitud.tipo === this.tipoFiltro) &&
+      (this.estadoFiltro === '' || solicitud.estado === this.estadoFiltro)
+    );
+
     this.actualizarResumen();
-  }
 
-  actualizarResumen() {
-    this.resumen.total = this.solicitudesFiltradas.length;
-    this.resumen.enviadas = this.solicitudesFiltradas.filter(s => s.tipo === 'Enviada').length;
-    this.resumen.recibidas = this.solicitudesFiltradas.filter(s => s.tipo === 'Recibida').length;
   }
 
 
 
-  nuevaSolicitud() {
-    // Lógica para crear una nueva solicitud
+  searchQuery: string = '';
+
+  aplicarBusqueda(): void {
+    if (this.searchQuery) {
+      this.solicitudesRecibidas = this.solicitudesRecibidas.filter(solicitud =>
+        solicitud.nombre_solicitud.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+
+      this.solicitudesEnviadas = this.solicitudesEnviadas.filter(solicitud =>
+        solicitud.nombre_solicitud.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    } else {
+      this.aplicarFiltros(); // Re-aplica los filtros si la búsqueda está vacía
+    }
+  }
+
+  actualizarResumen(): void {
+    this.resumen.recibidas = this.solicitudesRecibidas.length;
+    this.resumen.enviadas = this.solicitudesEnviadas.length;
+    this.resumen.total = this.resumen.recibidas + this.resumen.enviadas;
+  }
+
+
+
+  nuevaSolicitud(): void {
     console.log('Crear nueva solicitud');
+  }
+
+
+  selectedSolicitud: Solicitud | null = null;
+
+
+  openModal(solicitudId: number) {
+    this.selectedSolicitud = null;
+    this.solicitudesService.getSolicitudById(solicitudId).subscribe(data => {
+      this.selectedSolicitud = data;
+    }, error => {
+      console.error('Error al obtener la solicitud', error);
+    });
+  }
+  mensaje: string | null = null; // Para manejar el mensaje de alerta
+
+  submitSolicitud(form: NgForm) {
+    if (form.valid) {
+      const solicitudData: Solicitud = {
+        id_solicitud: 0, // o algún valor predeterminado, si tu backend lo ignora o lo genera automáticamente
+        nombre_solicitud: form.value.nombre_solicitud,
+        fecha: new Date().toISOString().split('T')[0], // o la fecha que quieras asignar
+        tipo: form.value.tipo,
+        prioridad: form.value.prioridad,
+        descripcion: form.value.descripcion,
+        id_departamento: this.departamentoActual,
+        enviado_por: 2, // o el valor que corresponda
+        enviado_a: form.value.enviado_a,
+        estado: 'Pendiente',
+        respuesta: '' // o algún valor predeterminado
+      };
+
+      this.solicitudesService.createSolicitud(solicitudData).subscribe(
+        (newSolicitud) => {
+          console.log('Solicitud creada exitosamente', newSolicitud);
+          this.mensaje = 'Solicitud enviada exitosamente';
+          setTimeout(() => {
+            window.location.reload(); // Recarga la página
+          }, 500);
+        },
+        (error) => {
+          console.error('Error al crear la solicitud', error);
+          this.mensaje = 'Error al enviar la solicitud';
+        }
+      );
+    }
+  }
+
+  setView(view: 'recibidas' | 'enviadas') {
+    this.currentView = view;
+    this.aplicarFiltros();
+  }
+
+  getTipoSolicitud(solicitud: Solicitud): string {
+    return solicitud.enviado_por === this.departamentoActual ? 'Enviada' : 'Recibida';
+  }
+
+  esSolicitudEnviada(solicitud: Solicitud): boolean {
+    return solicitud.enviado_por === this.departamentoActual;
+  }
+
+
+  openModalRecibida(solicitudId: number) {
+    this.selectedSolicitud = null;
+    this.solicitudesService.getSolicitudById(solicitudId).subscribe(
+      data => {
+        this.selectedSolicitud = data;
+        // Aquí puedes agregar lógica adicional específica para solicitudes recibidas
+        console.log('Abriendo modal de solicitud recibida:', this.selectedSolicitud);
+      },
+      error => {
+        console.error('Error al obtener la solicitud recibida', error);
+      }
+    );
+  }
+
+  openModalEnviada(solicitudId: number) {
+    this.selectedSolicitud = null;
+    this.solicitudesService.getSolicitudById(solicitudId).subscribe(
+      data => {
+        this.selectedSolicitud = data;
+        // Aquí puedes agregar lógica adicional específica para solicitudes enviadas
+        console.log('Abriendo modal de solicitud enviada:', this.selectedSolicitud);
+      },
+      error => {
+        console.error('Error al obtener la solicitud enviada', error);
+      }
+    );
   }
 
 }
