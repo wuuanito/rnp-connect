@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 
 
@@ -13,20 +14,26 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent  {
   email: string = '';
   password: string = '';
   rememberMe: boolean = false;
-  constructor(private router: Router) { }
+  constructor(private authService: AuthService, private router: Router) { }
 
-  onSubmit() {
-    // Aquí implementarías la lógica de inicio de sesión
-    console.log('Email:', this.email);
-    console.log('Password:', this.password);
-    console.log('Remember Me:', this.rememberMe);
-    // Por ejemplo, llamar a un servicio de autenticación corporativo
-  //redirigir a la página de inicio
-  this.router.navigateByUrl('layout/inicio');
-
+  onSubmit(): void {
+    this.authService.login(this.email, this.password).subscribe({
+      next: (response) => {
+        if (response.token) {
+          this.authService.saveToken(response.token);
+          this.router.navigate(['/layout/inicio']);  // Redirige a una página protegida
+        }
+      },
+      error: (error) => {
+        console.error('Error de autenticación', error);
+        // Maneja los errores de autenticación, muestra un mensaje al usuario, etc.
+      }
+    });
   }
+
+
 }

@@ -215,7 +215,8 @@ export class SolicitudesComprasComponent implements OnInit, OnDestroy {
         enviado_por: 2, // o el valor que corresponda
         enviado_a: form.value.enviado_a,
         estado: 'Pendiente',
-        respuesta: '' // o algún valor predeterminado
+        respuesta: '', // o algún valor predeterminado
+        email:''
       };
 
       this.solicitudesService.createSolicitud(solicitudData).subscribe(

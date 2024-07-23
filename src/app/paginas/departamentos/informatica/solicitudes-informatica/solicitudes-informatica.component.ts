@@ -11,6 +11,9 @@ import { ModalsolicitudesComponent } from "../../../../modals/modalsolicitudes/m
 import bootstrap from '../../../../../main.server';
 import { NgForm } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { AuthService } from '../../../../core/services/auth.service';
+
+
 
 @Component({
   selector: 'app-solicitudes-informatica',
@@ -22,6 +25,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
   pageRecibidas: number = 1;
   pageEnviadas: number = 1;
+
 
   departamentoMap: { [key: number]: string } = {
     1: "INFORMATICA",
@@ -49,7 +53,7 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
   currentView: 'recibidas' | 'enviadas' = 'recibidas';
 
   tipoFiltro: string = '';
-  estadoFiltro: string = ''
+  estadoFiltro: string = '';
 
   resumen = {
     total: 0,
@@ -58,10 +62,12 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
   };
 
   constructor(
+    private authService: AuthService,
     private solicitudesService: SolicitudesService,
     private eventService: EventService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
+   email = this.authService.getEmailFromToken();
 
   ngOnInit(): void {
     this.cargarSolicitudes().subscribe();
@@ -70,7 +76,7 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this.inicializarSocket()
           .pipe(
-            tap(() => this.escucharNuevasSolicitudes())
+            tap(() => this.escucharSolicitudes())
           )
           .subscribe();
       }, 0);
@@ -127,7 +133,8 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
       })
     );
   }
-  private escucharNuevasSolicitudes(): void {
+
+  private escucharSolicitudes(): void {
     const socket = this.socket$.getValue();
     if (socket) {
       socket.on('nuevaSolicitud', (nuevaSolicitud: Solicitud) => {
@@ -135,8 +142,17 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
         this.aplicarFiltros();
         this.eventService.emitNuevaSolicitud(nuevaSolicitud);
       });
+
+      socket.on('actualizacionSolicitud', (updatedSolicitud: Solicitud) => {
+        const index = this.solicitudes.findIndex(solicitud => solicitud.id_solicitud === updatedSolicitud.id_solicitud);
+        if (index !== -1) {
+          this.solicitudes[index] = updatedSolicitud;
+          this.aplicarFiltros();
+        }
+      });
     }
   }
+
   aplicarFiltros(): void {
     this.solicitudesRecibidas = this.solicitudes.filter(solicitud =>
       solicitud.enviado_por !== this.departamentoActual &&
@@ -151,10 +167,7 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
     );
 
     this.actualizarResumen();
-
   }
-
-
 
   searchQuery: string = '';
 
@@ -178,15 +191,7 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
     this.resumen.total = this.resumen.recibidas + this.resumen.enviadas;
   }
 
-
-
-  nuevaSolicitud(): void {
-    console.log('Crear nueva solicitud');
-  }
-
-
   selectedSolicitud: Solicitud | null = null;
-
 
   openModal(solicitudId: number) {
     this.selectedSolicitud = null;
@@ -196,35 +201,48 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
       console.error('Error al obtener la solicitud', error);
     });
   }
-  mensaje: string | null = null; // Para manejar el mensaje de alerta
 
+  mensaje: string | null = null; // Para manejar el mensaje de alerta
+  cargando: boolean = false;
+  mensajeExito: string | null = null;
   submitSolicitud(form: NgForm) {
     if (form.valid) {
+      this.cargando = true;
+      this.mensajeExito = null;
+
       const solicitudData: Solicitud = {
-        id_solicitud: 0, // o algún valor predeterminado, si tu backend lo ignora o lo genera automáticamente
+        id_solicitud: 0,
         nombre_solicitud: form.value.nombre_solicitud,
-        fecha: new Date().toISOString().split('T')[0], // o la fecha que quieras asignar
+        fecha: new Date().toISOString().split('T')[0],
         tipo: form.value.tipo,
         prioridad: form.value.prioridad,
         descripcion: form.value.descripcion,
         id_departamento: this.departamentoActual,
-        enviado_por: 1, // o el valor que corresponda
+        enviado_por: 1,
         enviado_a: form.value.enviado_a,
         estado: 'Pendiente',
-        respuesta: '' // o algún valor predeterminado
+        respuesta: '',
+        email: this.email ?? ''
       };
 
       this.solicitudesService.createSolicitud(solicitudData).subscribe(
         (newSolicitud) => {
           console.log('Solicitud creada exitosamente', newSolicitud);
-          this.mensaje = 'Solicitud enviada exitosamente';
+          this.cargando = false;
+          this.mensajeExito = 'Solicitud enviada con éxito';
+
+          // Cerrar el modal si está abierto
+
+
+          // Recargar la página después de un breve retraso
           setTimeout(() => {
-            window.location.reload(); // Recarga la página
-          }, 500);
+            window.location.reload();
+          }, 2000);
         },
-        (error) => {
+        error => {
           console.error('Error al crear la solicitud', error);
-          this.mensaje = 'Error al enviar la solicitud';
+          this.cargando = false;
+          // Aquí podrías manejar el error si lo deseas
         }
       );
     }
@@ -242,7 +260,6 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
   esSolicitudEnviada(solicitud: Solicitud): boolean {
     return solicitud.enviado_por === this.departamentoActual;
   }
-
 
   openModalRecibida(solicitudId: number) {
     this.selectedSolicitud = null;
@@ -272,4 +289,34 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
     );
   }
 
+  guardarCambios() {
+    if (this.selectedSolicitud) {
+      this.cargando = true;
+      this.mensajeExito = null;
+
+      this.solicitudesService.updateSolicitud(this.selectedSolicitud).subscribe(
+        updatedSolicitud => {
+          if (updatedSolicitud) {
+            console.log('Solicitud actualizada exitosamente');
+            this.cargando = false;
+            this.mensajeExito = 'Enviado';
+
+            // Recargar la página después de un breve retraso
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          } else {
+            console.error('No se pudo actualizar la solicitud');
+            this.cargando = false;
+          }
+        },
+        error => {
+          console.error('Error al actualizar la solicitud', error);
+          this.cargando = false;
+        }
+      );
+    } else {
+      console.error('No hay solicitud seleccionada para actualizar');
+    }
+  }
 }

@@ -91,7 +91,7 @@
           <button type="button" class="btn btn-primary me-2" (click)="setView('enviadas')">
             Solicitudes Enviadas
           </button>
-          <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="nuevaSolicitud()">
+          <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
             Nueva Solicitud
           </button>
         </div>
@@ -110,8 +110,7 @@
                 <th>Tipo</th>
                 <th>Estado</th>
                 <th>Prioridad</th>
-                <th>Descripción</th>
-                <th>Respuesta</th>
+
                 <th>Enviado Por</th>
                 <th>Acciones</th>
               </tr>
@@ -132,8 +131,7 @@
                   </span>
                 </td>
                 <td>{{ solicitud.prioridad }}</td>
-                <td>{{ solicitud.descripcion }}</td>
-                <td>{{ solicitud.respuesta }}</td>
+
                 <td>{{ getNombreDepartamento(solicitud.enviado_por) }}</td>
                 <td>
                   <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#solicitudRecibidaModal" (click)="openModalRecibida(solicitud.id_solicitud)">Ver</button>
@@ -158,8 +156,7 @@
                 <th>Tipo</th>
                 <th>Estado</th>
                 <th>Prioridad</th>
-                <th>Descripción</th>
-                <th>Respuesta</th>
+
                 <th>Enviado A</th>
                 <th>Acciones</th>
               </tr>
@@ -180,8 +177,7 @@
                   </span>
                 </td>
                 <td>{{ solicitud.prioridad }}</td>
-                <td>{{ solicitud.descripcion }}</td>
-                <td>{{ solicitud.respuesta }}</td>
+             
                 <td>{{ getNombreDepartamento(solicitud.enviado_a) }}</td>
                 <td>
                   <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#solicitudEnviadaModal" (click)="openModalEnviada(solicitud.id_solicitud)">Ver</button>
@@ -190,6 +186,18 @@
             </tbody>
           </table>
           <pagination-controls (pageChange)="pageEnviadas = $event"></pagination-controls>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="cargando || mensajeExito" class="overlay fade-in">
+      <div class="overlay-content">
+        <div *ngIf="cargando">
+          <div class="spinner"></div>
+          <p class="message">Enviando solicitud...</p>
+        </div>
+        <div *ngIf="mensajeExito">
+          <i class="fas fa-check-circle success-icon"></i>
+          <p class="message">{{ mensajeExito }}</p>
         </div>
       </div>
     </div>
@@ -317,7 +325,7 @@
       </div>
       <div class="modal-body">
         <div *ngIf="selectedSolicitud">
-          <form #solicitudForm="ngForm" >
+          <form #solicitudForm="ngForm" (ngSubmit)="guardarCambios()">
             <div class="mb-3">
               <label for="idSolicitudRecibida" class="form-label"><strong>ID Solicitud:</strong></label>
               <input type="text" class="form-control" id="idSolicitudRecibida" [value]="selectedSolicitud.id_solicitud" disabled>
@@ -359,6 +367,7 @@
     </div>
   </div>
 </div>
+
 <div class="modal fade" id="solicitudEnviadaModal" tabindex="-1" aria-labelledby="solicitudEnviadaModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">

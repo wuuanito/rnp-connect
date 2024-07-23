@@ -9,6 +9,7 @@ import { InicioInformaticaComponent } from './paginas/departamentos/informatica/
 import { LayoutComprasComponent } from './paginas/departamentos/compras/layout-compras/layout-compras.component';
 import { InicioComprasComponent } from './paginas/departamentos/compras/inicio-compras/inicio-compras.component';
 import { SolicitudesComprasComponent } from './paginas/departamentos/compras/solicitudes-compras/solicitudes-compras.component';
+import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
 
@@ -24,6 +25,7 @@ export const routes: Routes = [
       {
         path: 'layout',
         component: LayoutComponent,
+        canActivate: [AuthGuard],
         children: [
 
           {

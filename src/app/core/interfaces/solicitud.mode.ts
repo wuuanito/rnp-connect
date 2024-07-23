@@ -11,4 +11,5 @@ export interface Solicitud {
   id_departamento: number;
   enviado_por: number;
   enviado_a: number;
+  email: string;
 }

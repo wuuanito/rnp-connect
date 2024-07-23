@@ -60,5 +60,23 @@ export class SolicitudesService {
     );
   }
 
+  updateSolicitud(solicitudData: Solicitud): Observable<Solicitud> {
+    return this.http.put<Solicitud>(`${this.apiUrl}/${solicitudData.id_solicitud}`, solicitudData).pipe(
+      tap(updatedSolicitud => {
+        // Si hay caché, actualizamos la solicitud en la caché
+        if (this.cachedSolicitudes) {
+          const index = this.cachedSolicitudes.findIndex(solicitud => solicitud.id_solicitud === updatedSolicitud.id_solicitud);
+          if (index !== -1) {
+            this.cachedSolicitudes[index] = updatedSolicitud;
+          }
+        }
+      }),
+      catchError(error => {
+        console.error('Error updating solicitud', error);
+        return of(null as any);
+      })
+    );
+  }
+
 
 }

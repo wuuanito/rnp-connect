@@ -38,9 +38,9 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUsuario">
               <li><a class="dropdown-item" href="#">Perfil</a></li>
-              <li><a class="dropdown-item" href="#">Configuración</a></li>
+              <li><a class="dropdown-item" (click)="testTokenDecoding()">Configuración</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">Cerrar sesión</a></li>
+              <li><a class="dropdown-item logout-link" (click)="logout()">Cerrar sesión</a></li>
             </ul>
           </li>
         </ul>
