@@ -7,7 +7,6 @@ import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Observable, from, of } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { EventService } from '../../../../core/events/events.service';
-import { ModalsolicitudesComponent } from "../../../../modals/modalsolicitudes/modalsolicitudes.component";
 import bootstrap from '../../../../../main.server';
 import { NgForm } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -18,7 +17,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 @Component({
   selector: 'app-solicitudes-informatica',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalsolicitudesComponent,NgxPaginationModule],
+  imports: [CommonModule, FormsModule,NgxPaginationModule],
   templateUrl: './solicitudes-informatica.component.html',
   styleUrl: './solicitudes-informatica.component.css'
 })
@@ -152,10 +151,9 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
       });
     }
   }
-
   aplicarFiltros(): void {
     this.solicitudesRecibidas = this.solicitudes.filter(solicitud =>
-      solicitud.enviado_por !== this.departamentoActual &&
+      solicitud.enviado_a === this.departamentoActual &&
       (this.tipoFiltro === '' || solicitud.tipo === this.tipoFiltro) &&
       (this.estadoFiltro === '' || solicitud.estado === this.estadoFiltro)
     );

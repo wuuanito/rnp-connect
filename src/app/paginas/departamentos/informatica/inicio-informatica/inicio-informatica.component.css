@@ -13,3 +13,70 @@
     font-size: 2.5rem;
   }
 }
+.dashboard-wrapper {
+  position: relative;
+}
+
+.blur {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.development-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  z-index: 1000;
+  max-width: 80%;
+  width: 400px;
+}
+
+.development-message h1 {
+  margin-bottom: 15px;
+  font-size: 28px;
+}
+
+.development-message p {
+  margin-bottom: 20px;
+}
+
+.progress-info {
+  margin-bottom: 20px;
+}
+
+.progress {
+  height: 25px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background-color: #007bff;
+}
+
+.eta {
+  font-style: italic;
+  font-size: 0.9em;
+  margin-bottom: 25px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}

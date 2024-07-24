@@ -10,6 +10,41 @@ import { LayoutComprasComponent } from './paginas/departamentos/compras/layout-c
 import { InicioComprasComponent } from './paginas/departamentos/compras/inicio-compras/inicio-compras.component';
 import { SolicitudesComprasComponent } from './paginas/departamentos/compras/solicitudes-compras/solicitudes-compras.component';
 import { AuthGuard } from './core/guards/auth.guard';
+import { CalendarioComponent } from './paginas/calendario/calendario.component';
+import { LayoutProduccionComponent } from './paginas/departamentos/produccion/layout-produccion/layout-produccion.component';
+import { InicioProduccionComponent } from './paginas/departamentos/produccion/inicio-produccion/inicio-produccion.component';
+import { SolicitudesProduccionComponent } from './paginas/departamentos/produccion/solicitudes-produccion/solicitudes-produccion.component';
+import { LayoutRrhhComponent } from './paginas/departamentos/rrhh/layout-rrhh/layout-rrhh.component';
+import path from 'path';
+import { InicioRrhhComponent } from './paginas/departamentos/rrhh/inicio-rrhh/inicio-rrhh.component';
+import { SolicitudesRrhhComponent } from './paginas/departamentos/rrhh/solicitudes-rrhh/solicitudes-rrhh.component';
+import { LayoutAdministracionComponent } from './paginas/departamentos/administracion/layout-administracion/layout-administracion.component';
+import { InicioAdministracionComponent } from './paginas/departamentos/administracion/inicio-administracion/inicio-administracion.component';
+import { SolicitudesAdminsitracionComponent } from './paginas/departamentos/administracion/solicitudes-adminsitracion/solicitudes-adminsitracion.component';
+import { LayoutLaboratorioComponent } from './paginas/departamentos/laboratorio/layout-laboratorio/layout-laboratorio.component';
+import { InicioLaboratorioComponent } from './paginas/departamentos/laboratorio/inicio-laboratorio/inicio-laboratorio.component';
+import { SolicitudesLaboratorioComponent } from './paginas/departamentos/laboratorio/solicitudes-laboratorio/solicitudes-laboratorio.component';
+import { LayoutGerenciaComponent } from './paginas/departamentos/gerencia/layout-gerencia/layout-gerencia.component';
+import { SolicitudesGerenciaComponent } from './paginas/departamentos/gerencia/solicitudes-gerencia/solicitudes-gerencia.component';
+import { LayoutMantenimientoComponent } from './paginas/departamentos/mantenimiento/layout-mantenimiento/layout-mantenimiento.component';
+import { InicioMantenimientoComponent } from './paginas/departamentos/mantenimiento/inicio-mantenimiento/inicio-mantenimiento.component';
+import { SolicitudesManteniminentoComponent } from './paginas/departamentos/mantenimiento/solicitudes-manteniminento/solicitudes-manteniminento.component';
+import { LayoutOficinaTecnicaComponent } from './paginas/departamentos/oficina-tecnica/layout-oficina-tecnica/layout-oficina-tecnica.component';
+import { InicioOficinaTecnicaComponent } from './paginas/departamentos/oficina-tecnica/inicio-oficina-tecnica/inicio-oficina-tecnica.component';
+import { SolicitudesOficinaTecnicaComponent } from './paginas/departamentos/oficina-tecnica/solicitudes-oficina-tecnica/solicitudes-oficina-tecnica.component';
+import { informaticaGuard } from './core/guards/informatica.guard';
+import { comprasGuard } from './core/guards/compras.guard';
+import { produccionGuard } from './core/guards/produccion.guard';
+import { rrhhGuard } from './core/guards/rrhh.guard';
+import { administracionGuard } from './core/guards/administracion.guard';
+import { laboratorioGuard } from './core/guards/laboratorio.guard';
+import { gerenciaGuard } from './core/guards/gerencia.guard';
+import { manteniminentoGuard } from './core/guards/manteniminento.guard';
+import { oficinatecGuard } from './core/guards/oficinatec.guard';
+import { logisticaGuard } from './core/guards/logistica.guard';
+import { LayoutLogisticaComponent } from './paginas/departamentos/logistica/layout-logistica/layout-logistica.component';
+import { InicioLogisticaComponent } from './paginas/departamentos/logistica/inicio-logistica/inicio-logistica.component';
+import { SolicitudesLogisticaComponent } from './paginas/departamentos/logistica/solicitudes-logistica/solicitudes-logistica.component';
 
 export const routes: Routes = [
 
@@ -33,8 +68,13 @@ export const routes: Routes = [
             component:InicioComponent
           },
           {
+            path:'calendario',
+            component:CalendarioComponent
+          },
+          {
             path:'informatica',
             component:LayoutInformaticaComponent,
+            canActivate:[informaticaGuard],
             children:[
               {
                 path:'inicio-informatica',
@@ -58,6 +98,7 @@ export const routes: Routes = [
           {
             path:'compras',
             component:LayoutComprasComponent,
+            canActivate:[comprasGuard],
             children:[
               {
                 path:'inicio-compras',
@@ -66,6 +107,126 @@ export const routes: Routes = [
               {
                 path:'solicitudes-compras',
                 component:SolicitudesComprasComponent
+              }
+            ]
+          },
+          {
+            path:'produccion',
+            component:LayoutProduccionComponent,
+            canActivate:[produccionGuard],
+            children:[
+              {
+                path:'inicio-produccion',
+                component:InicioProduccionComponent
+              },
+              {
+                path:'solicitudes-produccion',
+                component:SolicitudesProduccionComponent
+              }
+            ]
+          },
+          {
+            path:'rrhh',
+            component:LayoutRrhhComponent,
+            canActivate:[rrhhGuard],
+            children:[
+              {
+                path:'inicio-rrhh',
+                component:InicioRrhhComponent
+              },
+              {
+                path:'solicitudes-rrhh',
+                component:SolicitudesRrhhComponent
+              }
+            ]
+          },
+          {
+            path:'administracion',
+            component:LayoutAdministracionComponent,
+            canActivate:[administracionGuard],
+            children:[
+              {
+                path:'inicio-administracion',
+                component:InicioAdministracionComponent
+              },
+              {
+                path:'solicitudes-administracion',
+                component:SolicitudesAdminsitracionComponent
+              }
+            ]
+          },
+          {
+            path:'laboratorio',
+            component:LayoutLaboratorioComponent,
+            canActivate:[laboratorioGuard],
+            children:[
+              {
+                path:'inicio-laboratorio',
+                component:InicioLaboratorioComponent
+              },
+              {
+                path:'solicitudes-laboratorio',
+                component:SolicitudesLaboratorioComponent
+              }
+            ]
+          },
+          {
+            path:'gerencia',
+            component:LayoutGerenciaComponent,
+            canActivate:[gerenciaGuard],
+            children:[
+              {
+                path:'inicio-gerencia',
+                component:InicioLaboratorioComponent
+              },
+              {
+                path:'solicitudes-gerencia',
+                component:SolicitudesGerenciaComponent
+              }
+            ]
+          },
+          {
+            path:'mantenimiento',
+            component:LayoutMantenimientoComponent,
+            canActivate:[manteniminentoGuard],
+            children:[
+              {
+                path:'inicio-mantenimiento',
+                component:InicioMantenimientoComponent
+              },
+              {
+                path:'solicitudes-mantenimiento',
+                component:SolicitudesManteniminentoComponent
+              }
+            ]
+          },
+          {
+            path:'oficina-tecnica',
+            component:LayoutOficinaTecnicaComponent,
+            canActivate:[oficinatecGuard],
+            children:[
+              {
+                path:'inicio-oficina-tecnica',
+                component:InicioOficinaTecnicaComponent
+              },
+              {
+                path:'solicitudes-oficina-tecnica',
+                component:SolicitudesOficinaTecnicaComponent
+              }
+            ]
+          },
+          {
+            path:'logistica',
+            component:LayoutLogisticaComponent,
+            canActivate:[logisticaGuard],
+            children:[
+              {
+                path:'inicio-logistica',
+                component:InicioLogisticaComponent
+              },
+              {
+                path:'solicitudes-logistica',
+                component:SolicitudesLogisticaComponent
               }
             ]
           }

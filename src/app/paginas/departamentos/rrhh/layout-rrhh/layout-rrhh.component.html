@@ -1,0 +1,28 @@
+<div class="app-container">
+  <header class="app-header">
+    <h1 class="company-title">RRHH</h1>
+  </header>
+  <div class="container-fluid main-content">
+    <div class="row h-100">
+      <nav class="col-md-3 col-lg-2 p-0 sidenav">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="inicio-rrhh">INICIO</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="solicitudes-rrhh">SOLICITUDES</a>
+          </li>
+        </ul>
+      </nav>
+      <main class="col-md-9 col-lg-10 px-md-4">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+  </div>
+  <app-app-notification
+  [message]="notificationMessage"
+  [show]="showNotification"
+  (closed)="closeNotification()">
+  </app-app-notification>
+</div>
+
