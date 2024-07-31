@@ -1,34 +1,39 @@
 <div class="container-fluid vh-100">
-    <div class="row h-100">
-      <!-- Lado izquierdo con imagen de fondo -->
-      <div class="col-md-6 d-none d-md-flex align-items-center justify-content-center background-image">
-        <div class="text-center text-white">
-          <h1 class="display-3 fw-bold">RNP CONNECT</h1>
-          <p class="lead">Conectando profesionales, impulsando innovación</p>
-        </div>
+  <div class="row h-100">
+    <!-- Lado izquierdo con imagen de fondo -->
+    <div class="col-md-6 d-none d-md-flex align-items-center justify-content-center background-image">
+      <div class="text-center text-white">
+        <h1 class="display-3 fw-bold">RNP CONNECT</h1>
+        <p class="lead">Conectando profesionales, impulsando innovación</p>
       </div>
-      
-      <!-- Lado derecho con formulario de login -->
-      <div class="col-md-6 d-flex align-items-center justify-content-center">
-        <div class="login-form p-4">
-          <h2 class="mb-4 text-center">Iniciar sesión</h2>
-          <form (ngSubmit)="onSubmit()">
-            <div class="mb-3">
-              <label for="email" class="form-label">Correo electrónico</label>
-              <input type="email" class="form-control" id="email" [(ngModel)]="email" name="email" required placeholder="usuario@naturepharma.es">
-            </div>
-            <div class="mb-3">
-              <label for="password" class="form-label">Contraseña</label>
-              <input type="password" class="form-control" id="password" [(ngModel)]="password" name="password" required>
-            </div>
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-primary btn-lg">Ingresar</button>
-            </div>
-          </form>
-          <div class="text-center mt-3">
-            <a href="#" class="text-muted">¿Olvidó su contraseña?</a>
+    </div>
+
+    <!-- Lado derecho con formulario de login -->
+    <div class="col-md-6 d-flex align-items-center justify-content-center">
+      <div class="login-form p-4">
+        <h2 class="mb-4 text-center">Iniciar sesión</h2>
+        <form (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label for="email" class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" id="email" [(ngModel)]="email" name="email" required placeholder="usuario@naturepharma.es">
           </div>
-        </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="password" [(ngModel)]="password" name="password" required>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg" [disabled]="loading">Ingresar</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+
+  <!-- Mensaje de carga -->
+  <div *ngIf="loading" class="loading-overlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <h2 class="loading-message">{{ message }}</h2>
+    </div>
+  </div>
+</div>

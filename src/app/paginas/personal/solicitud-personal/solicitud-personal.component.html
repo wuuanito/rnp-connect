@@ -1,0 +1,79 @@
+<div class="container mt-5">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Solicitud de Personal</h2>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="onSubmit()" #solicitudForm="ngForm">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="nombreSolicitante" class="form-label">Nombre del solicitante</label>
+            <input type="text" class="form-control" id="nombreSolicitante" [(ngModel)]="solicitud.nombreSolicitante" name="nombreSolicitante" required>
+          </div>
+          <div class="col-md-6">
+            <label for="numeroCandidatos" class="form-label">Nº de candidatos/as solicitados/as</label>
+            <input type="number" class="form-control" id="numeroCandidatos" [(ngModel)]="solicitud.numeroCandidatos" name="numeroCandidatos" required>
+          </div>
+          <div class="col-md-4">
+            <label for="tipoContrato" class="form-label">Tipo de Contrato</label>
+            <select class="form-select" id="tipoContrato" [(ngModel)]="solicitud.tipoContrato" name="tipoContrato" required>
+              <option value="">Seleccione una opción</option>
+              <option value="Indefinido">Indefinido</option>
+              <option value="Eventual">Eventual</option>
+              <option value="Practicas">Prácticas</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="departamento" class="form-label">Departamento/sección</label>
+            <input type="text" class="form-control" id="departamento" [(ngModel)]="solicitud.departamento" name="departamento" required>
+          </div>
+          <div class="col-md-4">
+            <label for="puesto" class="form-label">Puesto</label>
+            <input type="text" class="form-control" id="puesto" [(ngModel)]="solicitud.puesto" name="puesto" required>
+          </div>
+          <div class="col-md-6">
+            <label for="fechaInicio" class="form-label">Fecha de inicio</label>
+            <input type="date" class="form-control" id="fechaInicio" [(ngModel)]="solicitud.fechaInicio" name="fechaInicio" required>
+          </div>
+          <div class="col-md-6">
+            <label for="experiencia" class="form-label">Experiencia Indispensable</label>
+            <select class="form-select" id="experiencia" [(ngModel)]="solicitud.experiencia" name="experiencia" required>
+              <option value="">Seleccione una opción</option>
+              <option value="No requerida">No requerida</option>
+              <option value="1 año">1 año</option>
+              <option value="1-5 años">1-5 años</option>
+              <option value="Más de 5 años">Más de 5 años</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label for="justificacion" class="form-label">Justificación de la necesidad</label>
+            <select class="form-select" id="justificacion" [(ngModel)]="solicitud.justificacion" name="justificacion" required>
+              <option value="">Seleccione una opción</option>
+              <option value="Puesto de nueva Creación">Puesto de nueva Creación</option>
+              <option value="Ampliación de equipo">Ampliación de equipo</option>
+              <option value="Sustitución de vacaciones">Sustitución de vacaciones</option>
+              <option value="Sustitución de baja">Sustitución de baja</option>
+              <option value="Suplencia">Suplencia</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label for="notas" class="form-label">Notas</label>
+            <textarea class="form-control" id="notas" rows="3" [(ngModel)]="solicitud.notas" name="notas"></textarea>
+          </div>
+        </div>
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary" [disabled]="!solicitudForm.form.valid">Enviar Solicitud</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="mensajeExito" class="alert alert-success">
+  {{ mensajeExito }}
+</div>
+
+<!-- Mensaje de error -->
+<div *ngIf="mensajeError" class="alert alert-danger">
+  {{ mensajeError }}
+</div>

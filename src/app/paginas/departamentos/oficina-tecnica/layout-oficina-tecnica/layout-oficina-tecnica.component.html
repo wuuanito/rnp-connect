@@ -12,6 +12,16 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="solicitudes-oficina-tecnica">SOLICITUDES</a>
           </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              SOLICITUD DE MUESTRAS
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" routerLink="ver-muestras">VER SOLICITUD DE MUESTRAS</a></li>
+              <li><a class="dropdown-item" routerLink="muestras">CREAR SOLICITUD DE MUESTRAS</a></li>
+            </ul>
+          </li>
+
         </ul>
       </nav>
       <main class="col-md-9 col-lg-10 px-md-4">
@@ -25,4 +35,3 @@
   (closed)="closeNotification()">
   </app-app-notification>
 </div>
-

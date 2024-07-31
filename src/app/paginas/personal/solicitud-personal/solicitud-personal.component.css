@@ -1,0 +1,36 @@
+.card {
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.card-header {
+  background-color: #0056b3 !important;
+}
+
+.form-label {
+  font-weight: 600;
+}
+
+.form-control, .form-select {
+  border-radius: 8px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 0.2rem rgba(0, 86, 179, 0.25);
+}
+
+.btn-primary {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: #004494;
+  border-color: #004494;
+}
+
+.btn-primary:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}

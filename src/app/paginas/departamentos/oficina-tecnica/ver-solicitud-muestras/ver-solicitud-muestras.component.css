@@ -1,0 +1,73 @@
+/* Estilos para el modal */
+.modal-xl {
+  max-width: 90%;
+}
+
+/* Estilos para los paneles */
+.details-panel, .chat-panel {
+  height: 60vh;
+  overflow-y: auto;
+}
+
+.details-panel {
+  border-right: 1px solid #dee2e6;
+  padding-right: 15px;
+}
+
+.chat-panel {
+  padding-left: 15px;
+}
+
+/* Estilos para el contenedor de chat */
+.chat-container {
+  height: calc(100% - 120px);
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Estilos para los mensajes */
+.chat-message {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  max-width: 80%;
+}
+
+/* Mensajes enviados (alineados a la derecha) */
+.message-sent {
+  background-color: #007bff;
+  color: #ffffff;
+  margin-left: auto;
+}
+
+/* Mensajes recibidos (alineados a la izquierda) */
+.message-received {
+  background-color: #e9ecef;
+}
+
+/* Estilos para el área de entrada de mensaje */
+.chat-panel .form-control {
+  resize: none;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 767px) {
+  .details-panel, .chat-panel {
+    height: auto;
+    max-height: 50vh;
+  }
+
+  .details-panel {
+    border-right: none;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+    padding-right: 0;
+  }
+
+  .chat-panel {
+    padding-left: 0;
+  }
+}

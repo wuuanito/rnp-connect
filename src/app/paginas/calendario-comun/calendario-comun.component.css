@@ -1,0 +1,171 @@
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fc;
+  margin: 0;
+  padding: 0;
+}
+
+.container-fluid {
+  padding: 0 15px;
+}
+
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.card-header {
+  background: linear-gradient(45deg, #4e73df 0%, #224abe 100%);
+  color: #fff;
+  padding: 15px;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.calendar-toolbar {
+  gap: 10px;
+}
+
+/* Estilos específicos para FullCalendar */
+.fc-theme-standard .fc-toolbar-title {
+  font-size: 1.75rem;
+  color: #5a5c69;
+}
+
+.fc .fc-button-primary {
+  background-color: #4e73df;
+  border-color: #4e73df;
+  color: white;
+  border-radius: 0.25rem;
+}
+
+.fc .fc-button-primary:hover {
+  background-color: #224abe;
+  border-color: #224abe;
+}
+
+/* Ajustes de altura y espaciado para las celdas del calendario */
+.fc-daygrid-day {
+  height: 180px; /* Ajusta la altura de las celdas en la vista de mes */
+}
+
+.fc-daygrid-day-top {
+  padding: 10px; /* Ajusta el espaciado dentro de cada celda de día */
+}
+
+.fc-daygrid-day-number {
+  font-size: 1.5rem; /* Aumenta el tamaño del número del día */
+}
+
+.fc-timegrid-slot {
+  height: 120px; /* Ajusta la altura de las celdas en la vista de tiempo */
+}
+
+.fc-timegrid-slot-label {
+  font-size: 1rem; /* Aumenta el tamaño de la etiqueta de la celda */
+}
+
+.fc-timegrid-event {
+  padding: 10px; /* Aumenta el padding para los eventos en la vista de tiempo */
+  font-size: 1rem; /* Ajusta el tamaño de la fuente del evento */
+}
+
+/* Estilos para eventos en el calendario */
+.fc-event {
+  border-radius: 0.25rem;
+  border: none;
+  padding: 10px; /* Ajusta el padding dentro del evento */
+  font-size: 1rem; /* Ajusta el tamaño de la fuente de los eventos */
+  cursor: pointer;
+  color: #ffffff;
+  background-color: #007bff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.fc-event:hover {
+  background-color: #0056b3;
+}
+
+.fc-day-today {
+  background-color: rgba(78, 115, 223, 0.1) !important;
+}
+
+/* Diseño responsivo */
+@media (max-width: 992px) {
+  .card-header {
+    font-size: 1.25rem;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.5rem;
+  }
+
+  .fc .fc-button-primary {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .fc-timegrid-slot {
+    height: 100px; /* Ajusta la altura para pantallas medianas */
+  }
+
+  .fc-timegrid-slot-label {
+    font-size: 0.9rem;
+    line-height: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .card-header {
+    font-size: 1rem;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.25rem;
+  }
+
+  .fc .fc-button-primary {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .fc-timegrid-slot {
+    height: 80px; /* Ajusta la altura para pantallas más pequeñas */
+  }
+
+  .fc-timegrid-slot-label {
+    font-size: 0.85rem;
+    line-height: 80px;
+  }
+}
+
+@media (max-width: 576px) {
+  .card-header {
+    font-size: 0.875rem;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1rem;
+  }
+
+  .fc .fc-button-primary {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .fc-timegrid-slot {
+    height: 60px; /* Ajusta la altura para dispositivos móviles más pequeños */
+  }
+
+  .fc-timegrid-slot-label {
+    font-size: 0.75rem;
+    line-height: 60px;
+  }
+}

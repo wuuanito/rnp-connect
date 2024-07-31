@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet,RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -10,8 +10,15 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.css'
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnInit {
   constructor(private router: Router,private authService: AuthService) { }
+  email: string | null = null;
+
+
+ngOnInit(): void {
+  this.email = this.authService.getEmailFromToken();
+
+}
 
 logout() {
   localStorage.removeItem('token');
@@ -21,9 +28,11 @@ logout() {
 testTokenDecoding() {
   const email = this.authService.getEmailFromToken();
   const role = this.authService.getRoleFromToken();
+  const name = this.authService.getNameFromToken();
 
   console.log('Email from token:', email);
   console.log('Role from token:', role);
+  console.log('Name from token:', name);
 
   if (email && role) {
     console.log('Token decodificado exitosamente');

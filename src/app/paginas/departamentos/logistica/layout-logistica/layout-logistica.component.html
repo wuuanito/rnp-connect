@@ -12,7 +12,18 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="solicitudes-logistica">SOLICITUDES</a>
           </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              SOLICITUD DE MUESTRAS
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" routerLink="solicitudes-oficina-tecnica/ver">Ver</a>
+              <a class="dropdown-item" routerLink="solicitudes-oficina-tecnica/crear">Crear</a>
+            </div>
+          </li>
+
         </ul>
+
       </nav>
       <main class="col-md-9 col-lg-10 px-md-4">
         <router-outlet></router-outlet>

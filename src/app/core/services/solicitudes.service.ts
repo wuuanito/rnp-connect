@@ -4,12 +4,14 @@ import { Observable, of } from 'rxjs';
 import { Solicitud } from '../interfaces/solicitud.mode';
 import { catchError, tap } from 'rxjs/operators';
 import { isPlatformServer } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SolicitudesService {
-  private apiUrl = 'http://localhost:3000/solicitudes';
+  private apiUrl = environment.apiUrl;
+
   private cachedSolicitudes: Solicitud[] | null = null;
 
   constructor(
@@ -32,7 +34,7 @@ export class SolicitudesService {
   }
 
   private fetchSolicitudes(): Observable<Solicitud[]> {
-    return this.http.get<Solicitud[]>(this.apiUrl).pipe(
+    return this.http.get<Solicitud[]>(`${this.apiUrl}/solicitudes`).pipe(
       tap(solicitudes => this.cachedSolicitudes = solicitudes),
       catchError(error => {
         console.error('Error fetching solicitudes', error);
@@ -42,11 +44,11 @@ export class SolicitudesService {
   }
 
   getSolicitudById(id_solicitud: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${id_solicitud}`);
+    return this.http.get(`${this.apiUrl}/solicitudes/${id_solicitud}`);
   }
 
   createSolicitud(solicitudData: Solicitud): Observable<Solicitud> {
-    return this.http.post<Solicitud>(this.apiUrl, solicitudData).pipe(
+    return this.http.post<Solicitud>(`${this.apiUrl}/solicitudes`, solicitudData).pipe(
       tap((newSolicitud: Solicitud) => {
         // Si hay caché, agregamos la nueva solicitud a la caché
         if (this.cachedSolicitudes) {
@@ -61,7 +63,7 @@ export class SolicitudesService {
   }
 
   updateSolicitud(solicitudData: Solicitud): Observable<Solicitud> {
-    return this.http.put<Solicitud>(`${this.apiUrl}/${solicitudData.id_solicitud}`, solicitudData).pipe(
+    return this.http.put<Solicitud>(`${this.apiUrl}/solicitudes/${solicitudData.id_solicitud}`, solicitudData).pipe(
       tap(updatedSolicitud => {
         // Si hay caché, actualizamos la solicitud en la caché
         if (this.cachedSolicitudes) {

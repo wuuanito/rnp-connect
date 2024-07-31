@@ -11,6 +11,7 @@ import bootstrap from '../../../../../main.server';
 import { NgForm } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth.service';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { environment } from '../../../../../environments/environment';
 @Component({
   selector: 'app-solicitudes-laboratorio',
   standalone: true,
@@ -22,6 +23,7 @@ export class SolicitudesLaboratorioComponent implements OnInit, OnDestroy {
   pageRecibidas: number = 1;
   pageEnviadas: number = 1;
 
+  private apiUrl = environment.apiUrl;
 
   departamentoMap: { [key: number]: string } = {
     1: "INFORMATICA",
@@ -85,7 +87,8 @@ export class SolicitudesLaboratorioComponent implements OnInit, OnDestroy {
 
   private inicializarSocket(): Observable<void | null> {
     return new Observable<void>(observer => {
-      const socket = io('http://localhost:3000', {
+      const socket = io(`${this.apiUrl}`
+, {
         transports: ['websocket'],
         timeout: 10000
       });

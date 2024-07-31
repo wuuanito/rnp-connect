@@ -45,6 +45,13 @@ import { logisticaGuard } from './core/guards/logistica.guard';
 import { LayoutLogisticaComponent } from './paginas/departamentos/logistica/layout-logistica/layout-logistica.component';
 import { InicioLogisticaComponent } from './paginas/departamentos/logistica/inicio-logistica/inicio-logistica.component';
 import { SolicitudesLogisticaComponent } from './paginas/departamentos/logistica/solicitudes-logistica/solicitudes-logistica.component';
+import { CalendarioComunComponent } from './paginas/calendario-comun/calendario-comun.component';
+import { CalendarioProjectComponent } from './paginas/calendario-project/calendario-project.component';
+import { SolicitudPersonalComponent } from './paginas/personal/solicitud-personal/solicitud-personal.component';
+import { GestionComponent } from './paginas/personal/gestion/gestion.component';
+import { personalGuard } from './core/guards/personal.guard';
+import { CrearSolicitudMuestrasComponent } from './paginas/departamentos/oficina-tecnica/crear-solicitud-muestras/crear-solicitud-muestras.component';
+import { VerSolicitudMuestrasComponent } from './paginas/departamentos/oficina-tecnica/ver-solicitud-muestras/ver-solicitud-muestras.component';
 
 export const routes: Routes = [
 
@@ -71,6 +78,24 @@ export const routes: Routes = [
             path:'calendario',
             component:CalendarioComponent
           },
+          {
+            path:'calendario-comun',
+            component:CalendarioComunComponent
+          },
+          {
+            path:'calendario-project',
+            component:CalendarioProjectComponent
+          },
+          {
+            path:'solicitud-personal',
+            component:SolicitudPersonalComponent
+          },
+          {
+            path:'gestion',
+            canActivate:[personalGuard],
+            component:GestionComponent
+          },
+
           {
             path:'informatica',
             component:LayoutInformaticaComponent,
@@ -212,7 +237,16 @@ export const routes: Routes = [
               {
                 path:'solicitudes-oficina-tecnica',
                 component:SolicitudesOficinaTecnicaComponent
+              },
+              {
+                path:'muestras',
+                component:CrearSolicitudMuestrasComponent
+              },
+              {
+                path:'ver-muestras',
+                component:VerSolicitudMuestrasComponent
               }
+
             ]
           },
           {

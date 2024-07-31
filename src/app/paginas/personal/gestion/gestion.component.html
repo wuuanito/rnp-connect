@@ -1,0 +1,122 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h2 class="mb-0">Gestión de Solicitudes de Personal</h2>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <input type="text" class="form-control" placeholder="Filtrar por Solicitante" [(ngModel)]="filter.nombreSolicitante" (ngModelChange)="applyFilters()">
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" placeholder="Filtrar por Puesto" [(ngModel)]="filter.puesto" (ngModelChange)="applyFilters()">
+            </div>
+            <div class="col-md-4">
+              <select class="form-control" [(ngModel)]="filter.estado" (ngModelChange)="applyFilters()">
+                <option value="">Todos los Estados</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Aprobada">Aprobada</option>
+                <option value="Rechazada">Rechazada</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Solicitante</th>
+                  <th>Puesto</th>
+                  <th>Fecha de Inicio</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let solicitud of filteredSolicitudes">
+                  <td>{{ solicitud.nombreSolicitante }}</td>
+                  <td>{{ solicitud.puesto }}</td>
+                  <td>{{ solicitud.fechaInicio | date:'dd/MM/yyyy' }}</td>
+                  <td>
+                    <span class="badge rounded-pill" [ngClass]="{
+                      'bg-warning text-dark': solicitud.estado === 'Pendiente',
+                      'bg-success': solicitud.estado === 'Aprobada',
+                      'bg-danger': solicitud.estado === 'Rechazada'
+                    }">
+                      {{ solicitud.estado }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <button type="button" class="btn btn-outline-primary btn-sm" (click)="verDetalles(solicitud)" data-bs-toggle="modal" data-bs-target="#detallesModal">
+                        <i class="bi bi-eye"></i> Ver
+                      </button>
+                      <button type="button" class="btn btn-outline-success btn-sm" (click)="aprobarSolicitud(solicitud)" [disabled]="solicitud.estado !== 'Pendiente'">
+                        <i class="bi bi-check-lg"></i> Aprobar
+                      </button>
+                      <button type="button" class="btn btn-outline-danger btn-sm" (click)="rechazarSolicitud(solicitud)" [disabled]="solicitud.estado !== 'Pendiente'">
+                        <i class="bi bi-x-lg"></i> Rechazar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalles -->
+<div class="modal fade" id="detallesModal" tabindex="-1" aria-labelledby="detallesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="detallesModalLabel">Detalles de la Solicitud</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="solicitudSeleccionada">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Nombre del Solicitante</label>
+            <input type="text" class="form-control" [value]="solicitudSeleccionada.nombreSolicitante" readonly>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Puesto</label>
+            <input type="text" class="form-control" [value]="solicitudSeleccionada.puesto" readonly>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Fecha de Inicio</label>
+            <input type="text" class="form-control" [value]="solicitudSeleccionada.fechaInicio | date:'dd/MM/yyyy'" readonly>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Tipo de Contrato</label>
+            <input type="text" class="form-control" [value]="solicitudSeleccionada.tipoContrato" readonly>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Departamento</label>
+            <input type="text" class="form-control" [value]="solicitudSeleccionada.departamento" readonly>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Experiencia Requerida</label>
+            <input type="text" class="form-control" [value]="solicitudSeleccionada.experiencia" readonly>
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label">Justificación</label>
+            <textarea class="form-control" rows="3" readonly>{{solicitudSeleccionada.justificacion}}</textarea>
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label">Notas</label>
+            <textarea class="form-control" rows="3" readonly>{{solicitudSeleccionada.notas}}</textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

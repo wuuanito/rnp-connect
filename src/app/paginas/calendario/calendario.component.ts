@@ -7,6 +7,7 @@ import { FullCalendarModule } from '@fullcalendar/angular';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { EventSourceFunc } from '@fullcalendar/core';
 import { CalendarApi } from '@fullcalendar/core';
+import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -18,26 +19,43 @@ import { CalendarApi } from '@fullcalendar/core';
 })
 export class CalendarioComponent implements OnInit {
   calendarOptions: CalendarOptions;
+  private apiUrl = environment.apiUrl;
+
 
   constructor(private http: HttpClient) {
     this.calendarOptions = {
       plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
-      initialView: 'timeGridWeek',
-      weekends: true,
-      editable: true,
-      selectable: true,
-      selectMirror: true,
-      dayMaxEvents: true,
-      events: this.fetchEvents.bind(this) as EventSourceFunc,
-      select: this.handleDateSelect.bind(this),
-      eventClick: this.handleEventClick.bind(this),
-      slotDuration: '01:00:00',
-      slotMinTime: '08:00:00',
-      slotMaxTime: '20:00:00',
+      initialView: 'timeGridWeek', // Vista inicial del calendario
+      weekends: true, // Muestra los fines de semana
+      editable: true, // Permite la edición de eventos
+      selectable: true, // Permite seleccionar rangos de tiempo
+      selectMirror: true, // Permite que las selecciones se reflejen en tiempo real
+      dayMaxEvents: true, // Limita el número de eventos por día
+      events: this.fetchEvents.bind(this) as EventSourceFunc, // Obtiene eventos desde el servidor
+      select: this.handleDateSelect.bind(this), // Maneja la selección de rango de fechas
+      eventClick: this.handleEventClick.bind(this), // Maneja clics en eventos
+      slotDuration: '01:00:00', // Duración de los intervalos de tiempo (1 hora)
+      slotMinTime: '07:00:00', // Hora mínima visible en la vista
+      slotMaxTime: '19:00:00', // Hora máxima visible en la vista
+      //Ampliar tamaño de la vista
+      height: 'auto',
+
       headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        left: 'prev,next today', // Botones de navegación
+        center: 'title', // Título del calendario
+        right: 'timeGridWeek,timeGridDay' // Botones de vista
+      },
+      views: {
+        timeGridWeek: {
+          slotDuration: '01:00:00', // Intervalos de una hora en la vista semanal
+          slotMinTime: '07:00:00',
+          slotMaxTime: '19:00:00',
+        },
+        timeGridDay: {
+          slotDuration: '01:00:00', // Intervalos de una hora en la vista diaria
+          slotMinTime: '07:00:00',
+          slotMaxTime: '19:00:00',
+        }
       },
       eventDisplay: 'block', // Asegúrate de que los eventos se muestren en bloque
     };
@@ -47,7 +65,7 @@ export class CalendarioComponent implements OnInit {
   ngOnInit(): void {}
 
   fetchEvents: EventSourceFunc = (info, successCallback, failureCallback) => {
-    this.http.get<any[]>('http://localhost:3000/reservas', {
+    this.http.get<any[]>(`${this.apiUrl}/reservas`, {
       params: {
         start: info.startStr,
         end: info.endStr
@@ -88,7 +106,7 @@ export class CalendarioComponent implements OnInit {
         color: '', // Si tienes colores predeterminados, añádelos aquí
         description: '' // Si quieres añadir una descripción
       };
-      this.http.post<any>('http://localhost:3000/reservas', reserva).subscribe(
+      this.http.post<any>(`${this.apiUrl}/reservas`, reserva).subscribe(
         (response) => {
           selectInfo.view.calendar.addEvent({
             id: response.id,
@@ -111,16 +129,12 @@ export class CalendarioComponent implements OnInit {
   }
 
   handleEventClick(clickInfo: EventClickArg) {
-    if (confirm(`¿Está seguro de que desea eliminar la reserva '${clickInfo.event.title}'?`)) {
-      this.http.get<any[]>('http://localhost:3000/reservas').subscribe(
-        () => {
-          clickInfo.event.remove();
-        },
-        (error: HttpErrorResponse) => {
-          console.error('Error al eliminar la reserva:', error);
-          alert('No se pudo eliminar la reserva. Por favor, intente de nuevo.');
-        }
-      );
-    }
+    const eventTitle = clickInfo.event.title;
+
+    // Muestra la descripción del evento en una alerta o en un modal
+    alert(`Evento: ${eventTitle}\n`);
+
+    // Alternativa: si prefieres usar un modal, podrías implementar algo así:
+    // this.openDescriptionModal(eventTitle, eventDescription);
   }
 }

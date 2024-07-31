@@ -9,7 +9,7 @@ import { Solicitud } from '../interfaces/solicitud.mode';
 })
 export class SolicitudesDiferenciadasService {
 
-  private apiUrl = 'http://localhost:3000/solicitudes';
+  private apiUrl = 'http://192.168.11.19:4000/solicitudes';
   private cachedSolicitudesRecibidas: Solicitud[] | null = null;
   private cachedSolicitudesEnviadas: Solicitud[] | null = null;
 
