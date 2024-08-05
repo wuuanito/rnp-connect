@@ -13,16 +13,17 @@ import { environment } from '../../../../../environments/environment';
 import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
-  selector: 'app-ver-solicitud-muestras',
+  selector: 'app-ver-solicitud-muestras-logistica',
   standalone: true,
   imports: [DatePipe,CommonModule,FormsModule,NgxPaginationModule],
-  templateUrl: './ver-solicitud-muestras.component.html',
-  styleUrl: './ver-solicitud-muestras.component.css'
+  templateUrl: './ver-solicitud-muestras-logistica.component.html',
+  styleUrl: './ver-solicitud-muestras-logistica.component.css'
 })
-export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
 
   solicitudes: SolicitudMuestra[] = [];
+  solicitudesAlmacen: SolicitudMuestra[] = [];
   solicitudSeleccionada: SolicitudMuestra | null = null;
   mensajes: Mensaje[] = [];
   nuevoMensaje: string = '';
@@ -52,6 +53,7 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
   ngOnInit(): void {
     this.obtenerSolicitudes();
     this.nombre = this.authService.getNameFromToken() || '';
+    this.obtenerSolicitudesAlmacen();
   }
 
   checkScrollPosition() {
@@ -83,9 +85,18 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
   }
 
   obtenerSolicitudes(): void {
-    this.solicitudService.getSolicitudes().subscribe(
+    this.solicitudService.getSolicitudExpediciones().subscribe(
       (data: SolicitudMuestra[]) => {
         this.solicitudes = data;
+      },
+      error => console.error('Error al obtener solicitudes', error)
+    );
+  }
+
+  obtenerSolicitudesAlmacen(): void {
+    this.solicitudService.getSolicitudAlm().subscribe(
+      (data: SolicitudMuestra[]) => {
+        this.solicitudesAlmacen = data;
       },
       error => console.error('Error al obtener solicitudes', error)
     );
@@ -101,6 +112,8 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
       this.getFiles(this.solicitudSeleccionada.idSolicitudMuestra.toString());
       this.obtenerMensajes();
       this.iniciarPolling();
+      this.obtenerNecesidadAlmacen(this.solicitudSeleccionada.idSolicitudMuestra);
+
     } else {
       console.error('ID de solicitud no está definido o es inválido en cargarDetalles.');
     }
@@ -214,6 +227,63 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
   ngAfterViewChecked() {
     this.checkScrollPosition();
   }
+
+  showAlmacenOptions: boolean = false;
+  cantidadMuestra: string | undefined;
+
+
+  enviarSolicitudAlmacen() {
+    this.solicitudService.devolcerSolicitudLab(this.solicitudSeleccionada?.idSolicitudMuestra || 0).subscribe(
+      (data) => {
+        alert('Solicitud enviada devuelta a laboratorio');
+        window.location.reload();
+        this.showAlmacenOptions = false;
+        this.obtenerSolicitudes();
+        this.obtenerSolicitudesAlmacen();
+      },
+      (error) => {
+        console.error('Error al enviar solicitud a almacén', error);
+      }
+    );
+
+  }
+
+
+  necesidadAlmacen: any = null;
+
+  guardarDetallesAlmacen() {
+
+  }
+  obtenerNecesidadAlmacen(idSolicitudMuestra: number): void {
+    this.solicitudService.getNecesidadAlmacen(idSolicitudMuestra).subscribe(
+      (data) => {
+        this.necesidadAlmacen = data;
+      },
+      (error) => {
+        console.error('Error al obtener necesidad de almacén', error);
+        this.necesidadAlmacen = null;
+      }
+    );
+  }
+
+  finalizar() {
+    if (confirm('¿Está seguro de que desea finalizar esta solicitud?')) {
+      this.solicitudService.finalizarSolcitud(this.solicitudSeleccionada?.idSolicitudMuestra || 0).subscribe(
+        (data) => {
+          alert('Solicitud finalizada');
+          window.location.reload();
+          this.showAlmacenOptions = false;
+          this.obtenerSolicitudes();
+          this.obtenerSolicitudesAlmacen();
+        },
+        (error) => {
+          console.error('Error al finalizar solicitud', error);
+        }
+      );
+    }
+  }
+
+
 }
 
 

@@ -6,12 +6,14 @@ export interface SolicitudMuestra {
   proveedor: string;
   urgencia: string;
   fecha: Date;
-  estado: 'Pendiente' | 'En Laboratorio' | 'En Almacén' | 'En Expediciones' | 'Completada';
+  estado: "Pendiente" | "En Laboratorio" | "En Almacén" | "En Expediciones" | "Completada";
   codigoArticulo: string;
   comentarios: string;
   mensajes: Mensaje[];
   archivos?: {name: string, url: string}[];
-
+  expediciones ?: boolean;
+  almacen ?: boolean;
+  estadoAlmacen ?: string;
 }
 
 

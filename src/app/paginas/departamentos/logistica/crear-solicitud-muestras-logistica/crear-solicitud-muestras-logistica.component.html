@@ -2,20 +2,6 @@
   <h2>Crear Solicitud de Muestra</h2>
   <form (ngSubmit)="onSubmit()" #solicitudForm="ngForm">
     <div class="form-group">
-  <!-- Nuevo campo Directo Expediciones -->
-<div class="form-group">
-  <label>Directo Expediciones</label>
-  <div class="form-check">
-    <input type="radio" id="directoSi" class="form-check-input" [(ngModel)]="solicitud.expediciones" name="expediciones" [value]="true" required />
-    <label for="directoSi" class="form-check-label">Sí</label>
-  </div>
-  <div class="form-check">
-    <input type="radio" id="directoNo" class="form-check-input" [(ngModel)]="solicitud.expediciones" name="expediciones" [value]="false" required />
-    <label for="directoNo" class="form-check-label">No</label>
-  </div>
-</div>
-
-
       <label for="solicitante">Solicitante</label>
       <input type="text" id="solicitante" class="form-control" [(ngModel)]="solicitud.solicitante" name="solicitante" required />
     </div>

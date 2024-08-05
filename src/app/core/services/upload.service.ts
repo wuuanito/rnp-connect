@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -12,19 +12,28 @@ export class UploadService {
 
   constructor(private http: HttpClient) { }
 
-  //Servicio para subir archivos con el id de la solicitud de muestra
-  uploadFile(file: File, idSolicitudMuestra: number): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('solicitudId', idSolicitudMuestra.toString());
-    return this.http.post(`${this.apiUrl}/upload`, formData);
+  uploadFile(file: File, idSolicitudMuestra: string): Observable<any> {
+    const formData: FormData = new FormData();
+    formData.append('file', file, file.name);
+    formData.append('idSolicitudMuestra', idSolicitudMuestra);
+
+    return this.http.post<any>(`${this.apiUrl}/upload`, formData, {
+      headers: new HttpHeaders({
+        // Headers adicionales si es necesario
+      })
+    });
   }
 
-  getFiles(idSolicitudMuestra: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/files/${idSolicitudMuestra}`);
+  getFiles(idSolicitudMuestra: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/files/${idSolicitudMuestra}`);
   }
 
-  downloadFile(fileId: number): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/download/${fileId}`, { responseType: 'blob' });
-  }
+  //Eliminar archivo segun el id
+// file-upload.service.ts
+// file-upload.service.ts
+deleteFile(id: number): Observable<any> {
+  return this.http.delete<any>(`${this.apiUrl}/files/${id}`);
+}
+
+
 }

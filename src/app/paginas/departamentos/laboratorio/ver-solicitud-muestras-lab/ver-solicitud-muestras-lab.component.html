@@ -1,4 +1,4 @@
-<div class="container mt-5">
+<div class="container-fluid mt-5">
   <h2 class="mb-4">Ver Solicitudes de Muestra</h2>
 
   <!-- Tabla de Solicitudes -->
@@ -26,7 +26,6 @@
           <td>{{ solicitud.fecha | date }}</td>
           <td>{{ solicitud.estado }}</td>
           <td>
-            <!-- Botón para abrir el modal -->
             <button
               class="btn btn-info btn-sm"
               data-bs-toggle="modal"
@@ -42,71 +41,71 @@
   </div>
 
   <!-- Modal para Ver Detalles -->
-  <div
-    class="modal fade"
-    id="detalleModal"
-    tabindex="-1"
-    aria-labelledby="detalleModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+  <div class="modal fade" id="detalleModal" tabindex="-1" aria-labelledby="detalleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down modal-xl">
       <div class="modal-content">
-        <!-- Modal Header -->
         <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title" id="detalleModalLabel">
-            Detalles de la Solicitud
-          </h5>
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+          <h5 class="modal-title" id="detalleModalLabel">Detalles de la Solicitud</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <!-- Modal Body -->
         <div class="modal-body">
           <div class="row g-4">
             <!-- Panel izquierdo: Detalles de la Solicitud -->
-            <div class="col-lg-6 details-panel">
-              <div class="card h-100 shadow-sm">
+            <div class="col-lg-6 details-panel mb-4 mb-lg-0">
+              <div class="card shadow-sm">
                 <div class="card-body">
                   <h6 class="card-title mb-4">Detalles de la Solicitud</h6>
                   <dl class="row">
                     <dt class="col-sm-4">Solicitante:</dt>
-                    <dd class="col-sm-8">
-                      {{ solicitudSeleccionada?.solicitante }}
-                    </dd>
+                    <dd class="col-sm-8">{{ solicitudSeleccionada?.solicitante }}</dd>
                     <dt class="col-sm-4">Nombre del MP:</dt>
-                    <dd class="col-sm-8">
-                      {{ solicitudSeleccionada?.nombreMp }}
-                    </dd>
+                    <dd class="col-sm-8">{{ solicitudSeleccionada?.nombreMp }}</dd>
                     <dt class="col-sm-4">Lote:</dt>
                     <dd class="col-sm-8">{{ solicitudSeleccionada?.lote }}</dd>
                     <dt class="col-sm-4">Proveedor:</dt>
-                    <dd class="col-sm-8">
-                      {{ solicitudSeleccionada?.proveedor }}
-                    </dd>
+                    <dd class="col-sm-8">{{ solicitudSeleccionada?.proveedor }}</dd>
                     <dt class="col-sm-4">Urgencia:</dt>
-                    <dd class="col-sm-8">
-                      {{ solicitudSeleccionada?.urgencia }}
-                    </dd>
+                    <dd class="col-sm-8">{{ solicitudSeleccionada?.urgencia }}</dd>
                     <dt class="col-sm-4">Fecha:</dt>
-                    <dd class="col-sm-8">
-                      {{ solicitudSeleccionada?.fecha | date }}
-                    </dd>
+                    <dd class="col-sm-8">{{ solicitudSeleccionada?.fecha | date }}</dd>
                     <dt class="col-sm-4">Estado:</dt>
-                    <dd class="col-sm-8">
-                      {{ solicitudSeleccionada?.estado }}
-                    </dd>
+                    <dd class="col-sm-8">{{ solicitudSeleccionada?.estado }}</dd>
                     <dt class="col-sm-4">Código Artículo:</dt>
-                    <dd class="col-sm-8">
-                      {{ solicitudSeleccionada?.codigoArticulo }}
-                    </dd>
+                    <dd class="col-sm-8">{{ solicitudSeleccionada?.codigoArticulo }}</dd>
                     <dt class="col-sm-4">Comentarios:</dt>
-                    <dd class="col-sm-8">
-                      {{ solicitudSeleccionada?.comentarios }}
-                    </dd>
+                    <dd class="col-sm-8">{{ solicitudSeleccionada?.comentarios }}</dd>
                   </dl>
+
+                  <div class="card mt-4 shadow-sm">
+                    <div class="card-body">
+                      <h6 class="card-title mb-3">Necesidad de Almacén</h6>
+                      <div *ngIf="necesidadAlmacen; else noNecesidadAlmacen">
+                        <p><strong>Necesidad:</strong> {{ necesidadAlmacen.necesidad }}</p>
+                        <p><strong>Estado:</strong> {{ solicitudSeleccionada?.estadoAlmacen }}
+                        </p>
+
+                        <!-- Puedes agregar más detalles aquí si es necesario -->
+                      </div>
+                      <ng-template #noNecesidadAlmacen>
+                        <p>No se ha hecho ninguna solicitud a Almacen por ahora</p>
+                      </ng-template>
+
+                      <button class="btn btn-primary mb-3" (click)="toggleAlmacenOptions()" *ngIf="!necesidadAlmacen">
+                        ¿Se necesita Almacen?
+                      </button>
+
+                      <div *ngIf="showAlmacenOptions" class="almacen-options mt-3">
+                        <div class="mb-3">
+                          <label for="cantidadMuestra" class="form-label">Detalles para Almacen</label>
+                          <textarea class="form-control" id="cantidadMuestra" [(ngModel)]="cantidadMuestra" name="descripcion" rows="3"></textarea>
+                        </div>
+
+                        <button class="btn btn-success" (click)="enviarSolicitudAlmacen()">
+                          Enviar Solicitud a Almacén
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="card mt-4 shadow-sm">
@@ -131,18 +130,15 @@
                     <ul class="list-group">
                       <li
                         *ngFor="let archivo of archivos"
-                        class="list-group-item"
+                        class="list-group-item d-flex justify-content-between align-items-center"
                       >
-                        <a
+
                           [href]="archivo.url"
                           target="_blank"
                           class="text-decoration-none"
-                          >{{ archivo.url }}</a
-                        >
-
-                        <!--boton para eliminar un archivo especifico-->
+                        >{{ archivo.url }}
                         <button
-                          class="btn btn-danger btn-sm float-end"
+                          class="btn btn-danger btn-sm"
                           (click)="eliminarArchivo(archivo)"
                         >
                           Eliminar
@@ -154,12 +150,10 @@
               </div>
             </div>
 
-
-
             <!-- Panel derecho: Conversación -->
-            <div class="col-md-6 chat-panel">
+            <div class="col-lg-6 chat-panel">
               <h6>Conversación</h6>
-              <div class="chat-container" #chatContainer>
+              <div class="chat-container mb-3" #chatContainer>
                 <div *ngIf="mensajes.length === 0" class="text-center">No hay mensajes.</div>
                 <div *ngFor="let mensaje of mensajes" class="chat-message"
                      [ngClass]="{
@@ -171,27 +165,15 @@
                   <small class="text-muted">{{ mensaje.fecha | date:'short' }}</small>
                 </div>
               </div>
-              <div class="col-md-12 mt-3">
-
-
-</div>
               <div class="mt-3">
-                <textarea class="form-control" [(ngModel)]="nuevoMensaje" rows="3" placeholder="Escribe tu mensaje aquí..."></textarea>
-                <button class="btn btn-primary mt-2" (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim()">Enviar</button>
+                <textarea class="form-control mb-2" [(ngModel)]="nuevoMensaje" rows="3" placeholder="Escribe tu mensaje aquí..."></textarea>
+                <button class="btn btn-primary" (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim()">Enviar</button>
               </div>
-              <div class="col-md-12 mt-3">
-             <!-- ver-solicitud-muestras.component.html -->
-
-
-                </div>
-              </div>
-
-
-
+            </div>
           </div>
         </div>
-        <!-- Modal Footer -->
         <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="finalizar()">Finalizar y enviar a Expediciones</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>

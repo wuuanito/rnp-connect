@@ -52,6 +52,10 @@ import { GestionComponent } from './paginas/personal/gestion/gestion.component';
 import { personalGuard } from './core/guards/personal.guard';
 import { CrearSolicitudMuestrasComponent } from './paginas/departamentos/oficina-tecnica/crear-solicitud-muestras/crear-solicitud-muestras.component';
 import { VerSolicitudMuestrasComponent } from './paginas/departamentos/oficina-tecnica/ver-solicitud-muestras/ver-solicitud-muestras.component';
+import { CrearSolicitudMuestrasLabComponent } from './paginas/departamentos/laboratorio/crear-solicitud-muestras-lab/crear-solicitud-muestras-lab.component';
+import { VerSolicitudMuestrasLabComponent } from './paginas/departamentos/laboratorio/ver-solicitud-muestras-lab/ver-solicitud-muestras-lab.component';
+import { CrearSolicitudMuestrasLogisticaComponent } from './paginas/departamentos/logistica/crear-solicitud-muestras-logistica/crear-solicitud-muestras-logistica.component';
+import { VerSolicitudMuestrasLogisticaComponent } from './paginas/departamentos/logistica/ver-solicitud-muestras-logistica/ver-solicitud-muestras-logistica.component';
 
 export const routes: Routes = [
 
@@ -192,7 +196,16 @@ export const routes: Routes = [
               {
                 path:'solicitudes-laboratorio',
                 component:SolicitudesLaboratorioComponent
+              },
+              {
+                path:'CrearSolicitudMuestrasLab',
+                component:CrearSolicitudMuestrasLabComponent
+              },
+              {
+                path:'ver-muestras-lab',
+                component:VerSolicitudMuestrasLabComponent
               }
+
             ]
           },
           {
@@ -261,7 +274,16 @@ export const routes: Routes = [
               {
                 path:'solicitudes-logistica',
                 component:SolicitudesLogisticaComponent
+              },
+              {
+                path:'muestras',
+                component:CrearSolicitudMuestrasLogisticaComponent
+              },
+              {
+                path:'ver-muestras',
+                component:VerSolicitudMuestrasLogisticaComponent
               }
+
             ]
           }
         ]

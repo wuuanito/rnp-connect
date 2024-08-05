@@ -4,13 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { SolicitudMuestra } from '../../../../core/interfaces/SolicitudMuestra';
 import { Router } from '@angular/router';
 @Component({
-  selector: 'app-crear-solicitud-muestras',
+  selector: 'app-crear-solicitud-muestras-logistica',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './crear-solicitud-muestras.component.html',
-  styleUrl: './crear-solicitud-muestras.component.css'
+  templateUrl: './crear-solicitud-muestras-logistica.component.html',
+  styleUrl: './crear-solicitud-muestras-logistica.component.css'
 })
-export class CrearSolicitudMuestrasComponent {
+export class CrearSolicitudMuestrasLogisticaComponent {
 
   solicitud: SolicitudMuestra = {
     solicitante: '',
@@ -22,8 +22,7 @@ export class CrearSolicitudMuestrasComponent {
     estado: 'Pendiente', // Estado inicial
     codigoArticulo: '',
     comentarios: '',
-    mensajes: [], // Agregado para conversaciones
-    expediciones : false,
+    mensajes: [] // Agregado para conversaciones
   };
 
   constructor(private solicitudService: MuestrasService, private router: Router) { }
@@ -37,11 +36,6 @@ export class CrearSolicitudMuestrasComponent {
     this.solicitudService.createSolicitud(solicitudParaCrear).subscribe(
       response => {
         console.log('Solicitud creada:', response);
-        //Alerta de que la solicitud se ha creado correctamente
-        alert('Solicitud creada correctamente');
-       // Redirigir a la lista de solicitudes
-       window.location.reload();
-
       },
       error => {
         console.error('Error al crear la solicitud', error);
