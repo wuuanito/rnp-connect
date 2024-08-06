@@ -6,12 +6,13 @@ import { ApplicationConfig } from '@angular/core';
 import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
 
 
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet,NgbPaginationModule],
   providers: [HttpClient, SolicitudesService,],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

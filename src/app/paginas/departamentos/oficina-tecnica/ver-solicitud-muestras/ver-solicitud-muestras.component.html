@@ -1,6 +1,27 @@
 <div class="container mt-5">
   <h2 class="mb-4">Ver Solicitudes de Muestra</h2>
 
+  <!-- Filtros -->
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <input type="text" class="form-control" [(ngModel)]="filtroSolicitante" placeholder="Filtrar por solicitante">
+    </div>
+    <div class="col-md-3">
+      <input type="text" class="form-control" [(ngModel)]="filtroNombreMp" placeholder="Filtrar por nombre MP">
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" [(ngModel)]="filtroEstado">
+        <option value="">Todos los estados</option>
+        <option value="Pendiente">Pendiente</option>
+        <option value="Almacen">Laboratorio-Almacen</option>
+        <option value="Finalizado">Finalizado</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-primary" (click)="aplicarFiltros()">Aplicar filtros</button>
+    </div>
+  </div>
+
   <!-- Tabla de Solicitudes -->
   <div class="table-responsive">
     <table class="table table-striped">
@@ -17,7 +38,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let solicitud of solicitudes">
+        <tr *ngFor="let solicitud of solicitudesFiltradas | paginate: { itemsPerPage: itemsPerPage, currentPage: p }">
           <td>{{ solicitud.solicitante }}</td>
           <td>{{ solicitud.nombreMp }}</td>
           <td>{{ solicitud.lote }}</td>
@@ -26,7 +47,6 @@
           <td>{{ solicitud.fecha | date }}</td>
           <td>{{ solicitud.estado }}</td>
           <td>
-            <!-- Botón para abrir el modal -->
             <button
               class="btn btn-info btn-sm"
               data-bs-toggle="modal"
@@ -40,6 +60,9 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Paginación -->
+  <pagination-controls (pageChange)="p = $event"></pagination-controls>
 
   <!-- Modal para Ver Detalles -->
   <div
@@ -133,12 +156,11 @@
                         *ngFor="let archivo of archivos"
                         class="list-group-item"
                       >
-                        <a
+
                           [href]="archivo.url"
                           target="_blank"
                           class="text-decoration-none"
-                          >{{ archivo.url }}</a
-                        >
+                          >{{ archivo.url }}
 
                         <!--boton para eliminar un archivo especifico-->
                         <button
@@ -153,8 +175,6 @@
                 </div>
               </div>
             </div>
-
-
 
             <!-- Panel derecho: Conversación -->
             <div class="col-md-6 chat-panel">
@@ -171,23 +191,11 @@
                   <small class="text-muted">{{ mensaje.fecha | date:'short' }}</small>
                 </div>
               </div>
-              <div class="col-md-12 mt-3">
-
-
-</div>
               <div class="mt-3">
                 <textarea class="form-control" [(ngModel)]="nuevoMensaje" rows="3" placeholder="Escribe tu mensaje aquí..."></textarea>
                 <button class="btn btn-primary mt-2" (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim()">Enviar</button>
               </div>
-              <div class="col-md-12 mt-3">
-             <!-- ver-solicitud-muestras.component.html -->
-
-
-                </div>
-              </div>
-
-
-
+            </div>
           </div>
         </div>
         <!-- Modal Footer -->

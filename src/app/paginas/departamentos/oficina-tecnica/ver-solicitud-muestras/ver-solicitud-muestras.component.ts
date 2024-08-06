@@ -11,11 +11,15 @@ import { SolicitudesService } from '../../../../core/services/solicitudes.servic
 import { UploadService } from '../../../../core/services/upload.service';
 import { environment } from '../../../../../environments/environment';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+
 
 @Component({
   selector: 'app-ver-solicitud-muestras',
   standalone: true,
-  imports: [DatePipe,CommonModule,FormsModule,NgxPaginationModule],
+  imports: [DatePipe,CommonModule,FormsModule,NgxPaginationModule,NgbPaginationModule],
   templateUrl: './ver-solicitud-muestras.component.html',
   styleUrl: './ver-solicitud-muestras.component.css'
 })
@@ -52,6 +56,8 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
   ngOnInit(): void {
     this.obtenerSolicitudes();
     this.nombre = this.authService.getNameFromToken() || '';
+    this.aplicarFiltros();
+
   }
 
   checkScrollPosition() {
@@ -86,6 +92,7 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
     this.solicitudService.getSolicitudes().subscribe(
       (data: SolicitudMuestra[]) => {
         this.solicitudes = data;
+        this.aplicarFiltros(); // Llama a aplicarFiltros después de obtener los datos
       },
       error => console.error('Error al obtener solicitudes', error)
     );
@@ -99,6 +106,8 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
     this.solicitudSeleccionada = solicitud;
     if (this.solicitudSeleccionada && this.solicitudSeleccionada.idSolicitudMuestra) {
       this.getFiles(this.solicitudSeleccionada.idSolicitudMuestra.toString());
+      this.aplicarFiltros();
+
       this.obtenerMensajes();
       this.iniciarPolling();
     } else {
@@ -214,6 +223,30 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
   ngAfterViewChecked() {
     this.checkScrollPosition();
   }
+
+
+
+  solicitudesFiltradas: any[] = [];
+
+  // Variables para filtrado
+  filtroSolicitante: string = '';
+  filtroNombreMp: string = '';
+  filtroEstado: string = '';
+
+  // Variables para paginación
+  p: number = 1; // página actual
+
+
+
+  aplicarFiltros() {
+    this.solicitudesFiltradas = this.solicitudes.filter(solicitud =>
+      solicitud.solicitante.toLowerCase().includes(this.filtroSolicitante.toLowerCase()) &&
+      solicitud.nombreMp.toLowerCase().includes(this.filtroNombreMp.toLowerCase()) &&
+      (this.filtroEstado === '' || solicitud.estado === this.filtroEstado)
+    );
+  }
+
+
 }
 
 
