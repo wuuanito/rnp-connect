@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CalendarioComunComponent } from './calendario-comun.component';
+import { ActionProjectComponent } from './action-project.component';
 
-describe('CalendarioComunComponent', () => {
-  let component: CalendarioComunComponent;
-  let fixture: ComponentFixture<CalendarioComunComponent>;
+describe('ActionProjectComponent', () => {
+  let component: ActionProjectComponent;
+  let fixture: ComponentFixture<ActionProjectComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CalendarioComunComponent]
+      imports: [ActionProjectComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CalendarioComunComponent);
+    fixture = TestBed.createComponent(ActionProjectComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

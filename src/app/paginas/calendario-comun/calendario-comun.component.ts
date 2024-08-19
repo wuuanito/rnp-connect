@@ -8,6 +8,10 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { EventSourceFunc } from '@fullcalendar/core';
 import { CalendarApi } from '@fullcalendar/core';
 import { environment } from '../../../environments/environment';
+import { MatDialog } from '@angular/material/dialog';
+import { ActionComunComponent } from './action-comun/action-comun.component';
+import { EditComunComponent } from './edit-comun/edit-comun.component';
+import { ConfirmComunComponent } from './confirm-comun/confirm-comun.component';
 
 @Component({
   selector: 'app-calendario-comun',
@@ -20,7 +24,7 @@ export class CalendarioComunComponent implements OnInit {
   calendarOptions!: CalendarOptions;
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, public dialog: MatDialog) {
     this.initializeCalendarOptions();
   }
 
@@ -98,9 +102,9 @@ export class CalendarioComunComponent implements OnInit {
         title,
         start: selectInfo.startStr,
         end: selectInfo.endStr,
-        allDay: false,
-        color: '',
-        description: ''
+        allDay: false, // Puedes ajustar esto según tus necesidades
+        color: '', // Si tienes colores predeterminados, añádelos aquí
+        description: '' // Si quieres añadir una descripción
       };
       this.http.post<any>(`${this.apiUrl}/reservasComun`, reserva).subscribe(
         (response) => {
@@ -125,7 +129,96 @@ export class CalendarioComunComponent implements OnInit {
   }
 
   handleEventClick(clickInfo: EventClickArg) {
-    const eventTitle = clickInfo.event.title;
-    alert(`Evento: ${eventTitle}\n`);
+    const event = clickInfo.event;
+    const actionDialog = this.dialog.open(ActionComunComponent);
+
+    actionDialog.afterClosed().subscribe((action) => {
+      if (action === 'editar') {
+        const editDialog = this.dialog.open(EditComunComponent, {
+          data: {
+            title: event.title,
+            start: event.start,
+            end: event.end,
+            allDay: event.allDay,
+            color: event.backgroundColor,
+            description: event.extendedProps['description'] || ''
+          }
+        });
+
+        editDialog.afterClosed().subscribe((result) => {
+          if (result) {
+            const updatedEvent = {
+              id: event.id,
+              title: result.title,
+              start: event.start,
+              end: event.end,
+              allDay: event.allDay,
+              color: event.backgroundColor,
+              description: result.description
+            };
+
+            this.http.put(`${this.apiUrl}/reservasComun/${event.id}`, updatedEvent).subscribe(
+              () => {
+                event.setProp('title', result.title);
+                window.alert('Reserva actualizada con éxito');
+              },
+              (error: HttpErrorResponse) => {
+                console.error('Error al actualizar la reserva:', error);
+                alert('No se pudo actualizar la reserva. Por favor, intente de nuevo.');
+              }
+            );
+          }
+        });
+      } else if (action === 'eliminar') {
+        const confirmDialog = this.dialog.open(ConfirmComunComponent, {
+          data: { message: '¿Está seguro de que desea eliminar este evento?' }
+        });
+
+        confirmDialog.afterClosed().subscribe((confirmed) => {
+          if (confirmed) {
+            this.http.delete(`${this.apiUrl}/reservasComun/${event.id}`).subscribe(
+              () => {
+                event.remove();
+                window.alert('Evento eliminado con éxito');
+              },
+              (error: HttpErrorResponse) => {
+                console.error('Error al eliminar el evento:', error);
+                alert('No se pudo eliminar el evento. Por favor, intente de nuevo.');
+              }
+            );
+          }
+        });
+      }
+    });
+  }
+  handleEventDrop(dropInfo: any) {
+    this.updateEventDates(dropInfo.event);
+  }
+
+  handleEventResize(resizeInfo: any) {
+    this.updateEventDates(resizeInfo.event);
+  }
+
+  private updateEventDates(event: any) {
+    const updatedEvent = {
+      id: event.id,
+      title: event.title,
+      start: event.start,
+      end: event.end,
+      allDay: event.allDay,
+      color: event.backgroundColor,
+      description: event.extendedProps.description || ''
+    };
+
+    this.http.put(`${this.apiUrl}/reservasComun/${event.id}`, updatedEvent).subscribe(
+      (response) => {
+        console.log('Reserva actualizada con éxito');
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Error al actualizar la reserva:', error);
+        alert('No se pudo actualizar la reserva. Por favor, intente de nuevo.');
+        event.revert();
+      }
+    );
   }
 }

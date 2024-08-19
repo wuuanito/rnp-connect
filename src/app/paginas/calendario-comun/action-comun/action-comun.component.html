@@ -1,0 +1,16 @@
+<h2 mat-dialog-title class="dialog-title">Acciones disponibles</h2>
+
+<mat-dialog-content class="dialog-content">
+  <p>Por favor, seleccione la acción que desea realizar:</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-raised-button color="primary" (click)="close('editar')">
+    <mat-icon>edit</mat-icon>
+    Editar
+  </button>
+  <button mat-raised-button color="warn" (click)="close('eliminar')">
+    <mat-icon>delete</mat-icon>
+    Eliminar
+  </button>
+</mat-dialog-actions>
