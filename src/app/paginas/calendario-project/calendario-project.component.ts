@@ -8,6 +8,11 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { EventSourceFunc } from '@fullcalendar/core';
 import { CalendarApi } from '@fullcalendar/core';
 import { environment } from '../../../environments/environment';
+import { MatDialog } from '@angular/material/dialog';
+import { ActionProjectComponent } from './action-project/action-project.component';
+import { EditProjectComponent } from './edit-project/edit-project.component';
+import { ConfirmProjectComponent } from './confirm-project/confirm-project.component';
+
 @Component({
   selector: 'app-calendario-project',
   standalone: true,
@@ -16,10 +21,16 @@ import { environment } from '../../../environments/environment';
   styleUrl: './calendario-project.component.css'
 })
 export class CalendarioProjectComponent implements OnInit {
-  calendarOptions: CalendarOptions;
+  calendarOptions!: CalendarOptions;
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, public dialog: MatDialog) {
+    this.initializeCalendarOptions();
+  }
+
+  ngOnInit(): void {}
+
+  private initializeCalendarOptions(): void {
     this.calendarOptions = {
       plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
       initialView: 'timeGridWeek', // Vista inicial del calendario
@@ -56,10 +67,7 @@ export class CalendarioProjectComponent implements OnInit {
       },
       eventDisplay: 'block', // Asegúrate de que los eventos se muestren en bloque
     };
-
   }
-
-  ngOnInit(): void {}
 
   fetchEvents: EventSourceFunc = (info, successCallback, failureCallback) => {
     this.http.get<any[]>(`${this.apiUrl}/reservasProject`, {
@@ -69,7 +77,6 @@ export class CalendarioProjectComponent implements OnInit {
       }
     }).subscribe(
       (data) => {
-        console.log('Datos de eventos:', data); // Verifica los datos recibidos
         const formattedEvents = data.map(event => ({
           id: event.id_evento,
           title: event.title,
@@ -79,7 +86,6 @@ export class CalendarioProjectComponent implements OnInit {
           color: event.color || '#007bff',
           description: event.description || ''
         }));
-        console.log('Eventos formateados:', formattedEvents);
         successCallback(formattedEvents);
       },
       (error: HttpErrorResponse) => {
@@ -88,9 +94,6 @@ export class CalendarioProjectComponent implements OnInit {
       }
     );
   }
-
-
-
 
   handleDateSelect(selectInfo: DateSelectArg) {
     const title = prompt('Ingrese el nombre para la reserva:');
@@ -126,12 +129,96 @@ export class CalendarioProjectComponent implements OnInit {
   }
 
   handleEventClick(clickInfo: EventClickArg) {
-    const eventTitle = clickInfo.event.title;
+    const event = clickInfo.event;
+    const actionDialog = this.dialog.open(ActionProjectComponent);
 
-    // Muestra la descripción del evento en una alerta o en un modal
-    alert(`Evento: ${eventTitle}\n`);
+    actionDialog.afterClosed().subscribe((action) => {
+      if (action === 'editar') {
+        const editDialog = this.dialog.open(EditProjectComponent, {
+          data: {
+            title: event.title,
+            start: event.start,
+            end: event.end,
+            allDay: event.allDay,
+            color: event.backgroundColor,
+            description: event.extendedProps['description'] || ''
+          }
+        });
 
-    // Alternativa: si prefieres usar un modal, podrías implementar algo así:
-    // this.openDescriptionModal(eventTitle, eventDescription);
+        editDialog.afterClosed().subscribe((result) => {
+          if (result) {
+            const updatedEvent = {
+              id: event.id,
+              title: result.title,
+              start: event.start,
+              end: event.end,
+              allDay: event.allDay,
+              color: event.backgroundColor,
+              description: result.description
+            };
+
+            this.http.put(`${this.apiUrl}/reservasProject/${event.id}`, updatedEvent).subscribe(
+              () => {
+                event.setProp('title', result.title);
+                window.alert('Reserva actualizada con éxito');
+              },
+              (error: HttpErrorResponse) => {
+                console.error('Error al actualizar la reserva:', error);
+                alert('No se pudo actualizar la reserva. Por favor, intente de nuevo.');
+              }
+            );
+          }
+        });
+      } else if (action === 'eliminar') {
+        const confirmDialog = this.dialog.open(ConfirmProjectComponent, {
+          data: { message: '¿Está seguro de que desea eliminar este evento?' }
+        });
+
+        confirmDialog.afterClosed().subscribe((confirmed) => {
+          if (confirmed) {
+            this.http.delete(`${this.apiUrl}/reservasProject/${event.id}`).subscribe(
+              () => {
+                event.remove();
+                window.alert('Evento eliminado con éxito');
+              },
+              (error: HttpErrorResponse) => {
+                console.error('Error al eliminar el evento:', error);
+                alert('No se pudo eliminar el evento. Por favor, intente de nuevo.');
+              }
+            );
+          }
+        });
+      }
+    });
+  }
+  handleEventDrop(dropInfo: any) {
+    this.updateEventDates(dropInfo.event);
+  }
+
+  handleEventResize(resizeInfo: any) {
+    this.updateEventDates(resizeInfo.event);
+  }
+
+  private updateEventDates(event: any) {
+    const updatedEvent = {
+      id: event.id,
+      title: event.title,
+      start: event.start,
+      end: event.end,
+      allDay: event.allDay,
+      color: event.backgroundColor,
+      description: event.extendedProps.description || ''
+    };
+
+    this.http.put(`${this.apiUrl}/reservasProject/${event.id}`, updatedEvent).subscribe(
+      (response) => {
+        console.log('Reserva actualizada con éxito');
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Error al actualizar la reserva:', error);
+        alert('No se pudo actualizar la reserva. Por favor, intente de nuevo.');
+        event.revert();
+      }
+    );
   }
 }
