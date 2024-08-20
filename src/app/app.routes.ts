@@ -78,6 +78,7 @@ export const routes: Routes = [
             path: 'inicio',
             component:InicioComponent
           },
+        
           {
             path:'calendario',
             component:CalendarioComponent

@@ -2,3 +2,31 @@
 .logout-link {
   cursor: pointer;
 }
+/* styles.css */
+.font-weight-bold {
+  font-weight: bold;
+}
+
+.dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa; /* Color de fondo al pasar el mouse */
+}
+
+.text-muted {
+  font-size: 12px; /* Tamaño más pequeño para la fecha */
+}
+
+.badge.bg-secondary {
+  background-color: #6c757d; /* Cambia el color del badge según tu diseño */
+}
+
+.btn-danger {
+  margin-left: 10px;
+  font-size: 12px;
+}

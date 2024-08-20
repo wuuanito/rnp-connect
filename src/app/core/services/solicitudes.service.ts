@@ -5,6 +5,8 @@ import { Solicitud } from '../interfaces/solicitud.mode';
 import { catchError, tap } from 'rxjs/operators';
 import { isPlatformServer } from '@angular/common';
 import { environment } from '../../../environments/environment';
+import { NotificationBuenaService } from './notification-buena.service';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +18,10 @@ export class SolicitudesService {
 
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private notificacionService : NotificationBuenaService,
+    private authService: AuthService
+
   ) {}
 
   getSolicitudes(): Observable<Solicitud[]> {
@@ -50,9 +55,18 @@ export class SolicitudesService {
   createSolicitud(solicitudData: Solicitud): Observable<Solicitud> {
     return this.http.post<Solicitud>(`${this.apiUrl}/solicitudes`, solicitudData).pipe(
       tap((newSolicitud: Solicitud) => {
-        // Si hay caché, agregamos la nueva solicitud a la caché
         if (this.cachedSolicitudes) {
           this.cachedSolicitudes.push(newSolicitud);
+        }
+        // Obtener rol del usuario actual
+        const userRole = this.authService.getRoleFromToken();
+        if (userRole) {
+          // Enviar notificación a usuarios con el rol adecuado
+          this.notificacionService.sendNotificationToRole(
+            `Nueva solicitud creada: ${newSolicitud.nombre_solicitud}`,
+            'nueva',
+            userRole
+          );
         }
       }),
       catchError(error => {
@@ -61,16 +75,24 @@ export class SolicitudesService {
       })
     );
   }
-
   updateSolicitud(solicitudData: Solicitud): Observable<Solicitud> {
     return this.http.put<Solicitud>(`${this.apiUrl}/solicitudes/${solicitudData.id_solicitud}`, solicitudData).pipe(
       tap(updatedSolicitud => {
-        // Si hay caché, actualizamos la solicitud en la caché
         if (this.cachedSolicitudes) {
           const index = this.cachedSolicitudes.findIndex(solicitud => solicitud.id_solicitud === updatedSolicitud.id_solicitud);
           if (index !== -1) {
             this.cachedSolicitudes[index] = updatedSolicitud;
           }
+        }
+        // Obtener rol del usuario actual
+        const userRole = this.authService.getRoleFromToken();
+        if (userRole) {
+          // Enviar notificación a usuarios con el rol adecuado
+          this.notificacionService.sendNotificationToRole(
+            `Solicitud actualizada: ${updatedSolicitud.nombre_solicitud}`,
+            'actualizada',
+            userRole
+          );
         }
       }),
       catchError(error => {
@@ -79,6 +101,5 @@ export class SolicitudesService {
       })
     );
   }
-
 
 }

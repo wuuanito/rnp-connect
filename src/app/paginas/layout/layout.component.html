@@ -54,6 +54,27 @@
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownNotifications" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Notificaciones <span class="badge bg-secondary">{{unreadCount}}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownNotifications">
+              <li *ngFor="let notification of notifications">
+                <a class="dropdown-item" href="#" (click)="markAsRead(notification)" [ngClass]="{'font-weight-bold': !notification.read}">
+                  {{notification.message}}
+                  <small class="text-muted d-block">{{notification.timestamp | date:'short'}}</small>
+                </a>
+                <button class="btn btn-sm btn-danger" (click)="deleteNotification(notification)">Eliminar</button>
+              </li>
+              <li *ngIf="notifications.length === 0">
+                <a class="dropdown-item" href="#">No hay notificaciones</a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" (click)="clearNotifications()">Limpiar todas</a></li>
+            </ul>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUsuario" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               {{ email || 'Mi Cuenta' }}
             </a>
@@ -66,4 +87,6 @@
       </div>
     </div>
   </nav>
+
   <router-outlet></router-outlet>
+
