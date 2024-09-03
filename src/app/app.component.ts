@@ -14,7 +14,7 @@ import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet,NgbPaginationModule,MatSnackBarModule],
+  imports: [RouterOutlet,NgbPaginationModule,MatSnackBarModule,],
   providers: [HttpClient, SolicitudesService,],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

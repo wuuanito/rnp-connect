@@ -1,0 +1,10 @@
+/* Estilos adicionales para mejorar la presentación en tabletas */
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+.invalid-feedback {
+  display: block;
+}

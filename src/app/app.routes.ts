@@ -56,6 +56,8 @@ import { CrearSolicitudMuestrasLabComponent } from './paginas/departamentos/labo
 import { VerSolicitudMuestrasLabComponent } from './paginas/departamentos/laboratorio/ver-solicitud-muestras-lab/ver-solicitud-muestras-lab.component';
 import { CrearSolicitudMuestrasLogisticaComponent } from './paginas/departamentos/logistica/crear-solicitud-muestras-logistica/crear-solicitud-muestras-logistica.component';
 import { VerSolicitudMuestrasLogisticaComponent } from './paginas/departamentos/logistica/ver-solicitud-muestras-logistica/ver-solicitud-muestras-logistica.component';
+import { CalendarioGerenciaCompartidoComponent } from './paginas/calendario-gerencia-compartido/calendario-gerencia-compartido.component';
+import { RegistroPlantaComponent } from './paginas/departamentos/gerencia/registro-planta/registro-planta.component';
 
 export const routes: Routes = [
 
@@ -78,7 +80,7 @@ export const routes: Routes = [
             path: 'inicio',
             component:InicioComponent
           },
-        
+
           {
             path:'calendario',
             component:CalendarioComponent
@@ -94,6 +96,11 @@ export const routes: Routes = [
           {
             path:'solicitud-personal',
             component:SolicitudPersonalComponent
+          },
+          {
+            path:'calendario-compartido-gerencia',
+            component:CalendarioGerenciaCompartidoComponent
+
           },
           {
             path:'gestion',
@@ -221,6 +228,10 @@ export const routes: Routes = [
               {
                 path:'solicitudes-gerencia',
                 component:SolicitudesGerenciaComponent
+              },
+              {
+                path:'registro-planta',
+                component:RegistroPlantaComponent
               }
             ]
           },

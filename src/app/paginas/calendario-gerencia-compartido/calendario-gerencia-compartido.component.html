@@ -1,0 +1,23 @@
+<div class="calendar-container">
+  <div class="calendar-header">
+    <button (click)="previousPeriod()">&lt;</button>
+    <h2>{{ currentDate | date:'MMMM yyyy' }}</h2>
+    <button (click)="nextPeriod()">&gt;</button>
+  </div>
+  <div class="view-selector">
+    <button [class.active]="currentView === 'month'" (click)="changeView('month')">Mes</button>
+    <button [class.active]="currentView === 'week'" (click)="changeView('week')">Semana</button>
+    <button [class.active]="currentView === 'day'" (click)="changeView('day')">Día</button>
+  </div>
+  <div class="calendar-body" [ngSwitch]="currentView">
+    <div *ngSwitchCase="'month'" class="month-view">
+      <!-- Implementar vista de mes -->
+    </div>
+    <div *ngSwitchCase="'week'" class="week-view">
+      <!-- Implementar vista de semana -->
+    </div>
+    <div *ngSwitchCase="'day'" class="day-view">
+      <!-- Implementar vista de día -->
+    </div>
+  </div>
+</div>
