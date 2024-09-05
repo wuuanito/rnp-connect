@@ -1,3 +1,4 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CalendarOptions, DateSelectArg, EventClickArg, EventApi, EventSourceFunc } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -16,14 +17,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
+import { AddEventDialogComponent } from './add-event-dialog-component/add-event-dialog-component.component';
 import io from 'socket.io-client';
 import { AuthService } from '../../../../core/services/auth.service';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AddEventDialogComponent } from './add-event-dialog-component/add-event-dialog-component.component';
-
-
 @Component({
-  selector: 'app-inicio-informatica',
+  selector: 'app-calendario-fernando-carlos',
   standalone: true,
   imports: [
     FullCalendarModule,
@@ -35,10 +33,11 @@ import { AddEventDialogComponent } from './add-event-dialog-component/add-event-
     MatButtonModule,
     ReactiveFormsModule,
     CommonModule
-  ],  templateUrl: './inicio-informatica.component.html',
-  styleUrl: './inicio-informatica.component.css'
+  ],
+  templateUrl: './calendario-fernando-carlos.component.html',
+  styleUrls: ['./calendario-fernando-carlos.component.css']
 })
-export class InicioInformaticaComponent implements OnInit, OnDestroy {
+export class CalendarioFernandoCarlosComponent implements OnInit, OnDestroy {
   calendarOptions: CalendarOptions;
   upcomingEvents: EventApi[] = [];
   eventsWithDescriptions: any[] = [];
@@ -98,7 +97,7 @@ fetchEventsFromApi() {
     const startDate = new Date().toISOString();
     const endDate = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString();
 
-    this.http.get<any[]>(`${this.apiUrl}/calendarioInformatica`, {
+    this.http.get<any[]>(`${this.apiUrl}/reservas`, {
       params: {
         start: startDate,
         end: endDate
@@ -180,7 +179,7 @@ fetchEventsFromApi() {
           color: this.getEventColor(`${userName}-${result.title}`) // Use the new method to set color
         };
 
-        this.http.post<any>(`${this.apiUrl}/calendarioInformatica`, newEvent).subscribe(
+        this.http.post<any>(`${this.apiUrl}/reservas`, newEvent).subscribe(
           (response) => {
             selectInfo.view.calendar.addEvent({
               id: response.id,
@@ -211,7 +210,7 @@ fetchEventsFromApi() {
 
     confirmDialog.afterClosed().subscribe((confirmed) => {
       if (confirmed) {
-        this.http.delete(`${this.apiUrl}/calendarioInformatica/${event.id}`).subscribe(
+        this.http.delete(`${this.apiUrl}/reservas/${event.id}`).subscribe(
           () => {
             event.remove();
             window.alert('Evento eliminado con éxito');
@@ -266,7 +265,7 @@ fetchEventsFromApi() {
       description: event.extendedProps.description || ''
     };
 
-    this.http.put(`${this.apiUrl}/calendarioInformatica/${event.id}`, updatedEvent).subscribe(
+    this.http.put(`${this.apiUrl}/reservas/${event.id}`, updatedEvent).subscribe(
       (response) => {
         console.log('Reserva actualizada con éxito');
         this.socket.emit('eventUpdated');

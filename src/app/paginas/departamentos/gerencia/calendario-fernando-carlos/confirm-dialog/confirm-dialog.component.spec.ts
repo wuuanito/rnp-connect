@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FeaturedEventsComponent } from './featured-events.component';
+import { ConfirmDialogComponent } from './confirm-dialog.component';
 
-describe('FeaturedEventsComponent', () => {
-  let component: FeaturedEventsComponent;
-  let fixture: ComponentFixture<FeaturedEventsComponent>;
+describe('ConfirmDialogComponent', () => {
+  let component: ConfirmDialogComponent;
+  let fixture: ComponentFixture<ConfirmDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FeaturedEventsComponent]
+      imports: [ConfirmDialogComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FeaturedEventsComponent);
+    fixture = TestBed.createComponent(ConfirmDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

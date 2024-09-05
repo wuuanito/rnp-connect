@@ -35,6 +35,7 @@
     "jwt-decode": "^4.0.0",
     "moment": "^2.30.1",
     "ngx-bootstrap": "^18.0.2",
+    "ngx-mat-timepicker": "^18.0.0",
     "ngx-pagination": "^6.0.3",
     "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.0",
