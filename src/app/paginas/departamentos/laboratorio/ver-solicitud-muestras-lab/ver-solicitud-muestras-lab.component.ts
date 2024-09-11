@@ -28,7 +28,7 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
   mensajes: Mensaje[] = [];
   nuevoMensaje: string = '';
   pollingSubscription: Subscription | undefined;
-  files: any[] = []; // Arreglo para almacenar los archivos
+  files: any[] = [];
   page: number = 1;
   itemsPerPage: number = 10;
   mostrarBotonBajar: boolean = false;
@@ -40,21 +40,21 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
     proveedor: '',
     estado: ''
   };
+  // Filtros
 
   constructor(
     private solicitudService: MuestrasService,
     private mensajeService: MensajeService,
     private authService: AuthService,
-    private fileUploadService:UploadService
+    private fileUploadService: UploadService
   ) {}
 
   nombre = this.authService.getNameFromToken() || '';
-
   ngOnInit(): void {
     this.obtenerSolicitudes();
-    this.nombre = this.authService.getNameFromToken() || '';
-
   }
+
+
 
 
 
@@ -78,13 +78,14 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
   get filteredSolicitudes() {
     return this.solicitudes.filter(solicitud => {
       return (
-        (!this.filtros.solicitante || solicitud.solicitante.toLowerCase().includes(this.filtros.solicitante.toLowerCase())) &&
-        (!this.filtros.nombreMp || solicitud.nombreMp.toLowerCase().includes(this.filtros.nombreMp.toLowerCase())) &&
-        (!this.filtros.proveedor || solicitud.proveedor.toLowerCase().includes(this.filtros.proveedor.toLowerCase())) &&
-        (!this.filtros.estado || solicitud.estado.toLowerCase().includes(this.filtros.estado.toLowerCase()))
+        solicitud.solicitante.toLowerCase().includes(this.filtros.solicitante.toLowerCase()) &&
+        solicitud.nombreMp.toLowerCase().includes(this.filtros.nombreMp.toLowerCase()) &&
+        solicitud.proveedor.toLowerCase().includes(this.filtros.proveedor.toLowerCase()) &&
+        (this.filtros.estado === '' || solicitud.estado.toLowerCase() === this.filtros.estado.toLowerCase())
       );
     });
   }
+
   obtenerSolicitudes(): void {
     this.solicitudService.getSolicitudLab().subscribe(
       (data: SolicitudMuestra[]) => {
@@ -93,7 +94,6 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
       error => console.error('Error al obtener solicitudes', error)
     );
   }
-
 
 
   obtenerNombreToken(): string | null {
@@ -106,7 +106,6 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
       this.obtenerMensajes();
       this.iniciarPolling();
       this.obtenerNecesidadAlmacen(this.solicitudSeleccionada.idSolicitudMuestra);
-
     } else {
       console.error('ID de solicitud no está definido o es inválido en cargarDetalles.');
     }
@@ -302,7 +301,12 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
   obtenerNecesidadAlmacen(idSolicitudMuestra: number): void {
     this.solicitudService.getNecesidadAlmacen(idSolicitudMuestra).subscribe(
       (data) => {
-        this.necesidadAlmacen = data;
+        if (data) {
+          this.necesidadAlmacen = data;
+          this.showAlmacenOptions = false; // Ocultar las opciones si ya hay una necesidad
+        } else {
+          this.necesidadAlmacen = null;
+        }
       },
       (error) => {
         console.error('Error al obtener necesidad de almacén', error);

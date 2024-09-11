@@ -1,82 +1,247 @@
-.dashboard-container {
-  padding: 1rem;
-  min-height: 100vh;
-  width: 100%;
+/* Global Styles */
+body {
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+  background-color: #e8f5e9;
+  color: #1b5e20;
+  line-height: 1.6;
 }
 
+.calendar-container {
+  padding: 2rem 1rem;
+}
+
+/* Card Styles */
 .card {
-  height: 100%;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 100, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  margin-bottom: 1.5rem;
 }
 
-@media (max-width: 576px) {
-  .card-text.display-4 {
-    font-size: 2.5rem;
+.card:hover {
+  box-shadow: 0 6px 12px rgba(0, 100, 0, 0.15);
+}
+
+.card-header {
+  background-color: #4caf50;
+  color: white;
+  border-bottom: none;
+  padding: 1.5rem;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.card-body {
+  padding: 1.5rem;
+  background-color: white;
+}
+
+/* Main Calendar Card */
+.main-calendar-card .card-header {
+  background-color: #2e7d32;
+}
+
+/* FullCalendar Styles */
+.fc .fc-toolbar-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1b5e20;
+}
+
+.fc .fc-button-primary {
+  background-color: #4caf50;
+  border-color: #4caf50;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.fc .fc-button-primary:hover {
+  background-color: #45a049;
+  border-color: #45a049;
+}
+
+.fc-event {
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 0.85rem;
+  transition: transform 0.2s ease;
+}
+
+.fc-event:hover {
+  transform: translateY(-2px);
+}
+
+.fc-day-today {
+  background-color: rgba(76, 175, 80, 0.1) !important;
+}
+
+/* Upcoming Events Styles */
+.upcoming-events-card .card-header {
+  background-color: #388e3c;
+}
+
+.event-list-container {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.list-group-item {
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  padding: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.event-carlos {
+  border-left: 4px solid #1565c0;
+  background-color: #e3f2fd;
+}
+
+.event-fernando {
+  border-left: 4px solid #ef6c00;
+  background-color: #fff3e0;
+}
+
+.event-other {
+  border-left: 4px solid #66bb6a;
+  background-color: #f1f8e9;
+}
+
+.event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.event-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.event-carlos .event-title {
+  color: #1565c0;
+}
+
+.event-fernando .event-title {
+  color: #ef6c00;
+}
+
+.event-other .event-title {
+  color: #2e7d32;
+}
+
+.event-date {
+  font-size: 0.85rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.event-description {
+  font-size: 0.9rem;
+  color: #333;
+  margin: 0;
+}
+
+/* Legend Styles */
+.legend-card .card-header {
+  background-color: #66bb6a;
+}
+
+.legend-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1b5e20;
+  margin-bottom: 1rem;
+}
+
+.legend-items {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.bg-carlos {
+  background-color: #1565c0;
+}
+
+.bg-fernando {
+  background-color: #ef6c00;
+}
+
+.bg-other {
+  background-color: #66bb6a;
+}
+
+.legend-label {
+  font-size: 0.9rem;
+  color: #1b5e20;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .calendar-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .card-title {
+    font-size: 1.3rem;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.1rem;
+  }
+
+  .fc .fc-button-primary {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
   }
 }
-.dashboard-wrapper {
-  position: relative;
-}
 
-.blur {
-  filter: blur(5px);
-  pointer-events: none;
-  user-select: none;
-}
+@media (max-width: 768px) {
+  .card-title {
+    font-size: 1.2rem;
+  }
 
-.development-message {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 30px;
-  border-radius: 15px;
-  text-align: center;
-  z-index: 1000;
-  max-width: 80%;
-  width: 400px;
-}
+  .fc .fc-toolbar-title {
+    font-size: 1rem;
+  }
 
-.development-message h1 {
-  margin-bottom: 15px;
-  font-size: 28px;
-}
+  .fc .fc-button-primary {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.6rem;
+  }
 
-.development-message p {
-  margin-bottom: 20px;
-}
+  .legend-items {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-.progress-info {
-  margin-bottom: 20px;
-}
-
-.progress {
-  height: 25px;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 15px;
-  overflow: hidden;
-}
-
-.progress-bar {
-  background-color: #007bff;
-}
-
-.eta {
-  font-style: italic;
-  font-size: 0.9em;
-  margin-bottom: 25px;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  text-decoration: none;
-  transition: background-color 0.3s;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
+  .legend-item {
+    margin-bottom: 0.5rem;
+  }
 }

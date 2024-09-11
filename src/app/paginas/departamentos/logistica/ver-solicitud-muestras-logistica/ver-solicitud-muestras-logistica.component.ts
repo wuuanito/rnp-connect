@@ -7,17 +7,19 @@ import { MensajeService } from '../../../../core/services/mensaje.service';
 import { FormsModule } from '@angular/forms';
 import { Subscription, timer } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
-import { SolicitudesService } from '../../../../core/services/solicitudes.service';
 import { UploadService } from '../../../../core/services/upload.service';
-import { environment } from '../../../../../environments/environment';
 import { NgxPaginationModule } from 'ngx-pagination';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import { TDocumentDefinitions, TableCell } from 'pdfmake/interfaces';
+
 
 @Component({
   selector: 'app-ver-solicitud-muestras-logistica',
   standalone: true,
-  imports: [DatePipe,CommonModule,FormsModule,NgxPaginationModule],
+  imports: [DatePipe, CommonModule, FormsModule, NgxPaginationModule],
   templateUrl: './ver-solicitud-muestras-logistica.component.html',
-  styleUrl: './ver-solicitud-muestras-logistica.component.css'
+  styleUrls: ['./ver-solicitud-muestras-logistica.component.css']
 })
 export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
@@ -27,14 +29,31 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
   solicitudSeleccionada: SolicitudMuestra | null = null;
   mensajes: Mensaje[] = [];
   nuevoMensaje: string = '';
+  archivos: any[] = [];
+  selectedFile: File | null = null;
   pollingSubscription: Subscription | undefined;
-  files: any[] = [];
-  page: number = 1;
-  itemsPerPage: number = 10;
   mostrarBotonBajar: boolean = false;
+  showAlmacenOptions: boolean = false;
+  cantidadMuestra: string | undefined;
+  necesidadAlmacen: any = null;
 
-  // Filtros
-  filtros = {
+  // Pagination for Expediciones
+  pExpediciones: number = 1;
+  itemsPerPage: number = 10;
+
+  // Pagination for Almacén
+  pAlmacen: number = 1;
+
+  // Filters for Expediciones
+  filtrosExpediciones = {
+    solicitante: '',
+    nombreMp: '',
+    proveedor: '',
+    estado: ''
+  };
+
+  // Filters for Almacén
+  filtrosAlmacen = {
     solicitante: '',
     nombreMp: '',
     proveedor: '',
@@ -52,7 +71,6 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
 
   ngOnInit(): void {
     this.obtenerSolicitudes();
-    this.nombre = this.authService.getNameFromToken() || '';
     this.obtenerSolicitudesAlmacen();
   }
 
@@ -67,19 +85,261 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
     this.detenerPolling();
   }
 
+  imprimirOGenerarPDF() {
+    const confirmacion = confirm('¿Deseas generar un PDF o imprimir directamente?');
+    if (confirmacion) {
+      this.generarPDF();
+    } else {
+      this.imprimir();
+    }
+  }
+
+  imprimirOGenerarPDFAlmacen() {
+    const confirmacion = confirm('¿Deseas generar un PDF o imprimir directamente?');
+    if (confirmacion) {
+      this.generarPDFAlmacen();
+    } else {
+      this.imprimir();
+    }
+  }
+
+
+  private imprimir() {
+    window.print();
+  }
+
+  private generarPDF() {
+    (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
+  const logoPath = 'assets/imagenes/logo.png';
+
+    const documentDefinition: TDocumentDefinitions = {
+      pageSize: 'A4',
+      pageOrientation: 'landscape',
+      pageMargins: [40, 60, 40, 60],
+      header: (currentPage, pageCount, pageSize) => {
+        return [
+          {
+            text: 'Departamento de Logística - Detalles de Solicitud',
+            alignment: 'center',
+            margin: [0, 20, 0, 0],
+            fontSize: 16,
+            bold: true
+          },
+          {
+            canvas: [
+              {
+                type: 'line',
+                x1: 40,
+                y1: 58,
+                x2: pageSize.width - 40,
+                y2: 58,
+                lineWidth: 0.5
+              }
+            ]
+          }
+        ];
+      },
+      footer: (currentPage, pageCount) => {
+        return {
+          columns: [
+            { text: 'Documento generado el ' + new Date().toLocaleString(), alignment: 'left', margin: [40, 0] },
+            { text: 'Página ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', margin: [0, 0, 40, 0] }
+          ],
+          margin: [0, 20]
+        };
+      },
+      content: [
+        {
+          columns: [
+            {
+              width: '50%',
+              table: {
+                headerRows: 1,
+                widths: ['40%', '*'],
+                body: [
+                  [{ text: 'Campo', style: 'tableHeader' }, { text: 'Valor', style: 'tableHeader' }],
+                  ['Solicitante', this.solicitudSeleccionada?.solicitante || ''],
+                  ['Nombre del MP', this.solicitudSeleccionada?.nombreMp || ''],
+                  ['Lote', this.solicitudSeleccionada?.lote || ''],
+                  ['Proveedor', this.solicitudSeleccionada?.proveedor || ''],
+                  ['Urgencia', this.solicitudSeleccionada?.urgencia || '']
+                ]
+              }
+            },
+            {
+              width: '50%',
+              table: {
+                headerRows: 1,
+                widths: ['40%', '*'],
+                body: [
+                  [{ text: 'Campo', style: 'tableHeader' }, { text: 'Valor', style: 'tableHeader' }],
+                  ['Fecha', this.solicitudSeleccionada?.fecha ? new Date(this.solicitudSeleccionada.fecha).toLocaleDateString() : ''],
+                  ['Estado', this.solicitudSeleccionada?.estado || ''],
+                  ['Código Artículo', this.solicitudSeleccionada?.codigoArticulo || ''],
+                  ['Comentarios', this.solicitudSeleccionada?.comentarios || ''],
+                  ['', '']
+                ]
+              }
+            }
+          ]
+        },
+
+      ],
+      styles: {
+        tableHeader: {
+          bold: true,
+          fontSize: 12,
+          color: 'white',
+          fillColor: '#2c3e50'
+        },
+        subheader: {
+          fontSize: 14,
+          bold: true,
+          margin: [0, 15, 0, 5],
+          color: '#34495e'
+        }
+      },
+      defaultStyle: {
+        fontSize: 10,
+        color: '#2c3e50'
+      }
+    };
+
+    pdfMake.createPdf(documentDefinition).open();
+  }
+  private generarPDFAlmacen() {
+    (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
+
+    const documentDefinition: TDocumentDefinitions = {
+      pageSize: 'A4',
+      pageOrientation: 'landscape',
+      pageMargins: [40, 60, 40, 60],
+      header: (currentPage, pageCount, pageSize) => {
+        return [
+          {
+            text: 'Departamento de Logística - Detalles de Solicitud',
+            alignment: 'center',
+            margin: [0, 20, 0, 0],
+            fontSize: 16,
+            bold: true
+          },
+          {
+            canvas: [
+              {
+                type: 'line',
+                x1: 40,
+                y1: 58,
+                x2: pageSize.width - 40,
+                y2: 58,
+                lineWidth: 0.5
+              }
+            ]
+          }
+        ];
+      },
+      footer: (currentPage, pageCount) => {
+        return {
+          columns: [
+            { text: 'Documento generado el ' + new Date().toLocaleString(), alignment: 'left', margin: [40, 0] },
+            { text: 'Página ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', margin: [0, 0, 40, 0] }
+          ],
+          margin: [0, 20]
+        };
+      },
+      content: [
+        {
+          columns: [
+            {
+              width: '50%',
+              table: {
+                headerRows: 1,
+                widths: ['40%', '*'],
+                body: [
+                  [{ text: 'Campo', style: 'tableHeader' }, { text: 'Valor', style: 'tableHeader' }],
+                  ['Solicitante', this.solicitudSeleccionada?.solicitante || ''],
+                  ['Nombre del MP', this.solicitudSeleccionada?.nombreMp || ''],
+                  ['Lote', this.solicitudSeleccionada?.lote || ''],
+                  ['Proveedor', this.solicitudSeleccionada?.proveedor || ''],
+                  ['Urgencia', this.solicitudSeleccionada?.urgencia || '']
+                ]
+              }
+            },
+            {
+              width: '50%',
+              table: {
+                headerRows: 1,
+                widths: ['40%', '*'],
+                body: [
+                  [{ text: 'Campo', style: 'tableHeader' }, { text: 'Valor', style: 'tableHeader' }],
+                  ['Fecha', this.solicitudSeleccionada?.fecha ? new Date(this.solicitudSeleccionada.fecha).toLocaleDateString() : ''],
+                  ['Estado', this.solicitudSeleccionada?.estado || ''],
+                  ['Código Artículo', this.solicitudSeleccionada?.codigoArticulo || ''],
+                  ['Comentarios', this.solicitudSeleccionada?.comentarios || ''],
+                  ['', '']
+                ]
+              }
+            }
+          ]
+        },
+        { text: 'Necesidad de Almacén', style: 'subheader', margin: [0, 20, 0, 10] },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['20%', '*'],
+            body: [
+              [{ text: 'Campo', style: 'tableHeader' }, { text: 'Valor', style: 'tableHeader' }],
+              ['Necesidad', this.necesidadAlmacen?.necesidad || 'No especificada'],
+              ['Estado', this.solicitudSeleccionada?.estadoAlmacen || 'No especificado'],
+            ]
+          }
+        },
+      ],
+      styles: {
+        tableHeader: {
+          bold: true,
+          fontSize: 12,
+          color: 'white',
+          fillColor: '#2c3e50'
+        },
+        subheader: {
+          fontSize: 14,
+          bold: true,
+          margin: [0, 15, 0, 5],
+          color: '#34495e'
+        }
+      },
+      defaultStyle: {
+        fontSize: 10,
+        color: '#2c3e50'
+      }
+    };
+
+    pdfMake.createPdf(documentDefinition).open();
+  }
   scrollToBottom() {
     const container = this.chatContainer.nativeElement;
     container.scrollTop = container.scrollHeight;
     this.mostrarBotonBajar = false;
   }
 
-  get filteredSolicitudes() {
+  get filteredSolicitudesExpediciones() {
     return this.solicitudes.filter(solicitud => {
       return (
-        (!this.filtros.solicitante || solicitud.solicitante.toLowerCase().includes(this.filtros.solicitante.toLowerCase())) &&
-        (!this.filtros.nombreMp || solicitud.nombreMp.toLowerCase().includes(this.filtros.nombreMp.toLowerCase())) &&
-        (!this.filtros.proveedor || solicitud.proveedor.toLowerCase().includes(this.filtros.proveedor.toLowerCase())) &&
-        (!this.filtros.estado || solicitud.estado.toLowerCase().includes(this.filtros.estado.toLowerCase()))
+        (!this.filtrosExpediciones.solicitante || solicitud.solicitante.toLowerCase().includes(this.filtrosExpediciones.solicitante.toLowerCase())) &&
+        (!this.filtrosExpediciones.nombreMp || solicitud.nombreMp.toLowerCase().includes(this.filtrosExpediciones.nombreMp.toLowerCase())) &&
+        (!this.filtrosExpediciones.proveedor || solicitud.proveedor.toLowerCase().includes(this.filtrosExpediciones.proveedor.toLowerCase())) &&
+        (!this.filtrosExpediciones.estado || solicitud.estado.toLowerCase().includes(this.filtrosExpediciones.estado.toLowerCase()))
+      );
+    });
+  }
+
+  get filteredSolicitudesAlmacen() {
+    return this.solicitudesAlmacen.filter(solicitud => {
+      return (
+        (!this.filtrosAlmacen.solicitante || solicitud.solicitante.toLowerCase().includes(this.filtrosAlmacen.solicitante.toLowerCase())) &&
+        (!this.filtrosAlmacen.nombreMp || solicitud.nombreMp.toLowerCase().includes(this.filtrosAlmacen.nombreMp.toLowerCase())) &&
+        (!this.filtrosAlmacen.proveedor || solicitud.proveedor.toLowerCase().includes(this.filtrosAlmacen.proveedor.toLowerCase())) &&
+        (!this.filtrosAlmacen.estado || solicitud.estado.toLowerCase().includes(this.filtrosAlmacen.estado.toLowerCase()))
       );
     });
   }
@@ -106,16 +366,29 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
     return this.nombre = this.authService.getNameFromToken() || '';
   }
 
-  cargarDetalles(solicitud: SolicitudMuestra): void {
+  cargarDetallesExpedicion(solicitud: SolicitudMuestra): void {
+    this.solicitudSeleccionada = solicitud;
+    if (this.solicitudSeleccionada && this.solicitudSeleccionada.idSolicitudMuestra) {
+      this.getFiles(this.solicitudSeleccionada.idSolicitudMuestra.toString());
+      this.obtenerMensajes();
+      this.iniciarPolling();
+
+    } else {
+      console.error('ID de solicitud no está definido o es inválido en cargarDetallesExpedicion.');
+    }
+  }
+
+
+
+  cargarDetallesAlmacen(solicitud: SolicitudMuestra): void {
     this.solicitudSeleccionada = solicitud;
     if (this.solicitudSeleccionada && this.solicitudSeleccionada.idSolicitudMuestra) {
       this.getFiles(this.solicitudSeleccionada.idSolicitudMuestra.toString());
       this.obtenerMensajes();
       this.iniciarPolling();
       this.obtenerNecesidadAlmacen(this.solicitudSeleccionada.idSolicitudMuestra);
-
     } else {
-      console.error('ID de solicitud no está definido o es inválido en cargarDetalles.');
+      console.error('ID de solicitud no está definido o es inválido en cargarDetallesAlmacen.');
     }
   }
 
@@ -167,9 +440,6 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
       this.pollingSubscription.unsubscribe();
     }
   }
-
-  archivos: any[] = [];
-  selectedFile: File | null = null;
 
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
@@ -228,32 +498,25 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
     this.checkScrollPosition();
   }
 
-  showAlmacenOptions: boolean = false;
-  cantidadMuestra: string | undefined;
-
-
-  enviarSolicitudAlmacen() {
-    this.solicitudService.devolcerSolicitudLab(this.solicitudSeleccionada?.idSolicitudMuestra || 0).subscribe(
-      (data) => {
-        alert('Solicitud enviada devuelta a laboratorio');
-        window.location.reload();
-        this.showAlmacenOptions = false;
-        this.obtenerSolicitudes();
-        this.obtenerSolicitudesAlmacen();
-      },
-      (error) => {
-        console.error('Error al enviar solicitud a almacén', error);
-      }
-    );
-
+  enviarSolicitudAlmacen(): void {
+    if (this.solicitudSeleccionada?.idSolicitudMuestra) {
+      this.solicitudService.devolcerSolicitudLab(this.solicitudSeleccionada.idSolicitudMuestra).subscribe(
+        (data) => {
+          alert('Solicitud enviada devuelta a laboratorio');
+          window.location.reload();
+          this.showAlmacenOptions = false;
+          this.obtenerSolicitudes();
+          this.obtenerSolicitudesAlmacen();
+        },
+        (error) => {
+          console.error('Error al enviar solicitud a almacén', error);
+        }
+      );
+    } else {
+      console.error('ID de solicitud no está definido para enviar a almacén.');
+    }
   }
 
-
-  necesidadAlmacen: any = null;
-
-  guardarDetallesAlmacen() {
-
-  }
   obtenerNecesidadAlmacen(idSolicitudMuestra: number): void {
     this.solicitudService.getNecesidadAlmacen(idSolicitudMuestra).subscribe(
       (data) => {
@@ -266,7 +529,7 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
     );
   }
 
-  finalizar() {
+  finalizar(): void {
     if (confirm('¿Está seguro de que desea finalizar esta solicitud?')) {
       this.solicitudService.finalizarSolcitud(this.solicitudSeleccionada?.idSolicitudMuestra || 0).subscribe(
         (data) => {
@@ -283,8 +546,23 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
     }
   }
 
+  resetFiltrosExpediciones(): void {
+    this.filtrosExpediciones = {
+      solicitante: '',
+      nombreMp: '',
+      proveedor: '',
+      estado: ''
+    };
+    this.pExpediciones = 1;
+  }
 
+  resetFiltrosAlmacen(): void {
+    this.filtrosAlmacen = {
+      solicitante: '',
+      nombreMp: '',
+      proveedor: '',
+      estado: ''
+    };
+    this.pAlmacen = 1;
+  }
 }
-
-
-

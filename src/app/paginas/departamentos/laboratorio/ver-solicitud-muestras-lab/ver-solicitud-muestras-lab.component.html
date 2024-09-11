@@ -1,6 +1,27 @@
 <div class="container-fluid mt-5">
   <h2 class="mb-4">Ver Solicitudes de Muestra</h2>
 
+  <!-- Filtros -->
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <input type="text" class="form-control" [(ngModel)]="filtros.solicitante" placeholder="Filtrar por solicitante">
+    </div>
+    <div class="col-md-3">
+      <input type="text" class="form-control" [(ngModel)]="filtros.nombreMp" placeholder="Filtrar por nombre MP">
+    </div>
+    <div class="col-md-3">
+      <input type="text" class="form-control" [(ngModel)]="filtros.proveedor" placeholder="Filtrar por proveedor">
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" [(ngModel)]="filtros.estado">
+        <option value="">Todos los estados</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="en proceso">En proceso</option>
+        <option value="finalizado">Finalizado</option>
+      </select>
+    </div>
+  </div>
+
   <!-- Tabla de Solicitudes -->
   <div class="table-responsive">
     <table class="table table-striped">
@@ -17,7 +38,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let solicitud of solicitudes">
+        <tr *ngFor="let solicitud of filteredSolicitudes | paginate: { itemsPerPage: itemsPerPage, currentPage: page }">
           <td>{{ solicitud.solicitante }}</td>
           <td>{{ solicitud.nombreMp }}</td>
           <td>{{ solicitud.lote }}</td>
@@ -40,6 +61,10 @@
     </table>
   </div>
 
+  <!-- Paginación -->
+  <div class="d-flex justify-content-center mt-3">
+    <pagination-controls (pageChange)="page = $event"></pagination-controls>
+  </div>
   <!-- Modal para Ver Detalles -->
   <div class="modal fade" id="detalleModal" tabindex="-1" aria-labelledby="detalleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down modal-xl">
@@ -75,16 +100,13 @@
                     <dt class="col-sm-4">Comentarios:</dt>
                     <dd class="col-sm-8">{{ solicitudSeleccionada?.comentarios }}</dd>
                   </dl>
-
                   <div class="card mt-4 shadow-sm">
                     <div class="card-body">
                       <h6 class="card-title mb-3">Necesidad de Almacén</h6>
                       <div *ngIf="necesidadAlmacen; else noNecesidadAlmacen">
                         <p><strong>Necesidad:</strong> {{ necesidadAlmacen.necesidad }}</p>
-                        <p><strong>Estado:</strong> {{ solicitudSeleccionada?.estadoAlmacen }}
-                        </p>
-
-                        <!-- Puedes agregar más detalles aquí si es necesario -->
+                        <p *ngIf="necesidadAlmacen.cantidadRecibida"><strong>Cantidad Recibida:</strong> {{ necesidadAlmacen.cantidadRecibida }}</p>
+                        <p *ngIf="necesidadAlmacen.fechaRecepcion"><strong>Fecha de Recepción:</strong> {{ necesidadAlmacen.fechaRecepcion | date }}</p>
                       </div>
                       <ng-template #noNecesidadAlmacen>
                         <p>No se ha hecho ninguna solicitud a Almacen por ahora</p>
@@ -127,24 +149,7 @@
                   </div>
                   <div *ngIf="archivos.length > 0">
                     <h6 class="mt-4">Archivos:</h6>
-                    <ul class="list-group">
-                      <li
-                        *ngFor="let archivo of archivos"
-                        class="list-group-item d-flex justify-content-between align-items-center"
-                      >
 
-                          [href]="archivo.url"
-                          target="_blank"
-                          class="text-decoration-none"
-                        >{{ archivo.url }}
-                        <button
-                          class="btn btn-danger btn-sm"
-                          (click)="eliminarArchivo(archivo)"
-                        >
-                          Eliminar
-                        </button>
-                      </li>
-                    </ul>
                   </div>
                 </div>
               </div>

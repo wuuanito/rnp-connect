@@ -8,6 +8,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class MensajeService {
+
   private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
@@ -18,6 +19,9 @@ export class MensajeService {
 
   createMensaje(mensaje: Mensaje): Observable<Mensaje> {
     return this.http.post<Mensaje>(`${this.apiUrl}/mensajes`, mensaje);
+  }
+  marcarMensajesComoLeidos(idSolicitudMuestra: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/solicitudMuestras/${idSolicitudMuestra}/marcarLeidos`, {});
   }
 }
 

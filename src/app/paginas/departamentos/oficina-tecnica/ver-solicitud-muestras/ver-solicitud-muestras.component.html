@@ -54,6 +54,9 @@
               (click)="cargarDetalles(solicitud)"
             >
               Ver
+              <span *ngIf="solicitud.mensajesNoLeidos > 0" class="badge bg-danger">
+                {{ solicitud.mensajesNoLeidos }}
+              </span>
             </button>
           </td>
         </tr>
@@ -126,9 +129,11 @@
                       {{ solicitudSeleccionada?.codigoArticulo }}
                     </dd>
                     <dt class="col-sm-4">Comentarios:</dt>
-                    <dd class="col-sm-8">
-                      {{ solicitudSeleccionada?.comentarios }}
+                    <dd class="col-sm-8" [innerHTML]="formatearComentarios(solicitudSeleccionada?.comentarios || '')">
                     </dd>
+
+
+
                   </dl>
                 </div>
               </div>
@@ -157,10 +162,11 @@
                         class="list-group-item"
                       >
 
-                          [href]="archivo.url"
-                          target="_blank"
-                          class="text-decoration-none"
-                          >{{ archivo.url }}
+                      <a
+                      [href]="archivo.url"
+                      target="_blank"
+                      class="text-decoration-none"
+                    >{{ archivo.url }}</a>
 
                         <!--boton para eliminar un archivo especifico-->
                         <button

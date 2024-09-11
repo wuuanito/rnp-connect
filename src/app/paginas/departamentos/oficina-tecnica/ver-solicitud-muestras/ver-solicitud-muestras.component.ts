@@ -7,13 +7,9 @@ import { MensajeService } from '../../../../core/services/mensaje.service';
 import { FormsModule } from '@angular/forms';
 import { Subscription, timer } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
-import { SolicitudesService } from '../../../../core/services/solicitudes.service';
 import { UploadService } from '../../../../core/services/upload.service';
-import { environment } from '../../../../../environments/environment';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
 
 
 @Component({
@@ -91,8 +87,11 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
   obtenerSolicitudes(): void {
     this.solicitudService.getSolicitudes().subscribe(
       (data: SolicitudMuestra[]) => {
-        this.solicitudes = data;
-        this.aplicarFiltros(); // Llama a aplicarFiltros después de obtener los datos
+        this.solicitudes = data.map(solicitud => ({
+          ...solicitud,
+          mensajesNoLeidos: solicitud.mensajesNoLeidos ?? 0
+        }));
+        this.aplicarFiltros();
       },
       error => console.error('Error al obtener solicitudes', error)
     );
@@ -106,13 +105,21 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
     this.solicitudSeleccionada = solicitud;
     if (this.solicitudSeleccionada && this.solicitudSeleccionada.idSolicitudMuestra) {
       this.getFiles(this.solicitudSeleccionada.idSolicitudMuestra.toString());
-      this.aplicarFiltros();
-
       this.obtenerMensajes();
-      this.iniciarPolling();
-    } else {
-      console.error('ID de solicitud no está definido o es inválido en cargarDetalles.');
+      this.marcarMensajesComoLeidos(this.solicitudSeleccionada.idSolicitudMuestra);
     }
+  }
+
+  marcarMensajesComoLeidos(idSolicitudMuestra: number): void {
+    this.mensajeService.marcarMensajesComoLeidos(idSolicitudMuestra).subscribe(
+      () => {
+        const solicitud = this.solicitudes.find(s => s.idSolicitudMuestra === idSolicitudMuestra);
+        if (solicitud) {
+          solicitud.mensajesNoLeidos = 0;
+        }
+      },
+      error => console.error('Error al marcar mensajes como leídos', error)
+    );
   }
 
   obtenerMensajes(): void {
@@ -246,6 +253,12 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
     );
   }
 
+  formatearComentarios(comentarios: string): string {
+    if (!comentarios) return '';
+
+    // Reemplaza los saltos de línea por párrafos
+    return comentarios.split('\n').map(parrafo => `<p>${parrafo}</p>`).join('');
+  }
 
 }
 

@@ -19,11 +19,13 @@ export class CrearSolicitudMuestrasComponent {
     proveedor: '',
     urgencia: '',
     fecha: new Date(),
-    estado: 'Pendiente', // Estado inicial
+    estado: "Pendiente",
     codigoArticulo: '',
     comentarios: '',
-    mensajes: [], // Agregado para conversaciones
-    expediciones : false,
+    mensajes: [],
+    expediciones: false,
+    almacen: false,
+    mensajesNoLeidos: 0 // Inicializamos con 0
   };
 
   constructor(private solicitudService: MuestrasService, private router: Router) { }

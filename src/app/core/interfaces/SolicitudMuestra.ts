@@ -1,5 +1,5 @@
 export interface SolicitudMuestra {
-  idSolicitudMuestra?: number; // El campo puede ser opcional al crear una nueva solicitud
+  idSolicitudMuestra?: number;
   solicitante: string;
   nombreMp: string;
   lote: string;
@@ -11,9 +11,10 @@ export interface SolicitudMuestra {
   comentarios: string;
   mensajes: Mensaje[];
   archivos?: {name: string, url: string}[];
-  expediciones ?: boolean;
-  almacen ?: boolean;
-  estadoAlmacen ?: string;
+  expediciones?: boolean;
+  almacen?: boolean;
+  estadoAlmacen?: string;
+  mensajesNoLeidos?: number; // Hacemos este campo opcional
 }
 
 
