@@ -16,13 +16,13 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
-  selector: 'app-ver-solicitud-muestras-logistica',
+  selector: 'app-solicitudes-muestra-almacen',
   standalone: true,
   imports: [DatePipe, CommonModule, FormsModule, NgxPaginationModule,MatPaginator],
-  templateUrl: './ver-solicitud-muestras-logistica.component.html',
-  styleUrls: ['./ver-solicitud-muestras-logistica.component.css']
+  templateUrl: './solicitudes-muestra-almacen.component.html',
+  styleUrl: './solicitudes-muestra-almacen.component.css'
 })
-export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
   displayedColumns: string[] = ['solicitante', 'nombreMp', 'proveedor', 'estado'];
 

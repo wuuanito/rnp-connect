@@ -54,6 +54,7 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
     this.nombre = this.authService.getNameFromToken() || '';
     this.aplicarFiltros();
 
+
   }
 
   checkScrollPosition() {
@@ -73,6 +74,7 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
     this.mostrarBotonBajar = false;
   }
 
+
   get filteredSolicitudes() {
     return this.solicitudes.filter(solicitud => {
       return (
@@ -83,6 +85,22 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
       );
     });
   }
+  esUltimoMensajeDeOtroUsuario(solicitud: SolicitudMuestra): boolean {
+    const mensajes = solicitud.mensajes;
+    if (mensajes.length === 0) {
+      return false; // No hay mensajes, no mostrar insignia
+    }
+
+    const ultimoMensaje = mensajes[mensajes.length - 1];
+    const nombreUsuario = this.obtenerNombreToken();
+
+    console.log("Remitente del último mensaje: ", ultimoMensaje.remitente);
+    console.log("Nombre del usuario actual: ", nombreUsuario);
+
+    return ultimoMensaje.remitente !== nombreUsuario;
+  }
+
+
 
   obtenerSolicitudes(): void {
     this.solicitudService.getSolicitudes().subscribe(
@@ -122,17 +140,20 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
     );
   }
 
+
   obtenerMensajes(): void {
     if (this.solicitudSeleccionada?.idSolicitudMuestra) {
       this.mensajeService.getMensajes(this.solicitudSeleccionada.idSolicitudMuestra).subscribe(
         (mensajes: Mensaje[]) => {
           this.mensajes = mensajes;
+          console.log('Mensajes obtenidos: ', mensajes); // Verifica que los mensajes se obtienen correctamente
           setTimeout(() => this.scrollToBottom(), 0);
         },
         error => console.error('Error al obtener mensajes', error)
       );
     }
   }
+
 
   enviarMensaje(): void {
     const nombreRemitente = this.authService.getNameFromToken() || 'defaultName';

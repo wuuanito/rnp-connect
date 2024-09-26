@@ -1,5 +1,6 @@
+
 <div class="container mt-5">
-  <h2 class="mb-4">Ver Solicitudes Expediciones</h2>
+  <h2 class="mb-4">Ver Solicitudes de Almacén</h2>
 
   <!-- Filtros -->
   <div class="mb-4">
@@ -8,7 +9,7 @@
         <input
           type="text"
           class="form-control"
-          [(ngModel)]="filtrosExpediciones.solicitante"
+          [(ngModel)]="filtrosAlmacen.solicitante"
           placeholder="Filtrar por Solicitante"
         />
       </div>
@@ -16,7 +17,7 @@
         <input
           type="text"
           class="form-control"
-          [(ngModel)]="filtrosExpediciones.nombreMp"
+          [(ngModel)]="filtrosAlmacen.nombreMp"
           placeholder="Filtrar por Nombre MP"
         />
       </div>
@@ -24,7 +25,7 @@
         <input
           type="text"
           class="form-control"
-          [(ngModel)]="filtrosExpediciones.proveedor"
+          [(ngModel)]="filtrosAlmacen.proveedor"
           placeholder="Filtrar por Proveedor"
         />
       </div>
@@ -32,12 +33,12 @@
         <input
           type="text"
           class="form-control"
-          [(ngModel)]="filtrosExpediciones.estado"
+          [(ngModel)]="filtrosAlmacen.estado"
           placeholder="Filtrar por Estado"
         />
       </div>
     </div>
-    <button class="btn btn-secondary mt-3" (click)="resetFiltrosExpediciones()">Restablecer Filtros</button>
+    <button class="btn btn-secondary mt-3" (click)="resetFiltrosAlmacen()">Restablecer Filtros</button>
   </div>
 
   <!-- Tabla de Solicitudes -->
@@ -56,7 +57,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let solicitud of filteredSolicitudesExpediciones | paginate: { itemsPerPage: itemsPerPage, currentPage: pExpediciones }">
+        <tr *ngFor="let solicitud of filteredSolicitudesAlmacen | paginate: { itemsPerPage: itemsPerPage, currentPage: pAlmacen }">
           <td>{{ solicitud.solicitante }}</td>
           <td>{{ solicitud.nombreMp }}</td>
           <td>{{ solicitud.lote }}</td>
@@ -68,8 +69,8 @@
             <button
               class="btn btn-info btn-sm"
               data-bs-toggle="modal"
-              data-bs-target="#detalleModalExpedicion"
-              (click)="cargarDetallesExpedicion(solicitud)"
+              data-bs-target="#detalleModalAlmacen"
+              (click)="cargarDetallesAlmacen(solicitud)"
             >
               Ver
             </button>
@@ -78,21 +79,21 @@
       </tbody>
     </table>
   </div>
-  <pagination-controls (pageChange)="pExpediciones = $event"></pagination-controls>
+  <pagination-controls (pageChange)="pAlmacen = $event"></pagination-controls>
 
-  <!-- Modal para Ver Detalles Expedición -->
+  <!-- Modal para Ver Detalles Almacén -->
   <div
     class="modal fade"
-    id="detalleModalExpedicion"
+    id="detalleModalAlmacen"
     tabindex="-1"
-    aria-labelledby="detalleModalExpedicionLabel"
+    aria-labelledby="detalleModalAlmacenLabel"
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-scrollable modal-xl">
       <div class="modal-content">
         <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title" id="detalleModalExpedicionLabel">
-            Detalles de la Solicitud de Expedición
+          <h5 class="modal-title" id="detalleModalAlmacenLabel">
+            Detalles de la Solicitud de Almacén
           </h5>
           <button
             type="button"
@@ -108,7 +109,7 @@
               <div class="card h-100 shadow-sm">
                 <div class="card-body">
                   <h6 class="card-title mb-4">Detalles de la Solicitud</h6>
-                  <button class="btn btn-primary mt-3" (click)="imprimirOGenerarPDF()">
+                  <button class="btn btn-primary mt-3" (click)="imprimirOGenerarPDFAlmacen()">
                     Imprimir
                   </button>
                   <dl class="row">

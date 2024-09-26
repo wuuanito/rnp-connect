@@ -54,9 +54,10 @@
               (click)="cargarDetalles(solicitud)"
             >
               Ver
-              <span *ngIf="solicitud.mensajesNoLeidos > 0" class="badge bg-danger">
+              <span *ngIf="esUltimoMensajeDeOtroUsuario(solicitud)" class="badge bg-danger">
                 {{ solicitud.mensajesNoLeidos }}
               </span>
+
             </button>
           </td>
         </tr>

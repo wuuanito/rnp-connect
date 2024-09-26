@@ -58,6 +58,7 @@ import { CrearSolicitudMuestrasLogisticaComponent } from './paginas/departamento
 import { VerSolicitudMuestrasLogisticaComponent } from './paginas/departamentos/logistica/ver-solicitud-muestras-logistica/ver-solicitud-muestras-logistica.component';
 import { RegistroPlantaComponent } from './paginas/departamentos/gerencia/registro-planta/registro-planta.component';
 import { CalendarioFernandoCarlosComponent } from './paginas/departamentos/gerencia/calendario-fernando-carlos/calendario-fernando-carlos.component';
+import { SolicitudesMuestraAlmacenComponent } from './paginas/departamentos/logistica/solicitudes-muestra-almacen/solicitudes-muestra-almacen.component';
 
 export const routes: Routes = [
 
@@ -292,6 +293,10 @@ export const routes: Routes = [
               {
                 path:'ver-muestras',
                 component:VerSolicitudMuestrasLogisticaComponent
+              },
+              {
+                path:'muestras-almacen',
+                component:SolicitudesMuestraAlmacenComponent
               }
 
             ]

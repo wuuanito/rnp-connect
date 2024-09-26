@@ -1,52 +1,103 @@
-<!-- rnp-connect-landing.component.html -->
-<div class="landing-page">
-  <header class="bg-primary text-white text-center py-5">
-    <div class="container">
-      <h1 class="display-2 mb-4 fw-bold">RNP CONNECT</h1>
-      <p class="lead mb-5">RNP Connect es la herramienta definitiva para impulsar la innovación y la colaboración en tiempo real dentro de tu empresa. Descubre cómo podemos transformar tu forma de trabajar, optimizando la comunicación entre departamentos y potenciando la eficiencia operativa.</p>
-    </div>
-  </header>
 
-  <section class="bg-light py-5">
-    <div class="container">
-      <h2 class="text-center mb-5">Características principales</h2>
-      <div class="row">
-        <div class="col-md-6 col-lg-3 mb-4" *ngFor="let feature of features">
-          <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body text-center">
-              <i class="fas {{ feature.icon }} fa-3x text-primary mb-3"></i>
-              <h5 class="card-title">{{ feature.title }}</h5>
-              <p class="card-text">{{ feature.description }}</p>
+<body>
+
+
+    <div class="container-fluid calendar-container">
+        <div class="row g-4">
+            <div class="col-12 col-xl-9">
+                <div class="card main-calendar-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Calendario Rioja Nature Pharma</h2>
+                    </div>
+                    <div class="card-body">
+                        <full-calendar [options]="calendarOptions"></full-calendar>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-xl-3">
+                <div class="card upcoming-events-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Próximamente </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="event-list-container">
+                            <ul class="list-group">
+                                <li *ngFor="let event of upcomingEvents" class="list-group-item"
+                                    [ngClass]="{'event-vero': event.title.toLowerCase().startsWith('vero'),
+                                                'event-andrea': event.title.toLowerCase().startsWith('andrea'),
+                                                'event-other': !event.title.toLowerCase().startsWith('vero') && !event.title.toLowerCase().startsWith('andrea')}">
+                                    <div class="event-header">
+                                        <h5 class="event-title">{{ event.title }}</h5>
+                                        <span class="event-date">{{ event.start | date:'dd MMM' }}</span>
+                                    </div>
+                                    <p class="event-description">{{ getEventDescriptionById(event.id) }}</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="card legend-card">
+              <div class="card-body">
+                <h3 class="legend-title">Leyenda</h3>
+                <div class="legend-items">
+                  <div class="legend-item">
+                    <span class="legend-color bg-visitas"></span>
+                    <span class="legend-label">Visitas</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color bg-clientes"></span>
+                    <span class="legend-label">Visitas Clientes</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color bg-proveedores"></span>
+                    <span class="legend-label">Proveedores</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color bg-auditorias"></span>
+                    <span class="legend-label">Auditorias y Certificaciones</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color bg-other"></span>
+                    <span class="legend-label">Otros</span>
+                  </div>
+                  <p class="text-muted mt-3">
+                    <small>Nota: Los eventos se muestran en el formato <strong>Título - Sala</strong>.</small>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
     </div>
-  </section>
 
-  <section class="py-5">
-    <div class="container">
-      <h2 class="text-center mb-5">Cómo usar RNP Connect</h2>
-      <div class="row align-items-center">
-        <div class="col-md-6 order-md-2 mb-4 mb-md-0">
-          <img src="./assets/imagenes/logoVerti.png" alt="Usando RNP Connect" class="img-fluid rounded shadow" style="width: 200px;">
-        </div>
-        <div class="col-md-6 order-md-1">
-          <ol class="list-unstyled">
-            <li class="mb-3"><strong>1.</strong> Regístrate en nuestra plataforma</li>
-            <li class="mb-3"><strong>2.</strong> Conecta tus dispositivos RNP</li>
-            <li class="mb-3"><strong>3.</strong> Configura tus preferencias de red</li>
-            <li class="mb-3"><strong>4.</strong> Monitorea y optimiza tu red en tiempo real</li>
-            <li><strong>5.</strong> Disfruta de una gestión de red sin complicaciones</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-  </section>
+    <!-- Modal de detalles del evento -->
+    <div class="modal-overlay" *ngIf="showModal">
+        <div class="modal-content">
 
-  <footer class="bg-dark text-white text-center py-3">
-    <div class="container">
-      <p>&copy; 2024 RNP Connect. Todos los derechos reservados.</p>
+            <div class="modal-body">
+                <p><strong>Fecha de inicio:</strong> {{ selectedEvent.start | date:'dd MMM yyyy' }}</p>
+                <p><strong>Descripción:</strong> {{ selectedEvent.description }}</p>
+                <p><strong>Sala:</strong> {{ selectedEvent.sala }}</p>
+                <p><strong>Responsable:</strong> {{ selectedEvent.responsable }}</p>
+                <section class="participants-section">
+                    <h4>Participantes:</h4>
+                    <ul class="list-unstyled">
+                        <li *ngFor="let participant of selectedEvent.participants">
+                            <i class="fas fa-user me-2"></i>{{ participant.email }}
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <footer class="modal-footer">
+                <button class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
+                <button class="btn btn-danger" (click)="deleteEvent()">Eliminar Evento</button>
+            </footer>
+        </div>
     </div>
-  </footer>
-</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>

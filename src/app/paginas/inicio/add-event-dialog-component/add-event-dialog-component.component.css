@@ -1,0 +1,47 @@
+/* Estilos corporativos de Nature Pharma */
+
+/* Colores corporativos */
+:root {
+  --primary-color: #4CAF50;  /* Verde corporativo */
+  --secondary-color: #FFC107; /* Amarillo corporativo */
+  --font-color: #333333;      /* Color del texto */
+  --background-color: #f5f5f5; /* Fondo de los diálogos */
+}
+
+/* Estilos del formulario */
+mat-form-field {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+input, textarea {
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  color: var(--font-color);
+}
+
+/* Estilo para el botón de acción */
+button {
+  font-family: 'Arial', sans-serif;
+}
+
+button.mat-raised-button {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+button.mat-button {
+  color: var(--secondary-color);
+}
+
+/* Fondo del diálogo */
+mat-dialog-content {
+  background-color: var(--background-color);
+}
+
+mat-dialog-title {
+  font-family: 'Arial', sans-serif;
+  color: var(--primary-color);
+  font-weight: bold;
+  margin-bottom: 20px;
+}

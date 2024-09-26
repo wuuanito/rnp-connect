@@ -94,8 +94,8 @@ export class CalendarioFernandoCarlosComponent implements OnInit, OnDestroy {
 
 
 fetchEventsFromApi() {
-    const startDate = new Date().toISOString();
-    const endDate = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString();
+  const startDate = new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString(); // Incluir eventos pasados
+  const endDate = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString();
 
     this.http.get<any[]>(`${this.apiUrl}/reservas`, {
       params: {
