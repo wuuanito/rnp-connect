@@ -1,0 +1,45 @@
+.mat-header-cell, .mat-cell {
+  text-align: center;
+  font-weight: bold;
+}
+
+.mat-elevation-z8 {
+  border: 1px solid #e0e0e0;
+  margin-top: 20px;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+table {
+  width: 100%;
+}
+
+.action-button {
+  margin: 5px; /* Espaciado entre botones */
+  min-width: 120px; /* Ancho mínimo para los botones */
+}
+
+button.mat-raised-button {
+  font-size: 14px; /* Tamaño de fuente para mayor claridad */
+  border-radius: 4px; /* Bordes redondeados */
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+button.mat-raised-button:hover {
+  background-color: darken(#3f51b5, 10%); /* Oscurecer color primario en hover */
+  transform: scale(1.02); /* Efecto de aumento en hover */
+}
+
+.state-created {
+  background-color: #d1ecf1; /* Color para estado "Creado" */
+}
+
+.state-delivered {
+  background-color: #d4edda; /* Color para estado "Entregado" */
+}
+
+.table-row {
+  transition: background-color 0.3s; /* Para una transición suave de color */
+}

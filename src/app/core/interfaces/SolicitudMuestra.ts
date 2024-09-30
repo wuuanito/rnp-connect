@@ -6,7 +6,7 @@ export interface SolicitudMuestra {
   proveedor: string;
   urgencia: string;
   fecha: Date;
-  estado: "Pendiente" | "En Laboratorio" | "En Almacén" | "En Expediciones" | "Completada";
+  estado: "Pendiente" | "En Laboratorio" | "En Almacén" | "En Expediciones" | "Completada" | "Finalizado";
   codigoArticulo: string;
   comentarios: string;
   mensajes: Mensaje[];

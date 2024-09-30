@@ -1,0 +1,28 @@
+.mat-header-cell, .mat-cell {
+  text-align: center;
+  font-weight: bold;
+}
+
+.mat-elevation-z8 {
+  border: 1px solid #e0e0e0;
+  margin-top: 20px;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+table {
+  width: 100%;
+}
+.state-created {
+  background-color: #d1ecf1; /* Color para estado "Creado" */
+}
+
+.state-delivered {
+  background-color: #d4edda; /* Color para estado "Entregado" */
+}
+
+.table-row {
+  transition: background-color 0.3s; /* Para una transición suave de color */
+}

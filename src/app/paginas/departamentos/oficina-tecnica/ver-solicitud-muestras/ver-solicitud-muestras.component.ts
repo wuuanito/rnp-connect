@@ -10,12 +10,20 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { UploadService } from '../../../../core/services/upload.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialogModule } from '@angular/material/dialog';
+import {MatTabsModule} from '@angular/material/tabs';
 
 @Component({
   selector: 'app-ver-solicitud-muestras',
   standalone: true,
-  imports: [DatePipe,CommonModule,FormsModule,NgxPaginationModule,NgbPaginationModule],
+  imports: [DatePipe,CommonModule,FormsModule,NgxPaginationModule,NgbPaginationModule,MatFormFieldModule,MatInputModule,MatSelectModule,MatTableModule,MatPaginatorModule,MatButtonModule,MatIconModule,MatDialogModule,MatTabsModule],
   templateUrl: './ver-solicitud-muestras.component.html',
   styleUrl: './ver-solicitud-muestras.component.css'
 })
@@ -31,7 +39,15 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
   page: number = 1;
   itemsPerPage: number = 10;
   mostrarBotonBajar: boolean = false;
+  solicitudesFinalizadas: SolicitudMuestra[] = [];
 
+
+  solicitudesFiltradas: SolicitudMuestra[] = [];
+  displayedColumns: string[] = ['solicitante', 'nombreMp', 'lote', 'proveedor', 'urgencia', 'fecha', 'estado', 'acciones'];
+  filtroSolicitante = '';
+  filtroNombreMp = '';
+  filtroEstado = '';
+  p = 1;
   // Filtros
   filtros = {
     solicitante: '',
@@ -253,25 +269,23 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
   }
 
 
+  solicitudesPendientes: SolicitudMuestra[] = [];
 
-  solicitudesFiltradas: any[] = [];
-
-  // Variables para filtrado
-  filtroSolicitante: string = '';
-  filtroNombreMp: string = '';
-  filtroEstado: string = '';
 
   // Variables para paginación
-  p: number = 1; // página actual
 
 
 
   aplicarFiltros() {
-    this.solicitudesFiltradas = this.solicitudes.filter(solicitud =>
+    const filteredSolicitudes = this.solicitudes.filter(solicitud =>
       solicitud.solicitante.toLowerCase().includes(this.filtroSolicitante.toLowerCase()) &&
       solicitud.nombreMp.toLowerCase().includes(this.filtroNombreMp.toLowerCase()) &&
       (this.filtroEstado === '' || solicitud.estado === this.filtroEstado)
     );
+
+    // Dividimos entre pendientes y finalizadas
+    this.solicitudesPendientes = filteredSolicitudes.filter(solicitud => solicitud.estado !== 'Finalizado');
+    this.solicitudesFinalizadas = filteredSolicitudes.filter(solicitud => solicitud.estado === 'Finalizado');
   }
 
   formatearComentarios(comentarios: string): string {

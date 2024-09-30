@@ -74,12 +74,14 @@ export class InicioComponent implements OnInit, OnDestroy {
       eventResize: this.handleEventResize.bind(this),
       // New options for day names and week numbers
       dayHeaderFormat: { weekday: 'long' },
+      //solo sea de lunes a viernes
+      hiddenDays: [0, 6],
       weekNumbers: true,
       weekNumberFormat: { week: 'numeric' },
-      weekText: 'Semana ',
+      weekText: 'w - ',
       // Custom rendering for week numbers
       weekNumberContent: (arg: any) => {
-        return 'Semana - ' + arg.num;
+        return 'w - ' + arg.num;
       }
     };
   }

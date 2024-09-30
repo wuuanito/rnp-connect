@@ -4,72 +4,155 @@
   <!-- Filtros -->
   <div class="row mb-3">
     <div class="col-md-3">
-      <input type="text" class="form-control" [(ngModel)]="filtroSolicitante" placeholder="Filtrar por solicitante">
+      <mat-form-field appearance="fill" class="w-100">
+        <mat-label>Filtrar por solicitante</mat-label>
+        <input matInput [(ngModel)]="filtroSolicitante" placeholder="Filtrar por solicitante">
+      </mat-form-field>
     </div>
     <div class="col-md-3">
-      <input type="text" class="form-control" [(ngModel)]="filtroNombreMp" placeholder="Filtrar por nombre MP">
+      <mat-form-field appearance="fill" class="w-100">
+        <mat-label>Filtrar por nombre MP</mat-label>
+        <input matInput [(ngModel)]="filtroNombreMp" placeholder="Filtrar por nombre MP">
+      </mat-form-field>
     </div>
     <div class="col-md-3">
-      <select class="form-select" [(ngModel)]="filtroEstado">
-        <option value="">Todos los estados</option>
-        <option value="Pendiente">Pendiente</option>
-        <option value="Almacen">Laboratorio-Almacen</option>
-        <option value="Finalizado">Finalizado</option>
-      </select>
+      <mat-form-field appearance="fill" class="w-100">
+        <mat-label>Estado</mat-label>
+        <mat-select [(ngModel)]="filtroEstado">
+          <mat-option value="">Todos los estados</mat-option>
+          <mat-option value="Pendiente">Pendiente</mat-option>
+          <mat-option value="Almacen">Laboratorio-Almacen</mat-option>
+          <mat-option value="Finalizado">Finalizado</mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
     <div class="col-md-3">
-      <button class="btn btn-primary" (click)="aplicarFiltros()">Aplicar filtros</button>
+      <button mat-raised-button color="primary" (click)="aplicarFiltros()">Aplicar filtros</button>
     </div>
   </div>
 
-  <!-- Tabla de Solicitudes -->
-  <div class="table-responsive">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Solicitante</th>
-          <th>Nombre MP</th>
-          <th>Lote</th>
-          <th>Proveedor</th>
-          <th>Urgencia</th>
-          <th>Fecha</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let solicitud of solicitudesFiltradas | paginate: { itemsPerPage: itemsPerPage, currentPage: p }">
-          <td>{{ solicitud.solicitante }}</td>
-          <td>{{ solicitud.nombreMp }}</td>
-          <td>{{ solicitud.lote }}</td>
-          <td>{{ solicitud.proveedor }}</td>
-          <td>{{ solicitud.urgencia }}</td>
-          <td>{{ solicitud.fecha | date }}</td>
-          <td>{{ solicitud.estado }}</td>
-          <td>
-            <button
-              class="btn btn-info btn-sm"
-              data-bs-toggle="modal"
-              data-bs-target="#detalleModal"
-              (click)="cargarDetalles(solicitud)"
-            >
-              Ver
-              <span *ngIf="esUltimoMensajeDeOtroUsuario(solicitud)" class="badge bg-danger">
-                {{ solicitud.mensajesNoLeidos }}
-              </span>
+  <!-- Tabs para solicitudes -->
+  <mat-tab-group>
+    <!-- Pendientes/En proceso -->
+    <mat-tab label="Pendientes/En proceso">
+      <div class="mat-elevation-z8">
+        <table mat-table [dataSource]="solicitudesPendientes" class="mat-table">
+          <!-- Columnas -->
+          <ng-container matColumnDef="solicitante">
+            <th mat-header-cell *matHeaderCellDef> Solicitante </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.solicitante }} </td>
+          </ng-container>
 
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+          <ng-container matColumnDef="nombreMp">
+            <th mat-header-cell *matHeaderCellDef> Nombre MP </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.nombreMp }} </td>
+          </ng-container>
 
-  <!-- Paginación -->
-  <pagination-controls (pageChange)="p = $event"></pagination-controls>
+          <ng-container matColumnDef="lote">
+            <th mat-header-cell *matHeaderCellDef> Lote </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.lote }} </td>
+          </ng-container>
 
-  <!-- Modal para Ver Detalles -->
-  <div
+          <ng-container matColumnDef="proveedor">
+            <th mat-header-cell *matHeaderCellDef> Proveedor </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.proveedor }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="urgencia">
+            <th mat-header-cell *matHeaderCellDef> Urgencia </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.urgencia }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef> Fecha </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.fecha | date }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef> Estado </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.estado }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef> Acciones </th>
+            <td mat-cell *matCellDef="let solicitud">
+              <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#detalleModal" (click)="cargarDetalles(solicitud)">
+                Ver
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- Paginación -->
+        <mat-paginator [length]="solicitudesPendientes.length" [pageSize]="itemsPerPage" (page)="p = $event.pageIndex + 1"></mat-paginator>
+      </div>
+    </mat-tab>
+
+    <!-- Finalizadas -->
+    <mat-tab label="Finalizadas">
+      <div class="mat-elevation-z8">
+        <table mat-table [dataSource]="solicitudesFinalizadas" class="mat-table">
+          <!-- Columnas -->
+          <ng-container matColumnDef="solicitante">
+            <th mat-header-cell *matHeaderCellDef> Solicitante </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.solicitante }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="nombreMp">
+            <th mat-header-cell *matHeaderCellDef> Nombre MP </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.nombreMp }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="lote">
+            <th mat-header-cell *matHeaderCellDef> Lote </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.lote }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="proveedor">
+            <th mat-header-cell *matHeaderCellDef> Proveedor </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.proveedor }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="urgencia">
+            <th mat-header-cell *matHeaderCellDef> Urgencia </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.urgencia }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef> Fecha </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.fecha | date }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef> Estado </th>
+            <td mat-cell *matCellDef="let solicitud"> {{ solicitud.estado }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef> Acciones </th>
+            <td mat-cell *matCellDef="let solicitud">
+              <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#detalleModal" (click)="cargarDetalles(solicitud)">
+                Ver
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- Paginación -->
+        <mat-paginator [length]="solicitudesFinalizadas.length" [pageSize]="itemsPerPage" (page)="p = $event.pageIndex + 1"></mat-paginator>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Modal para Ver Detalles (Bootstrap) -->
+    <!-- Modal para Ver Detalles -->
+    <div
     class="modal fade"
     id="detalleModal"
     tabindex="-1"

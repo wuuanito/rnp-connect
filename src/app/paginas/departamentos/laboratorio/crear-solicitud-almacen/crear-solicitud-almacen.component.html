@@ -1,0 +1,52 @@
+<!--Titulo de la pagina-->
+
+<h1 class="page-title" style="text-align: center; margin-bottom: 20px; font-size: 24px; color: #2c3e50;">
+  Crear Solicitud de Materias Primas Almacén
+</h1>
+<form [formGroup]="materialRequestForm" (ngSubmit)="onSubmit()" class="material-request-form">
+  <mat-form-field appearance="fill">
+    <mat-label>Fecha de Solicitud</mat-label>
+    <input matInput [formControlName]="'fechaSolicitud'" [value]="getCurrentDate()" >
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Persona que solicita</mat-label>
+    <input matInput formControlName="personaSolicita" placeholder="Nombre de la persona">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Nombre materia</mat-label>
+    <input matInput formControlName="nombreMateria" placeholder="Nombre del material">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Código</mat-label>
+    <input matInput formControlName="codigo" placeholder="Código del material">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Lote</mat-label>
+    <input matInput formControlName="lote" placeholder="Número de lote">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Proveedor</mat-label>
+    <input matInput formControlName="proveedor" placeholder="Nombre del proveedor">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Ubicación</mat-label>
+    <input matInput formControlName="ubicacion" placeholder="Ubicación del material">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Urgencia</mat-label>
+    <mat-select formControlName="urgencia">
+      <mat-option value="Baja">Baja</mat-option>
+      <mat-option value="Media">Media</mat-option>
+      <mat-option value="Alta">Alta</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="materialRequestForm.invalid" class="submit-button">Enviar</button>
+</form>

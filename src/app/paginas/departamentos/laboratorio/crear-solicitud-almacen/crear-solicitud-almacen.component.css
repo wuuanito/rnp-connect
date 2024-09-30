@@ -1,0 +1,30 @@
+.material-request-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Espaciado entre campos */
+  max-width: 600px; /* Ancho máximo del formulario */
+  margin: auto; /* Centrar el formulario */
+  padding: 20px; /* Padding interno */
+  background-color: #f9f9f9; /* Color de fondo suave */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra para profundidad */
+}
+
+.mat-form-field {
+  width: 100%; /* Ancho completo para campos */
+}
+
+.submit-button {
+  align-self: flex-end; /* Alinear el botón a la derecha */
+}
+.table-row {
+  padding: 10px;
+}
+
+.state-created {
+  background-color: #d1ecf1; /* Color para estado "Creado" */
+}
+
+.state-delivered {
+  background-color: #d4edda; /* Color para estado "Entregado" */
+}

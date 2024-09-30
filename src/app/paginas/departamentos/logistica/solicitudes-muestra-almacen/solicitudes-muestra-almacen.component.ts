@@ -79,6 +79,28 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
     this.obtenerSolicitudesAlmacen();
   }
 
+  private ordenarSolicitudes(solicitudes: SolicitudMuestra[]): SolicitudMuestra[] {
+    return solicitudes.sort((a, b) => {
+      // Definir el orden de prioridad de los estados
+      const ordenEstados = {
+        'Pendiente': 0,
+        'En Laboratorio': 1,
+        'En Almacén': 2,
+        'En Expediciones': 3,
+        'Completada': 4,
+        'Finalizado': 5
+      };
+
+      // Comparar primero por estado
+      if (ordenEstados[a.estado] !== ordenEstados[b.estado]) {
+        return ordenEstados[a.estado] - ordenEstados[b.estado];
+      }
+
+      // Si los estados son iguales, ordenar por fecha (más reciente primero)
+      return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+    });
+  }
+
   checkScrollPosition() {
     const container = this.chatContainer.nativeElement;
     const scrollPosition = container.scrollTop + container.clientHeight;
@@ -328,31 +350,30 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
   }
 
   get filteredSolicitudesExpediciones() {
-    return this.solicitudes.filter(solicitud => {
+    return this.ordenarSolicitudes(this.solicitudes.filter(solicitud => {
       return (
         (!this.filtrosExpediciones.solicitante || solicitud.solicitante.toLowerCase().includes(this.filtrosExpediciones.solicitante.toLowerCase())) &&
         (!this.filtrosExpediciones.nombreMp || solicitud.nombreMp.toLowerCase().includes(this.filtrosExpediciones.nombreMp.toLowerCase())) &&
         (!this.filtrosExpediciones.proveedor || solicitud.proveedor.toLowerCase().includes(this.filtrosExpediciones.proveedor.toLowerCase())) &&
         (!this.filtrosExpediciones.estado || solicitud.estado.toLowerCase().includes(this.filtrosExpediciones.estado.toLowerCase()))
       );
-    });
+    }));
   }
 
   get filteredSolicitudesAlmacen() {
-    return this.solicitudesAlmacen.filter(solicitud => {
+    return this.ordenarSolicitudes(this.solicitudesAlmacen.filter(solicitud => {
       return (
         (!this.filtrosAlmacen.solicitante || solicitud.solicitante.toLowerCase().includes(this.filtrosAlmacen.solicitante.toLowerCase())) &&
         (!this.filtrosAlmacen.nombreMp || solicitud.nombreMp.toLowerCase().includes(this.filtrosAlmacen.nombreMp.toLowerCase())) &&
         (!this.filtrosAlmacen.proveedor || solicitud.proveedor.toLowerCase().includes(this.filtrosAlmacen.proveedor.toLowerCase())) &&
         (!this.filtrosAlmacen.estado || solicitud.estado.toLowerCase().includes(this.filtrosAlmacen.estado.toLowerCase()))
       );
-    });
+    }));
   }
-
   obtenerSolicitudes(): void {
     this.solicitudService.getSolicitudExpediciones().subscribe(
       (data: SolicitudMuestra[]) => {
-        this.solicitudes = data;
+        this.solicitudes = this.ordenarSolicitudes(data);
       },
       error => console.error('Error al obtener solicitudes', error)
     );
@@ -361,7 +382,7 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
   obtenerSolicitudesAlmacen(): void {
     this.solicitudService.getSolicitudAlm().subscribe(
       (data: SolicitudMuestra[]) => {
-        this.solicitudesAlmacen = data;
+        this.solicitudesAlmacen = this.ordenarSolicitudes(data);
       },
       error => console.error('Error al obtener solicitudes', error)
     );
@@ -571,4 +592,7 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
     };
     this.pAlmacen = 1;
   }
+
+
+
 }

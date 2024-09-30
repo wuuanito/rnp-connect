@@ -1,0 +1,140 @@
+<mat-tab-group>
+  <mat-tab label="Solicitudes Creadas">
+    <mat-form-field>
+      <mat-label>Filtro</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Buscar...">
+    </mat-form-field>
+
+    <table mat-table [dataSource]="dataSourceCreadas" matSort>
+      <ng-container matColumnDef="fechaSolicitud">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha de Creación </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.fechaSolicitud}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="personaSolicita">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Persona que Solicita </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.personaSolicita}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="nombreMateria">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre Materia </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.nombreMateria}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="codigo">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Código </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.codigo}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="lote">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Lote </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.lote}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="proveedor">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Proveedor </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.proveedor}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ubicacion">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Ubicación </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.ubicacion}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="urgencia">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Urgencia </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.urgencia}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.estado}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ver">
+        <th mat-header-cell *matHeaderCellDef> Ver </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-button (click)="verDetalles(element)">Ver detalles</button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-button (click)="finalizarSolicitud(element)">Finalizar Solicitud</button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-paginator #paginatorCreadas [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  </mat-tab>
+
+  <mat-tab label="Solicitudes Devueltas">
+    <mat-form-field>
+      <mat-label>Filtro</mat-label>
+      <input matInput (keyup)="applyFilterDevueltas($event)" placeholder="Buscar...">
+    </mat-form-field>
+
+    <table mat-table [dataSource]="dataSourceDevueltas" matSort>
+      <ng-container matColumnDef="fechaDevuelto">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha Devolución </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.fechaDevuelto}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="personaSolicita">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Persona que Solicita </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.personaSolicita}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="nombreMateria">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre Materia </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.nombreMateria}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="codigo">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Código </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.codigo}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="lote">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Lote </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.lote}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="proveedor">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Proveedor </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.proveedor}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ubicacion">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Ubicación </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.ubicacion}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="urgencia">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Urgencia </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.urgencia}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="getRowClass(element.estado)"> {{element.estado}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ver">
+        <th mat-header-cell *matHeaderCellDef> Ver </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-button (click)="verDetalles(element)">Ver detalles</button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsDevueltas"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsDevueltas;"></tr>
+    </table>
+
+    <mat-paginator #paginatorDevueltas [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  </mat-tab>
+</mat-tab-group>

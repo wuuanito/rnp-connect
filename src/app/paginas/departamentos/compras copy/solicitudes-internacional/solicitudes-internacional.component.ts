@@ -9,20 +9,25 @@ import { catchError, switchMap, tap } from 'rxjs/operators';
 import { EventService } from '../../../../core/events/events.service';
 import bootstrap from '../../../../../main.server';
 import { NgForm } from '@angular/forms';
-import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from '../../../../core/services/auth.service';
+import { NgxPaginationModule } from 'ngx-pagination';
 import { environment } from '../../../../../environments/environment';
 
 
 
 @Component({
-  selector: 'app-solicitudes-informatica',
+  selector: 'app-solicitudes-internacional',
   standalone: true,
   imports: [CommonModule, FormsModule,NgxPaginationModule],
-  templateUrl: './solicitudes-informatica.component.html',
-  styleUrl: './solicitudes-informatica.component.css'
+  templateUrl: './solicitudes-internacional.component.html',
+  styleUrl: './solicitudes-internacional.component.css'
 })
-export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
+
+
+
+
+
+export class SolicitudesInternacionalComponent implements OnInit, OnDestroy {
   pageRecibidas: number = 1;
   pageEnviadas: number = 1;
   private apiUrl = environment.apiUrl;
@@ -49,7 +54,7 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
   solicitudes: Solicitud[] = [];
   solicitudesFiltradas: Solicitud[] = [];
   private socket$: BehaviorSubject<Socket | null> = new BehaviorSubject<Socket | null>(null);
-  departamentoActual: number = 1; // Asume que el departamento actual es 1
+  departamentoActual: number = 11; // Asume que el departamento actual es 2 (Compras) por defecto
   solicitudesRecibidas: Solicitud[] = [];
   solicitudesEnviadas: Solicitud[] = [];
   currentView: 'recibidas' | 'enviadas' = 'recibidas';
@@ -155,6 +160,7 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
       });
     }
   }
+
   aplicarFiltros(): void {
     this.solicitudesRecibidas = this.solicitudes.filter(solicitud =>
       solicitud.enviado_a === this.departamentoActual &&
@@ -220,7 +226,7 @@ export class SolicitudesInformaticaComponent implements OnInit, OnDestroy {
         prioridad: form.value.prioridad,
         descripcion: form.value.descripcion,
         id_departamento: this.departamentoActual,
-        enviado_por: 1,
+        enviado_por: 11,
         enviado_a: form.value.enviado_a,
         estado: 'Pendiente',
         respuesta: '',

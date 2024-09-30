@@ -59,6 +59,13 @@ import { VerSolicitudMuestrasLogisticaComponent } from './paginas/departamentos/
 import { RegistroPlantaComponent } from './paginas/departamentos/gerencia/registro-planta/registro-planta.component';
 import { CalendarioFernandoCarlosComponent } from './paginas/departamentos/gerencia/calendario-fernando-carlos/calendario-fernando-carlos.component';
 import { SolicitudesMuestraAlmacenComponent } from './paginas/departamentos/logistica/solicitudes-muestra-almacen/solicitudes-muestra-almacen.component';
+import { LayoutInternacionalComponent } from './paginas/departamentos/compras copy/layout-internacional/layout-internacional.component';
+import { InicioInternacionalComponent } from './paginas/departamentos/compras copy/inicio-internacional/inicio-internacional.component';
+import { SolicitudesInternacionalComponent } from './paginas/departamentos/compras copy/solicitudes-internacional/solicitudes-internacional.component';
+import { internacionalGuard } from './core/guards/internacional.guard';
+import { CrearSolicitudAlmacenComponent } from './paginas/departamentos/laboratorio/crear-solicitud-almacen/crear-solicitud-almacen.component';
+import { VerMateriasPrimasAlmacenComponent } from './paginas/departamentos/laboratorio/ver-materias-primas-almacen/ver-materias-primas-almacen.component';
+import { MateriasprimasLabComponent } from './paginas/departamentos/logistica/materiasprimas-lab/materiasprimas-lab.component';
 
 export const routes: Routes = [
 
@@ -186,6 +193,20 @@ export const routes: Routes = [
                 component:SolicitudesAdminsitracionComponent
               }
             ]
+          },   {
+            path:'internacional',
+            component:LayoutInternacionalComponent,
+            canActivate:[internacionalGuard],
+            children:[
+              {
+                path:'inicio-internacional',
+                component:InicioInternacionalComponent
+              },
+              {
+                path:'solicitudes-internacional',
+                component:SolicitudesInternacionalComponent
+              }
+            ]
           },
           {
             path:'laboratorio',
@@ -207,6 +228,14 @@ export const routes: Routes = [
               {
                 path:'ver-muestras-lab',
                 component:VerSolicitudMuestrasLabComponent
+              },
+              {
+                path:'crear-muestra-almacen',
+                component:CrearSolicitudAlmacenComponent
+              },
+              {
+                path:'ver-muestra-almacen',
+                component:VerMateriasPrimasAlmacenComponent
               }
 
             ]
@@ -297,6 +326,11 @@ export const routes: Routes = [
               {
                 path:'muestras-almacen',
                 component:SolicitudesMuestraAlmacenComponent
+              }
+              ,
+              {
+                path:'materiasPrimas',
+                component:MateriasprimasLabComponent
               }
 
             ]
