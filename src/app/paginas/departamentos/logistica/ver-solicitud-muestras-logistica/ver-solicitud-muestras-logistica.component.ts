@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild, AfterViewChecked, OnDestroy } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { MuestrasService } from '../../../../core/services/muestras.service';
 import { Mensaje, SolicitudMuestra } from '../../../../core/interfaces/SolicitudMuestra';
 import { DatePipe } from '@angular/common';
@@ -8,27 +8,34 @@ import { FormsModule } from '@angular/forms';
 import { Subscription, timer } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UploadService } from '../../../../core/services/upload.service';
-import { NgxPaginationModule } from 'ngx-pagination';
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
-import { TDocumentDefinitions, TableCell } from 'pdfmake/interfaces';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @Component({
   selector: 'app-ver-solicitud-muestras-logistica',
   standalone: true,
-  imports: [DatePipe, CommonModule, FormsModule, NgxPaginationModule,MatPaginator],
+  imports: [DatePipe,MatButtonToggleModule,MatDatepickerModule,MatChipsModule,MatExpansionModule,MatTableModule, CommonModule, FormsModule, MatPaginator, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule],
   templateUrl: './ver-solicitud-muestras-logistica.component.html',
   styleUrls: ['./ver-solicitud-muestras-logistica.component.css']
 })
-export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
-  displayedColumns: string[] = ['solicitante', 'nombreMp', 'proveedor', 'estado'];
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  // DataSource for each table
-  dataSourceExpediciones = new MatTableDataSource<SolicitudMuestra>([]);
-  dataSourceAlmacen = new MatTableDataSource<SolicitudMuestra>([]);
+  displayedColumns: string[] = ['solicitante', 'nombreMp', 'proveedor', 'estado', 'acciones'];
+  dataSource: MatTableDataSource<SolicitudMuestra>;
 
   solicitudSeleccionada: SolicitudMuestra | null = null;
   mensajes: Mensaje[] = [];
@@ -41,36 +48,33 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
   cantidadMuestra: string | undefined;
   necesidadAlmacen: any = null;
 
-  // Variables de paginación
-  pExpediciones: number = 1;
-  pAlmacen: number = 1;
-  itemsPerPage: number = 10;
-
   solicitudes: SolicitudMuestra[] = [];
   solicitudesAlmacen: SolicitudMuestra[] = [];
 
-  // Filters for Expediciones
-  filtrosExpediciones = {
+
+  filtrosExpediciones: { [key: string]: string } = {
     solicitante: '',
     nombreMp: '',
     proveedor: '',
     estado: ''
   };
 
-  // Filters for Almacén
-  filtrosAlmacen = {
-    solicitante: '',
-    nombreMp: '',
-    proveedor: '',
-    estado: ''
-  };
-
+  activeTab: string = 'Todas';
+  filtrosAplicados: {key: string, value: string}[] = [];
+  filterFields = [
+    { key: 'solicitante', label: 'Solicitante' },
+    { key: 'nombreMp', label: 'Nombre MP' },
+    { key: 'proveedor', label: 'Proveedor' },
+    { key: 'estado', label: 'Estado' }
+  ];
   constructor(
     private solicitudService: MuestrasService,
     private mensajeService: MensajeService,
     private authService: AuthService,
     private fileUploadService: UploadService
-  ) {}
+  ) {
+    this.dataSource = new MatTableDataSource<SolicitudMuestra>([]);
+  }
 
   nombre = this.authService.getNameFromToken() || '';
 
@@ -79,9 +83,12 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
     this.obtenerSolicitudesAlmacen();
   }
 
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+  }
+
   private ordenarSolicitudes(solicitudes: SolicitudMuestra[]): SolicitudMuestra[] {
     return solicitudes.sort((a, b) => {
-      // Definir el orden de prioridad de los estados
       const ordenEstados: { [key: string]: number } = {
         'Pendiente': 0,
         'En Laboratorio': 1,
@@ -90,25 +97,23 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
         'Finalizada': 4
       };
 
-      // Comparar primero por estado
       if (ordenEstados[a.estado] !== ordenEstados[b.estado]) {
         return ordenEstados[a.estado] - ordenEstados[b.estado];
       }
 
-      // Si los estados son iguales, ordenar por fecha (más reciente primero)
       return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
     });
   }
 
-  checkScrollPosition() {
-    const container = this.chatContainer.nativeElement;
-    const scrollPosition = container.scrollTop + container.clientHeight;
-    const bottom = container.scrollHeight;
-    this.mostrarBotonBajar = (bottom - scrollPosition) > 100;
-  }
-
-  ngOnDestroy(): void {
-    this.detenerPolling();
+  obtenerSolicitudes(): void {
+    this.solicitudService.getSolicitudExpediciones().subscribe(
+      (data: SolicitudMuestra[]) => {
+        this.solicitudes = this.ordenarSolicitudes(data);
+        this.dataSource.data = this.solicitudes;
+        this.aplicarFiltros();
+      },
+      error => console.error('Error al obtener solicitudes', error)
+    );
   }
 
   imprimirOGenerarPDF() {
@@ -119,265 +124,14 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
       this.imprimir();
     }
   }
-
-  imprimirOGenerarPDFAlmacen() {
-    const confirmacion = confirm('¿Deseas generar un PDF o imprimir directamente?');
-    if (confirmacion) {
-      this.generarPDFAlmacen();
-    } else {
-      this.imprimir();
-    }
-  }
-
-
   private imprimir() {
     window.print();
   }
 
-  private generarPDF() {
-    (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
-  const logoPath = 'assets/imagenes/logo.png';
-
-    const documentDefinition: TDocumentDefinitions = {
-      pageSize: 'A4',
-      pageOrientation: 'landscape',
-      pageMargins: [40, 60, 40, 60],
-      header: (currentPage, pageCount, pageSize) => {
-        return [
-          {
-            text: 'Departamento de Logística - Detalles de Solicitud',
-            alignment: 'center',
-            margin: [0, 20, 0, 0],
-            fontSize: 16,
-            bold: true
-          },
-          {
-            canvas: [
-              {
-                type: 'line',
-                x1: 40,
-                y1: 58,
-                x2: pageSize.width - 40,
-                y2: 58,
-                lineWidth: 0.5
-              }
-            ]
-          }
-        ];
-      },
-      footer: (currentPage, pageCount) => {
-        return {
-          columns: [
-            { text: 'Documento generado el ' + new Date().toLocaleString(), alignment: 'left', margin: [40, 0] },
-            { text: 'Página ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', margin: [0, 0, 40, 0] }
-          ],
-          margin: [0, 20]
-        };
-      },
-      content: [
-        {
-          columns: [
-            {
-              width: '50%',
-              table: {
-                headerRows: 1,
-                widths: ['40%', '*'],
-                body: [
-                  [{ text: 'Campo', style: 'tableHeader' }, { text: 'Valor', style: 'tableHeader' }],
-                  ['Solicitante', this.solicitudSeleccionada?.solicitante || ''],
-                  ['Nombre del MP', this.solicitudSeleccionada?.nombreMp || ''],
-                  ['Lote', this.solicitudSeleccionada?.lote || ''],
-                  ['Proveedor', this.solicitudSeleccionada?.proveedor || ''],
-                  ['Urgencia', this.solicitudSeleccionada?.urgencia || '']
-                ]
-              }
-            },
-            {
-              width: '50%',
-              table: {
-                headerRows: 1,
-                widths: ['40%', '*'],
-                body: [
-                  [{ text: 'Campo', style: 'tableHeader' }, { text: 'Valor', style: 'tableHeader' }],
-                  ['Fecha', this.solicitudSeleccionada?.fecha ? new Date(this.solicitudSeleccionada.fecha).toLocaleDateString() : ''],
-                  ['Estado', this.solicitudSeleccionada?.estado || ''],
-                  ['Código Artículo', this.solicitudSeleccionada?.codigoArticulo || ''],
-                  ['Comentarios', this.solicitudSeleccionada?.comentarios || ''],
-                  ['', '']
-                ]
-              }
-            }
-          ]
-        },
-
-      ],
-      styles: {
-        tableHeader: {
-          bold: true,
-          fontSize: 12,
-          color: 'white',
-          fillColor: '#2c3e50'
-        },
-        subheader: {
-          fontSize: 14,
-          bold: true,
-          margin: [0, 15, 0, 5],
-          color: '#34495e'
-        }
-      },
-      defaultStyle: {
-        fontSize: 10,
-        color: '#2c3e50'
-      }
-    };
-
-    pdfMake.createPdf(documentDefinition).open();
-  }
-  private generarPDFAlmacen() {
-    (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
-
-    const documentDefinition: TDocumentDefinitions = {
-      pageSize: 'A4',
-      pageOrientation: 'landscape',
-      pageMargins: [40, 60, 40, 60],
-      header: (currentPage, pageCount, pageSize) => {
-        return [
-          {
-            text: 'Departamento de Logística - Detalles de Solicitud',
-            alignment: 'center',
-            margin: [0, 20, 0, 0],
-            fontSize: 16,
-            bold: true
-          },
-          {
-            canvas: [
-              {
-                type: 'line',
-                x1: 40,
-                y1: 58,
-                x2: pageSize.width - 40,
-                y2: 58,
-                lineWidth: 0.5
-              }
-            ]
-          }
-        ];
-      },
-      footer: (currentPage, pageCount) => {
-        return {
-          columns: [
-            { text: 'Documento generado el ' + new Date().toLocaleString(), alignment: 'left', margin: [40, 0] },
-            { text: 'Página ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', margin: [0, 0, 40, 0] }
-          ],
-          margin: [0, 20]
-        };
-      },
-      content: [
-        {
-          columns: [
-            {
-              width: '50%',
-              table: {
-                headerRows: 1,
-                widths: ['40%', '*'],
-                body: [
-                  [{ text: 'Campo', style: 'tableHeader' }, { text: 'Valor', style: 'tableHeader' }],
-                  ['Solicitante', this.solicitudSeleccionada?.solicitante || ''],
-                  ['Nombre del MP', this.solicitudSeleccionada?.nombreMp || ''],
-                  ['Lote', this.solicitudSeleccionada?.lote || ''],
-                  ['Proveedor', this.solicitudSeleccionada?.proveedor || ''],
-                  ['Urgencia', this.solicitudSeleccionada?.urgencia || '']
-                ]
-              }
-            },
-            {
-              width: '50%',
-              table: {
-                headerRows: 1,
-                widths: ['40%', '*'],
-                body: [
-                  [{ text: 'Campo', style: 'tableHeader' }, { text: 'Valor', style: 'tableHeader' }],
-                  ['Fecha', this.solicitudSeleccionada?.fecha ? new Date(this.solicitudSeleccionada.fecha).toLocaleDateString() : ''],
-                  ['Estado', this.solicitudSeleccionada?.estado || ''],
-                  ['Código Artículo', this.solicitudSeleccionada?.codigoArticulo || ''],
-                  ['Comentarios', this.solicitudSeleccionada?.comentarios || ''],
-                  ['', '']
-                ]
-              }
-            }
-          ]
-        },
-        { text: 'Necesidad de Almacén', style: 'subheader', margin: [0, 20, 0, 10] },
-        {
-          table: {
-            headerRows: 1,
-            widths: ['20%', '*'],
-            body: [
-              [{ text: 'Campo', style: 'tableHeader' }, { text: 'Valor', style: 'tableHeader' }],
-              ['Necesidad', this.necesidadAlmacen?.necesidad || 'No especificada'],
-              ['Estado', this.solicitudSeleccionada?.estadoAlmacen || 'No especificado'],
-            ]
-          }
-        },
-      ],
-      styles: {
-        tableHeader: {
-          bold: true,
-          fontSize: 12,
-          color: 'white',
-          fillColor: '#2c3e50'
-        },
-        subheader: {
-          fontSize: 14,
-          bold: true,
-          margin: [0, 15, 0, 5],
-          color: '#34495e'
-        }
-      },
-      defaultStyle: {
-        fontSize: 10,
-        color: '#2c3e50'
-      }
-    };
-
-    pdfMake.createPdf(documentDefinition).open();
-  }
-  scrollToBottom() {
-    const container = this.chatContainer.nativeElement;
-    container.scrollTop = container.scrollHeight;
-    this.mostrarBotonBajar = false;
+  obtenerNombreToken(): string | null {
+    return this.nombre = this.authService.getNameFromToken() || '';
   }
 
-  get filteredSolicitudesExpediciones() {
-    return this.ordenarSolicitudes(this.solicitudes.filter(solicitud => {
-      return (
-        (!this.filtrosExpediciones.solicitante || solicitud.solicitante.toLowerCase().includes(this.filtrosExpediciones.solicitante.toLowerCase())) &&
-        (!this.filtrosExpediciones.nombreMp || solicitud.nombreMp.toLowerCase().includes(this.filtrosExpediciones.nombreMp.toLowerCase())) &&
-        (!this.filtrosExpediciones.proveedor || solicitud.proveedor.toLowerCase().includes(this.filtrosExpediciones.proveedor.toLowerCase())) &&
-        (!this.filtrosExpediciones.estado || solicitud.estado.toLowerCase().includes(this.filtrosExpediciones.estado.toLowerCase()))
-      );
-    }));
-  }
-
-  get filteredSolicitudesAlmacen() {
-    return this.ordenarSolicitudes(this.solicitudesAlmacen.filter(solicitud => {
-      return (
-        (!this.filtrosAlmacen.solicitante || solicitud.solicitante.toLowerCase().includes(this.filtrosAlmacen.solicitante.toLowerCase())) &&
-        (!this.filtrosAlmacen.nombreMp || solicitud.nombreMp.toLowerCase().includes(this.filtrosAlmacen.nombreMp.toLowerCase())) &&
-        (!this.filtrosAlmacen.proveedor || solicitud.proveedor.toLowerCase().includes(this.filtrosAlmacen.proveedor.toLowerCase())) &&
-        (!this.filtrosAlmacen.estado || solicitud.estado.toLowerCase().includes(this.filtrosAlmacen.estado.toLowerCase()))
-      );
-    }));
-  }
-
-  obtenerSolicitudes(): void {
-    this.solicitudService.getSolicitudExpediciones().subscribe(
-      (data: SolicitudMuestra[]) => {
-        this.solicitudes = this.ordenarSolicitudes(data);
-      },
-      error => console.error('Error al obtener solicitudes', error)
-    );
-  }
 
   obtenerSolicitudesAlmacen(): void {
     this.solicitudService.getSolicitudAlm().subscribe(
@@ -388,9 +142,142 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
     );
   }
 
+  private generarPDF() {
+    (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
+  const logoPath = 'assets/imagenes/logo.png';
 
-  obtenerNombreToken(): string | null {
-    return this.nombre = this.authService.getNameFromToken() || '';
+  const documentDefinition: TDocumentDefinitions = {
+    pageSize: 'A4',
+      pageOrientation: 'landscape',
+      pageMargins: [40, 60, 40, 60],
+      header: (currentPage, pageCount, pageSize) => {
+        return [
+          {
+            text: 'Departamento de Logística - Detalles de Solicitud',
+            alignment: 'center',
+            margin: [0, 20, 0, 0],
+            fontSize: 16,
+            bold: true
+          },
+          {
+            canvas: [
+              {
+                type: 'line',
+                x1: 40,
+                y1: 58,
+                x2: pageSize.width - 40,
+                y2: 58,
+                lineWidth: 0.5
+              }
+            ]
+          }
+        ];
+      },
+      footer: (currentPage, pageCount) => {
+        return {
+          columns: [
+            { text: 'Documento generado el ' + new Date().toLocaleString(), alignment: 'left', margin: [40, 0] },
+            { text: 'Página ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', margin: [0, 0, 40, 0] }
+          ],
+          margin: [0, 20]
+        };
+      },
+      content: [
+        {
+          columns: [
+            {
+              width: '50%',
+              table: {
+                headerRows: 1,
+                widths: ['40%', '*'],
+                body: [
+                  [{ text: 'Campo', style: 'tableHeader' }, { text: 'Valor', style: 'tableHeader' }],
+                  ['Solicitante', this.solicitudSeleccionada?.solicitante || ''],
+                  ['Nombre del MP', this.solicitudSeleccionada?.nombreMp || ''],
+                  ['Lote', this.solicitudSeleccionada?.lote || ''],
+                  ['Proveedor', this.solicitudSeleccionada?.proveedor || ''],
+                  ['Urgencia', this.solicitudSeleccionada?.urgencia || '']
+                ]
+              }
+            },
+            {
+              width: '50%',
+              table: {
+                headerRows: 1,
+                widths: ['40%', '*'],
+                body: [
+                  [{ text: 'Campo', style: 'tableHeader' }, { text: 'Valor', style: 'tableHeader' }],
+                  ['Fecha', this.solicitudSeleccionada?.fecha ? new Date(this.solicitudSeleccionada.fecha).toLocaleDateString() : ''],
+                  ['Estado', this.solicitudSeleccionada?.estado || ''],
+                  ['Código Artículo', this.solicitudSeleccionada?.codigoArticulo || ''],
+                  ['Comentarios', this.solicitudSeleccionada?.comentarios || ''],
+                  ['', '']
+                ]
+              }
+            }
+          ]
+        },
+
+      ],
+      styles: {
+        tableHeader: {
+          bold: true,
+          fontSize: 12,
+          color: 'white',
+          fillColor: '#2c3e50'
+        },
+        subheader: {
+          fontSize: 14,
+          bold: true,
+          margin: [0, 15, 0, 5],
+          color: '#34495e'
+        }
+      },
+      defaultStyle: {
+        fontSize: 10,
+        color: '#2c3e50'
+      }
+    };
+
+    pdfMake.createPdf(documentDefinition).open();
+  }
+   aplicarFiltros(): void {
+    this.dataSource.filterPredicate = (data: SolicitudMuestra, filter: string) => {
+      const searchTerms = JSON.parse(filter);
+      return Object.entries(searchTerms).every(([key, value]) => {
+        if (key === 'tab') {
+          if (value === 'Finalizadas') return data.estado === 'Finalizado';
+          if (value === 'No Finalizadas') return data.estado !== 'Finalizado';
+          return true; // 'Todas'
+        }
+        return String(data[key as keyof SolicitudMuestra]).toLowerCase().includes((value as string).toLowerCase());
+      });
+    };
+
+    const filtrosActivos = { ...this.filtrosExpediciones, tab: this.activeTab };
+    this.dataSource.filter = JSON.stringify(filtrosActivos);
+
+    this.actualizarFiltrosAplicados();
+  }
+
+  actualizarFiltrosAplicados(): void {
+    this.filtrosAplicados = Object.entries(this.filtrosExpediciones)
+      .filter(([_, value]) => value !== '')
+      .map(([key, value]) => ({ key, value }));
+  }
+  resetFiltrosExpediciones(): void {
+    this.filtrosExpediciones = {
+      solicitante: '',
+      nombreMp: '',
+      proveedor: '',
+      estado: ''
+    };
+    this.activeTab = 'Todas';
+    this.aplicarFiltros();
+  }
+  removerFiltro(filtro: {key: string, value: string}): void {
+    this.filtrosExpediciones[filtro.key as keyof typeof this.filtrosExpediciones] = '';
+    this.aplicarFiltros();
   }
 
   cargarDetallesExpedicion(solicitud: SolicitudMuestra): void {
@@ -399,23 +286,8 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
       this.getFiles(this.solicitudSeleccionada.idSolicitudMuestra.toString());
       this.obtenerMensajes();
       this.iniciarPolling();
-
     } else {
       console.error('ID de solicitud no está definido o es inválido en cargarDetallesExpedicion.');
-    }
-  }
-
-
-
-  cargarDetallesAlmacen(solicitud: SolicitudMuestra): void {
-    this.solicitudSeleccionada = solicitud;
-    if (this.solicitudSeleccionada && this.solicitudSeleccionada.idSolicitudMuestra) {
-      this.getFiles(this.solicitudSeleccionada.idSolicitudMuestra.toString());
-      this.obtenerMensajes();
-      this.iniciarPolling();
-      this.obtenerNecesidadAlmacen(this.solicitudSeleccionada.idSolicitudMuestra);
-    } else {
-      console.error('ID de solicitud no está definido o es inválido en cargarDetallesAlmacen.');
     }
   }
 
@@ -521,8 +393,17 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
     }
   }
 
-  ngAfterViewChecked() {
-    this.checkScrollPosition();
+  checkScrollPosition() {
+    const container = this.chatContainer.nativeElement;
+    const scrollPosition = container.scrollTop + container.clientHeight;
+    const bottom = container.scrollHeight;
+    this.mostrarBotonBajar = (bottom - scrollPosition) > 100;
+  }
+
+  scrollToBottom() {
+    const container = this.chatContainer.nativeElement;
+    container.scrollTop = container.scrollHeight;
+    this.mostrarBotonBajar = false;
   }
 
   enviarSolicitudAlmacen(): void {
@@ -573,23 +454,7 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
     }
   }
 
-  resetFiltrosExpediciones(): void {
-    this.filtrosExpediciones = {
-      solicitante: '',
-      nombreMp: '',
-      proveedor: '',
-      estado: ''
-    };
-    this.pExpediciones = 1;
-  }
-
-  resetFiltrosAlmacen(): void {
-    this.filtrosAlmacen = {
-      solicitante: '',
-      nombreMp: '',
-      proveedor: '',
-      estado: ''
-    };
-    this.pAlmacen = 1;
+  ngOnDestroy(): void {
+    this.detenerPolling();
   }
 }

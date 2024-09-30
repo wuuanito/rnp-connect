@@ -51,21 +51,20 @@ import { SolicitudPersonalComponent } from './paginas/personal/solicitud-persona
 import { GestionComponent } from './paginas/personal/gestion/gestion.component';
 import { personalGuard } from './core/guards/personal.guard';
 import { CrearSolicitudMuestrasComponent } from './paginas/departamentos/oficina-tecnica/crear-solicitud-muestras/crear-solicitud-muestras.component';
-import { VerSolicitudMuestrasComponent } from './paginas/departamentos/oficina-tecnica/ver-solicitud-muestras/ver-solicitud-muestras.component';
 import { CrearSolicitudMuestrasLabComponent } from './paginas/departamentos/laboratorio/crear-solicitud-muestras-lab/crear-solicitud-muestras-lab.component';
 import { VerSolicitudMuestrasLabComponent } from './paginas/departamentos/laboratorio/ver-solicitud-muestras-lab/ver-solicitud-muestras-lab.component';
 import { CrearSolicitudMuestrasLogisticaComponent } from './paginas/departamentos/logistica/crear-solicitud-muestras-logistica/crear-solicitud-muestras-logistica.component';
 import { VerSolicitudMuestrasLogisticaComponent } from './paginas/departamentos/logistica/ver-solicitud-muestras-logistica/ver-solicitud-muestras-logistica.component';
 import { RegistroPlantaComponent } from './paginas/departamentos/gerencia/registro-planta/registro-planta.component';
 import { CalendarioFernandoCarlosComponent } from './paginas/departamentos/gerencia/calendario-fernando-carlos/calendario-fernando-carlos.component';
-import { SolicitudesMuestraAlmacenComponent } from './paginas/departamentos/logistica/solicitudes-muestra-almacen/solicitudes-muestra-almacen.component';
 import { LayoutInternacionalComponent } from './paginas/departamentos/compras copy/layout-internacional/layout-internacional.component';
 import { InicioInternacionalComponent } from './paginas/departamentos/compras copy/inicio-internacional/inicio-internacional.component';
 import { SolicitudesInternacionalComponent } from './paginas/departamentos/compras copy/solicitudes-internacional/solicitudes-internacional.component';
 import { internacionalGuard } from './core/guards/internacional.guard';
 import { CrearSolicitudAlmacenComponent } from './paginas/departamentos/laboratorio/crear-solicitud-almacen/crear-solicitud-almacen.component';
 import { VerMateriasPrimasAlmacenComponent } from './paginas/departamentos/laboratorio/ver-materias-primas-almacen/ver-materias-primas-almacen.component';
-import { MateriasprimasLabComponent } from './paginas/departamentos/logistica/materiasprimas-lab/materiasprimas-lab.component';
+import { SolicitudesMuestraAlmacenComponent } from './paginas/departamentos/logistica/solicitudes-muestra-almacen/solicitudes-muestra-almacen.component';
+import { VerSolicitudMuestrasComponent } from './paginas/departamentos/oficina-tecnica/ver-solicitud-muestras/ver-solicitud-muestras.component';
 
 export const routes: Routes = [
 
@@ -328,10 +327,7 @@ export const routes: Routes = [
                 component:SolicitudesMuestraAlmacenComponent
               }
               ,
-              {
-                path:'materiasPrimas',
-                component:MateriasprimasLabComponent
-              }
+
 
             ]
           }
