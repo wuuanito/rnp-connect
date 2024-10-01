@@ -22,22 +22,22 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 @Component({
   selector: 'app-ver-solicitud-muestras-logistica',
   standalone: true,
-  imports: [DatePipe,MatButtonToggleModule,MatDatepickerModule,MatChipsModule,MatExpansionModule,MatTableModule, CommonModule, FormsModule, MatPaginator, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [DatePipe,ReactiveFormsModule,MatButtonToggleModule,MatDatepickerModule,MatChipsModule,MatExpansionModule,MatTableModule, CommonModule, FormsModule, MatPaginator, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule],
   templateUrl: './ver-solicitud-muestras-logistica.component.html',
-  styleUrls: ['./ver-solicitud-muestras-logistica.component.css']
+  styleUrls: ['./ver-solicitud-muestras-logistica.component.css'],
+  providers: [provideNativeDateAdapter()],
 })
 export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('chatContainer') chatContainer!: ElementRef;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  displayedColumns: string[] = ['solicitante', 'nombreMp', 'proveedor', 'estado', 'acciones'];
-  dataSource: MatTableDataSource<SolicitudMuestra>;
 
-  solicitudSeleccionada: SolicitudMuestra | null = null;
+
   mensajes: Mensaje[] = [];
   nuevoMensaje: string = '';
   archivos: any[] = [];
@@ -61,61 +61,92 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
 
   activeTab: string = 'Todas';
   filtrosAplicados: {key: string, value: string}[] = [];
+
+
+  @ViewChild('chatContainer') chatContainer!: ElementRef;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+  displayedColumns: string[] = ['solicitante', 'nombreMp', 'proveedor', 'estado', 'acciones'];
+  dataSource: MatTableDataSource<SolicitudMuestra>;
+
+  solicitudSeleccionada: SolicitudMuestra | null = null;
+
+
+
+
+  filterForm: FormGroup;
+
   filterFields = [
     { key: 'solicitante', label: 'Solicitante' },
     { key: 'nombreMp', label: 'Nombre MP' },
     { key: 'proveedor', label: 'Proveedor' },
     { key: 'estado', label: 'Estado' }
   ];
+
+
+
+
+
   constructor(
     private solicitudService: MuestrasService,
     private mensajeService: MensajeService,
     private authService: AuthService,
-    private fileUploadService: UploadService
+    private fileUploadService: UploadService,
+    private formBuilder: FormBuilder
   ) {
     this.dataSource = new MatTableDataSource<SolicitudMuestra>([]);
+    this.filterForm = this.formBuilder.group({
+      solicitante: [''],
+      nombreMp: [''],
+      proveedor: [''],
+      estado: [''],
+      fechaDesde: [''],
+      fechaHasta: [''],
+      activeTab: ['Todas']
+    });
   }
-
   nombre = this.authService.getNameFromToken() || '';
 
   ngOnInit(): void {
     this.obtenerSolicitudes();
     this.obtenerSolicitudesAlmacen();
+    this.setupFilterPredicate();
+    this.filterForm.valueChanges.subscribe(() => this.applyFilter());
   }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
   }
+  applyFilter(): void {
+    const filterValue = this.filterForm.value;
+    this.dataSource.filter = JSON.stringify(filterValue);
+  }
+
 
   private ordenarSolicitudes(solicitudes: SolicitudMuestra[]): SolicitudMuestra[] {
-    return solicitudes.sort((a, b) => {
-      const ordenEstados: { [key: string]: number } = {
-        'Pendiente': 0,
-        'En Laboratorio': 1,
-        'En Almacén': 2,
-        'En Expediciones': 3,
-        'Finalizada': 4
-      };
+    const ordenEstados: { [key: string]: number } = {
+      'Pendiente': 0,
+      'En Laboratorio': 1,
+      'En Almacén': 2,
+      'En Expediciones': 3,
+      'Finalizado': 4
+    };
 
+    return solicitudes.sort((a, b) => {
       if (ordenEstados[a.estado] !== ordenEstados[b.estado]) {
         return ordenEstados[a.estado] - ordenEstados[b.estado];
       }
-
       return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
     });
   }
-
   obtenerSolicitudes(): void {
     this.solicitudService.getSolicitudExpediciones().subscribe(
       (data: SolicitudMuestra[]) => {
-        this.solicitudes = this.ordenarSolicitudes(data);
-        this.dataSource.data = this.solicitudes;
-        this.aplicarFiltros();
+        this.dataSource.data = this.ordenarSolicitudes(data);
       },
       error => console.error('Error al obtener solicitudes', error)
     );
   }
-
   imprimirOGenerarPDF() {
     const confirmacion = confirm('¿Deseas generar un PDF o imprimir directamente?');
     if (confirmacion) {
@@ -127,6 +158,53 @@ export class VerSolicitudMuestrasLogisticaComponent implements OnInit, OnDestroy
   private imprimir() {
     window.print();
   }
+  setupFilterPredicate(): void {
+    this.dataSource.filterPredicate = (data: SolicitudMuestra, filter: string) => {
+      const searchTerms = JSON.parse(filter);
+      const fechaSolicitud = new Date(data.fecha);
+
+      return Object.entries(searchTerms).every(([key, value]) => {
+        if (value === null || value === '') return true;
+
+        switch(key) {
+          case 'activeTab':
+            if (value === 'Finalizadas') return data.estado === 'Finalizado';
+            if (value === 'No Finalizadas') return data.estado !== 'Finalizado';
+            return true;
+          case 'fechaDesde':
+            return !value || fechaSolicitud >= new Date(value as string);
+          case 'fechaHasta':
+            return !value || fechaSolicitud <= new Date(value as string);
+          default:
+            return String(data[key as keyof SolicitudMuestra]).toLowerCase().includes((value as string).toLowerCase());
+        }
+      });
+    };
+  }
+  resetFilters(): void {
+    this.filterForm.reset({
+      solicitante: '',
+      nombreMp: '',
+      proveedor: '',
+      estado: '',
+      fechaDesde: null,
+      fechaHasta: null,
+      activeTab: 'Todas'
+    });
+    this.applyFilter();
+  }
+
+  removeFilter(key: string): void {
+    this.filterForm.patchValue({ [key]: '' });
+    this.applyFilter();
+  }
+
+  get appliedFilters(): {key: string, value: string}[] {
+    return Object.entries(this.filterForm.value)
+      .filter(([key, value]) => value !== '' && value !== null && key !== 'activeTab')
+      .map(([key, value]) => ({ key, value: String(value) }));
+  }
+
 
   obtenerNombreToken(): string | null {
     return this.nombre = this.authService.getNameFromToken() || '';

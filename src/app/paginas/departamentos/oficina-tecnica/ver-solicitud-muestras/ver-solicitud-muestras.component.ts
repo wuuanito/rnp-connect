@@ -19,6 +19,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import {MatTabsModule} from '@angular/material/tabs';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-ver-solicitud-muestras',
@@ -40,6 +42,8 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
   itemsPerPage: number = 10;
   mostrarBotonBajar: boolean = false;
   solicitudesFinalizadas: SolicitudMuestra[] = [];
+  solicitudesPendientesDataSource = new MatTableDataSource<SolicitudMuestra>();
+  solicitudesFinalizadasDataSource = new MatTableDataSource<SolicitudMuestra>();
 
 
   solicitudesFiltradas: SolicitudMuestra[] = [];
@@ -71,6 +75,12 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
     this.aplicarFiltros();
 
 
+  }
+  @ViewChild('paginatorPendientes') paginatorPendientes!: MatPaginator;
+  @ViewChild('paginatorFinalizadas') paginatorFinalizadas!: MatPaginator;
+  ngAfterViewInit() {
+    this.solicitudesPendientesDataSource.paginator = this.paginatorPendientes;
+    this.solicitudesFinalizadasDataSource.paginator = this.paginatorFinalizadas;
   }
 
   checkScrollPosition() {
@@ -117,15 +127,14 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
   }
 
 
-
   obtenerSolicitudes(): void {
     this.solicitudService.getSolicitudes().subscribe(
       (data: SolicitudMuestra[]) => {
-        this.solicitudes = data.map(solicitud => ({
-          ...solicitud,
-          mensajesNoLeidos: solicitud.mensajesNoLeidos ?? 0
-        }));
-        this.aplicarFiltros();
+        const solicitudesPendientes = data.filter(solicitud => solicitud.estado !== 'Finalizado');
+        const solicitudesFinalizadas = data.filter(solicitud => solicitud.estado === 'Finalizado');
+
+        this.solicitudesPendientesDataSource.data = solicitudesPendientes;
+        this.solicitudesFinalizadasDataSource.data = solicitudesFinalizadas;
       },
       error => console.error('Error al obtener solicitudes', error)
     );
@@ -276,16 +285,13 @@ export class VerSolicitudMuestrasComponent implements OnInit, OnDestroy, AfterVi
 
 
 
-  aplicarFiltros() {
-    const filteredSolicitudes = this.solicitudes.filter(solicitud =>
-      solicitud.solicitante.toLowerCase().includes(this.filtroSolicitante.toLowerCase()) &&
-      solicitud.nombreMp.toLowerCase().includes(this.filtroNombreMp.toLowerCase()) &&
-      (this.filtroEstado === '' || solicitud.estado === this.filtroEstado)
-    );
+  aplicarFiltros(): void {
+    const filtroSolicitante = this.filtroSolicitante.trim().toLowerCase();
+    const filtroNombreMp = this.filtroNombreMp.trim().toLowerCase();
+    const filtroEstado = this.filtroEstado;
 
-    // Dividimos entre pendientes y finalizadas
-    this.solicitudesPendientes = filteredSolicitudes.filter(solicitud => solicitud.estado !== 'Finalizado');
-    this.solicitudesFinalizadas = filteredSolicitudes.filter(solicitud => solicitud.estado === 'Finalizado');
+    this.solicitudesPendientesDataSource.filter = `${filtroSolicitante}${filtroNombreMp}${filtroEstado}`;
+    this.solicitudesFinalizadasDataSource.filter = `${filtroSolicitante}${filtroNombreMp}${filtroEstado}`;
   }
 
   formatearComentarios(comentarios: string): string {

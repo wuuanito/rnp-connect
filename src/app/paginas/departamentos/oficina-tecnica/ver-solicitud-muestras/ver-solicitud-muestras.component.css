@@ -5,9 +5,10 @@
 
 /* Estilos para los paneles */
 .details-panel, .chat-panel {
-  height: 60vh;
   overflow-y: auto;
+  max-height: 80vh; /* Ajusta según lo que necesites */
 }
+
 
 .details-panel {
   border-right: 1px solid #dee2e6;
@@ -26,6 +27,9 @@
   border-radius: 0.25rem;
   padding: 1rem;
   margin-bottom: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+
 }
 
 /* Estilos para los mensajes */
@@ -69,5 +73,11 @@
 
   .chat-panel {
     padding-left: 0;
+  }
+}
+@media (max-width: 768px) {
+  .modal-xl {
+    max-width: 100%;
+    margin: 0;
   }
 }

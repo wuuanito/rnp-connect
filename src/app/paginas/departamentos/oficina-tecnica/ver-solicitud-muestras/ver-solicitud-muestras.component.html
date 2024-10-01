@@ -4,6 +4,7 @@
   <!-- Filtros -->
   <div class="row mb-3">
     <div class="col-md-3">
+
       <mat-form-field appearance="fill" class="w-100">
         <mat-label>Filtrar por solicitante</mat-label>
         <input matInput [(ngModel)]="filtroSolicitante" placeholder="Filtrar por solicitante">
@@ -29,6 +30,12 @@
     <div class="col-md-3">
       <button mat-raised-button color="primary" (click)="aplicarFiltros()">Aplicar filtros</button>
     </div>
+    <div class="col-md-12">
+      <p style="color: blue; font-weight: bold;">
+        Los filtros aplicados permiten una búsqueda precisa y detallada, reconociendo caracteres especiales como comas, tildes, y otros signos distintivos.
+      </p>
+    </div>
+
   </div>
 
   <!-- Tabs para solicitudes -->
@@ -36,7 +43,7 @@
     <!-- Pendientes/En proceso -->
     <mat-tab label="Pendientes/En proceso">
       <div class="mat-elevation-z8">
-        <table mat-table [dataSource]="solicitudesPendientes" class="mat-table">
+        <table mat-table [dataSource]="solicitudesPendientesDataSource" class="mat-table">
           <!-- Columnas -->
           <ng-container matColumnDef="solicitante">
             <th mat-header-cell *matHeaderCellDef> Solicitante </th>
@@ -87,14 +94,14 @@
         </table>
 
         <!-- Paginación -->
-        <mat-paginator [length]="solicitudesPendientes.length" [pageSize]="itemsPerPage" (page)="p = $event.pageIndex + 1"></mat-paginator>
+        <mat-paginator #paginatorPendientes [pageSize]="itemsPerPage" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
       </div>
     </mat-tab>
 
     <!-- Finalizadas -->
     <mat-tab label="Finalizadas">
       <div class="mat-elevation-z8">
-        <table mat-table [dataSource]="solicitudesFinalizadas" class="mat-table">
+        <table mat-table [dataSource]="solicitudesFinalizadasDataSource" class="mat-table">
           <!-- Columnas -->
           <ng-container matColumnDef="solicitante">
             <th mat-header-cell *matHeaderCellDef> Solicitante </th>
@@ -145,7 +152,7 @@
         </table>
 
         <!-- Paginación -->
-        <mat-paginator [length]="solicitudesFinalizadas.length" [pageSize]="itemsPerPage" (page)="p = $event.pageIndex + 1"></mat-paginator>
+        <mat-paginator #paginatorFinalizadas [pageSize]="itemsPerPage" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
       </div>
     </mat-tab>
   </mat-tab-group>
@@ -177,7 +184,7 @@
         <div class="modal-body">
           <div class="row g-4">
             <!-- Panel izquierdo: Detalles de la Solicitud -->
-            <div class="col-lg-6 details-panel">
+            <div class="col-md-6 col-lg-6 details-panel">
               <div class="card h-100 shadow-sm">
                 <div class="card-body">
                   <h6 class="card-title mb-4">Detalles de la Solicitud</h6>
@@ -267,7 +274,7 @@
             </div>
 
             <!-- Panel derecho: Conversación -->
-            <div class="col-md-6 chat-panel">
+            <div class="col-md-6 col-lg-6 chat-panel">
               <h6>Conversación</h6>
               <div class="chat-container" #chatContainer>
                 <div *ngIf="mensajes.length === 0" class="text-center">No hay mensajes.</div>

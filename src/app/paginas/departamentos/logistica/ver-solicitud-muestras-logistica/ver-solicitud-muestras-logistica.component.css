@@ -1,3 +1,134 @@
+.modal-xl {
+  max-width: 95%;
+}
+/* Estilos para los paneles dentro del modal */
+.details-panel,
+.chat-panel {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.chat-container {
+  height: calc(100% - 150px);
+  min-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.chat-message {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  max-width: 80%;
+}
+.message-sent {
+  background-color: #007bff;
+  color: #ffffff;
+  margin-left: auto;
+}
+.message-received {
+  background-color: #e9ecef;
+}
+.chat-panel .form-control {
+  resize: none;
+}
+/* Estilos para las opciones de Almacén */
+.almacen-options {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 5px;
+}
+/* Ajustes responsivos */
+@media (max-width: 991px) {
+  .details-panel,
+  .chat-panel {
+    max-height: none;
+  }
+  .chat-container {
+    height: 300px;
+  }
+}
+@media (max-width: 575px) {
+  .modal-fullscreen-sm-down {
+    padding: 0 !important;
+  }
+  .modal-fullscreen-sm-down .modal-dialog {
+    max-width: none;
+    height: 100%;
+    margin: 0;
+  }
+  .modal-fullscreen-sm-down .modal-content {
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+  }
+  .modal-fullscreen-sm-down .modal-body {
+    overflow-y: auto;
+  }
+  .details-panel,
+  .chat-panel {
+    height: auto;
+    max-height: none;
+    overflow-y: visible;
+  }
+  .chat-container {
+    height: 300px;
+  }
+}
+/* Estilos adicionales para mejorar la legibilidad en móviles */
+@media (max-width: 575px) {
+  .card-body {
+    padding: 0.5rem;
+  }
+  .chat-message {
+    max-width: 90%;
+  }
+  .modal-header {
+    padding: 0.5rem 1rem;
+  }
+  .modal-footer {
+    padding: 0.5rem;
+  }
+  .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+/* Ajustes para la tabla en dispositivos móviles */
+@media (max-width: 767px) {
+  .table-responsive {
+    border: 0;
+  }
+  .table-responsive table {
+    border: 1px solid #dee2e6;
+  }
+  .table-responsive thead {
+    display: none;
+  }
+  .table-responsive tr {
+    margin-bottom: 10px;
+    display: block;
+    border-bottom: 2px solid #ddd;
+  }
+  .table-responsive td {
+    display: block;
+    text-align: right;
+    font-size: 13px;
+    border-bottom: 1px dotted #ccc;
+  }
+  .table-responsive td:last-child {
+    border-bottom: 0;
+  }
+  .table-responsive td:before {
+    content: attr(data-label);
+    float: left;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+}
+
+
 .corporativo-container {
   background-color: #f5f5f5;
   padding: 20px;
