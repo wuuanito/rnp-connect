@@ -114,13 +114,14 @@ table.mat-table tr:hover {
 }
 
 /* Resaltar estados por colores */
+/* Resaltar estados por colores */
 table.mat-table td.estado-pendiente {
   background-color: #ffeb3b; /* Amarillo para pendientes */
   font-weight: bold;
 }
 
 table.mat-table td.estado-almacen {
-  background-color: #03a9f4; /* Azul claro para "Laboratorio-Almacen" */
+  background-color: #03a9f4; /* Azul claro para "Laboratorio - Almacen" */
   font-weight: bold;
   color: white;
 }
@@ -130,6 +131,19 @@ table.mat-table td.estado-finalizado {
   font-weight: bold;
   color: white;
 }
+
+table.mat-table td.estado-devuelto-almacen {
+  background-color: #17a2b8; /* Turquesa para "En Laboratorio - Devuelto a Almacén" */
+  font-weight: bold;
+  color: white;
+}
+
+table.mat-table td.estado-en-proceso {
+  background-color: #6c757d; /* Gris oscuro para "En Proceso" */
+  font-weight: bold;
+  color: white;
+}
+
 
 /* Estilos para los botones de acciones */
 .btn-info.btn-sm {

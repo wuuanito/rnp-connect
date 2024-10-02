@@ -3,17 +3,62 @@
   <form (ngSubmit)="onSubmit()" #solicitudForm="ngForm">
     <div class="form-row">
       <div class="form-group">
-        <label>Directo Expediciones</label>
-        <div class="form-check form-check-inline">
-          <input type="radio" id="directoSi" class="form-check-input" [(ngModel)]="solicitud.expediciones" name="expediciones" [value]="true" required />
-          <label for="directoSi" class="form-check-label">Sí</label>
+        <div class="form-check">
+          <input type="radio"
+                 id="expedicionesSi"
+                 class="form-check-input"
+                 [(ngModel)]="selectedOption"
+                 name="options"
+                 value="expediciones"
+                 (change)="onOptionChange('expediciones')" />
+          <label for="expedicionesSi" class="form-check-label">Expediciones</label>
+          <i class="fas fa-question-circle info-icon"
+             [matTooltip]="tooltips.expediciones"
+             matTooltipPosition="right"></i>
         </div>
-        <div class="form-check form-check-inline">
-          <input type="radio" id="directoNo" class="form-check-input" [(ngModel)]="solicitud.expediciones" name="expediciones" [value]="false" required />
-          <label for="directoNo" class="form-check-label">No</label>
+        <div class="form-check">
+          <input type="radio"
+                 id="laboratorioNo"
+                 class="form-check-input"
+                 [(ngModel)]="selectedOption"
+                 name="options"
+                 value="laboratorio"
+                 (change)="onOptionChange('laboratorio')" />
+          <label for="laboratorioNo" class="form-check-label">Laboratorio</label>
+          <i class="fas fa-question-circle info-icon"
+             [matTooltip]="tooltips.laboratorio"
+             matTooltipPosition="right"></i>
+        </div>
+
+        <div class="form-check">
+          <input type="radio"
+                 id="almacenNo"
+                 class="form-check-input"
+                 [(ngModel)]="selectedOption"
+                 name="options"
+                 value="almacen"
+                 (change)="onOptionChange('almacen')" />
+          <label for="almacenNo" class="form-check-label">Almacen</label>
+          <i class="fas fa-question-circle info-icon"
+             [matTooltip]="tooltips.almacen"
+             matTooltipPosition="right"></i>
         </div>
       </div>
       <hr /> <!-- Línea horizontal antes del botón -->
+      <div *ngIf="selectedOption === 'laboratorio'" class="mt-2">
+        <label for="laboratorioOptions" class="form-label"><strong>Tipo de análisis:</strong> </label>
+        <select id="laboratorioOptions" class="form-select" [(ngModel)]="selectedLaboratorioOption" name="laboratorioOptions">
+            <option value="" disabled selected>-- Seleccione --</option>
+            <option value="HOMOLOGACION">HOMOLOGACION</option>
+            <option value="DISGREGACION">DISGREGACION</option>
+            <option value="POLVO">POLVO</option>
+            <option value="LIQUIDO">LIQUIDO</option>
+            <option value="CAPSULAS">CAPSULAS</option>
+            <option value="COMPRIMIDOS">COMPRIMIDOS</option>
+            <option value="OTROS">OTROS</option>
+        </select>
+        <hr>
+    </div>
       <div class="form-group col-md-6">
         <label for="solicitante">Solicitante</label>
         <input type="text" id="solicitante" class="form-control" [(ngModel)]="solicitud.solicitante" name="solicitante" required />

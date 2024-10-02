@@ -12,6 +12,10 @@ import { UploadService } from '../../../../core/services/upload.service';
 import { environment } from '../../../../../environments/environment';
 import { NgxPaginationModule } from 'ngx-pagination';
 import bootstrap from 'bootstrap';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+
 
 @Component({
   selector: 'app-ver-solicitud-muestras-lab',
@@ -48,14 +52,42 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
     private authService: AuthService,
     private fileUploadService: UploadService
   ) {}
+  mostrarInformes: boolean = false; // Inicializa la variable para controlar la visibilidad de los informes
 
   nombre = this.authService.getNameFromToken() || '';
   ngOnInit(): void {
     this.obtenerSolicitudes();
   }
 
+  fechaDesde: string = '';
+  fechaHasta: string = '';
+  informeData: SolicitudMuestra[] = [];
+  loading: boolean = false;
+  error: string = '';
+  today: string = new Date().toISOString().split('T')[0];
+  generarInforme(): void {
+    if (!this.fechaDesde || !this.fechaHasta) {
+        this.error = 'Por favor, seleccione ambas fechas';
+        return;
+    }
 
+    this.loading = true;
+    this.error = '';
+    this.informeData = [];
 
+    this.solicitudService.generarInformeLaboratorio(this.fechaDesde, this.fechaHasta)
+        .subscribe({
+            next: (response: { message: string; data: SolicitudMuestra[] }) => {
+                this.informeData = response.data; // Asegúrate de acceder a `data`
+                this.loading = false;
+            },
+            error: (error) => {
+                this.error = 'Error al generar el informe. Por favor, intente nuevamente.';
+                this.loading = false;
+                console.error('Error:', error);
+            }
+        });
+}
 
 
   checkScrollPosition() {
@@ -66,6 +98,54 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
     // Si está cerca del final, ocultar el botón
     this.mostrarBotonBajar = (bottom - scrollPosition) > 100;
   }
+
+  generarPDF(): void {
+    const doc = new jsPDF();
+
+    // Título
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Informe de Solicitudes de Laboratorio', 14, 22);
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 30); // Agregar fecha actual
+
+    // Tabla
+    autoTable(doc, {
+      head: [[ 'Fecha', 'Tipo Análisis', 'Nombre MP','Lote','Proveedor']], // Agregar columna de Estado
+      headStyles: { fillColor: [22, 160, 133], textColor: [255, 255, 255], fontSize: 12 }, // Estilo de encabezado
+      body: this.informeData.map(solicitud => [
+        new Date(solicitud.fecha).toLocaleString(),
+        solicitud.tipoAnalisis ?? '',
+        solicitud.nombreMp,
+        solicitud.lote,
+        solicitud.proveedor
+      ]),
+      startY: 40,
+      styles: { fontSize: 10, cellPadding: 5, overflow: 'linebreak' }, // Estilo de celdas
+      theme: 'grid', // Estilo de tabla
+    });
+
+    // Guardar el PDF
+    doc.save(`Informe de Solicitudes de Laboratorio - ${this.fechaDesde} a ${this.fechaHasta}.pdf`);
+}
+
+// Generar Excel
+generarExcel(): void {
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.informeData.map(solicitud => ({
+        Fecha: new Date(solicitud.fecha).toLocaleString(),
+        'Tipo Análisis': solicitud.tipoAnalisis,
+        'Nombre MP': solicitud.nombreMp,
+        'Lote': solicitud.lote,
+        'Proveedor': solicitud.proveedor
+    })));
+
+    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Solicitudes');
+
+    // Guardar el archivo Excel
+    XLSX.writeFile(workbook, `Informe de Solicitudes de Laboratorio - ${this.fechaDesde} a ${this.fechaHasta}.xlsx`);
+}
 
   ngOnDestroy(): void {
     this.detenerPolling();
@@ -314,12 +394,15 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
       }
     );
   }
+  mostrarMensaje() {
+    alert('No se puede enviar a Project Manager si no se ha devuelto de almacén');
+  }
 
 //funcion finalizar para finalizar la solicitud de la muestra
 
 finalizar(){
 
-  this.solicitudService.enviarSolicitudExpediciones(this.solicitudSeleccionada?.idSolicitudMuestra || 0).subscribe(
+  this.solicitudService.devolveraPm(this.solicitudSeleccionada?.idSolicitudMuestra || 0).subscribe(
     (data) => {
       console.log('Solicitud enviada a expediciones', data);
       alert('Solicitud enviada a expediciones');

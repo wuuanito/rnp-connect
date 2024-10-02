@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { SolicitudMuestra } from '../interfaces/SolicitudMuestra';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { HttpParams } from '@angular/common/http'; // Añadir esta línea
 
 @Injectable({
   providedIn: 'root'
@@ -51,8 +52,19 @@ export class MuestrasService {
   enviarSolicitudExpediciones(idSolicitudMuestra: number): Observable<SolicitudMuestra> {
     return this.http.put<SolicitudMuestra>(`${this.apiUrl}/solicitudMuestras/enviarExpediciones/${idSolicitudMuestra}`, {});
   }
+  devolveraPm(idSolicitudMuestra: number): Observable<SolicitudMuestra> {
+    return this.http.put<SolicitudMuestra>(`${this.apiUrl}/solicitudMuestras/devolverpm/${idSolicitudMuestra}`, {});
+  }
+
 
   finalizarSolcitud(idSolicitudMuestra: number): Observable<SolicitudMuestra> {
     return this.http.put<SolicitudMuestra>(`${this.apiUrl}/solicitudMuestras/finalizar/${idSolicitudMuestra}`, {});
   }
+  generarInformeLaboratorio(fechaDesde: string, fechaHasta: string): Observable<any> {
+    const params = new HttpParams()
+        .set('fechaDesde', fechaDesde)
+        .set('fechaHasta', fechaHasta);
+
+    return this.http.get<any>(`${this.apiUrl}/solicitudMuestras/informe`, { params });
+}
 }

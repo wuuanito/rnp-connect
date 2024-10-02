@@ -6,16 +6,17 @@ export interface SolicitudMuestra {
   proveedor: string;
   urgencia: string;
   fecha: Date;
-  estado: "Pendiente" | "En Laboratorio" | "En Almacén" | "En Expediciones" | "Completada" | "Finalizado";
+  estado: "Pendiente" | "En Laboratorio" | "En Almacén" | "En Expediciones" | "Completada" | "Finalizado" | "En Laboratorio - Enviado a Almacén";
   codigoArticulo: string;
   comentarios: string;
   mensajes: Mensaje[];
   archivos?: {name: string, url: string}[];
   expediciones?: boolean;
+  laboratorio?: boolean; // Nueva propiedad añadida como opcional
   almacen?: boolean;
   estadoAlmacen?: string;
-  mensajesNoLeidos?: number; // Hacemos este campo opcional
-
+  mensajesNoLeidos?: number;
+  tipoAnalisis?: string;
 }
 
 

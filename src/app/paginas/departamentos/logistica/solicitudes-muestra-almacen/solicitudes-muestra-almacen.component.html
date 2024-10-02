@@ -76,8 +76,11 @@
         <td mat-cell *matCellDef="let solicitud" [ngClass]="{
           'bg-success text-white': solicitud.estado === 'Finalizado',
           'bg-warning text-dark': solicitud.estado === 'En Laboratorio - Enviado a Almacén',
-          'bg-danger text-white': solicitud.estado === 'Pendiente'
+          'bg-danger text-white': solicitud.estado === 'Pendiente',
+          'bg-info text-white': solicitud.estado === 'En Laboratorio - Devuelto a Almacén',
+          'bg-secondary text-white': solicitud.estado === 'En Proceso'
         }">{{ solicitud.estado }}</td>
+
       </ng-container>
 
       <ng-container matColumnDef="acciones">
@@ -254,7 +257,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" (click)="finalizar()">Finalizar</button>
+          <button type="button" class="btn btn-primary" *ngIf="!necesidadAlmacen" (click)="finalizar()">Enviar a Project Manager</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>

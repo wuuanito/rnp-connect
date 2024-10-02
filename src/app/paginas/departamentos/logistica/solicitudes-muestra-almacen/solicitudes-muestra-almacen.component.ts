@@ -117,7 +117,9 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
         'En Almacén': 2,
         'En Expediciones': 3,
         'Completada': 4,
-        'Finalizado': 5
+        'Finalizado': 5,
+        'En Laboratorio - Enviado a Almacén': 6, // Añadir este estado
+
       };
 
       // Comparar primero por estado

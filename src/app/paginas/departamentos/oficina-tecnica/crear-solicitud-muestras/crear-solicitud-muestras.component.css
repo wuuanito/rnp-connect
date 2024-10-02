@@ -40,3 +40,12 @@ h2 {
   background-color: #0056b3; /* Color más oscuro al pasar el mouse */
   border-color: #0056b3; /* Color de borde más oscuro al pasar el mouse */
 }
+.info-icon {
+  margin-left: 5px;
+  cursor: help;
+  color: #666;
+}
+
+.info-icon:hover {
+  color: #333;
+}

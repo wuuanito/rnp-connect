@@ -28,6 +28,7 @@
       <thead>
         <tr>
           <th>Solicitante</th>
+          <th>Tipo de Analisis</th>
           <th>Nombre MP</th>
           <th>Lote</th>
           <th>Proveedor</th>
@@ -40,6 +41,7 @@
       <tbody>
         <tr *ngFor="let solicitud of filteredSolicitudes | paginate: { itemsPerPage: itemsPerPage, currentPage: page }">
           <td>{{ solicitud.solicitante }}</td>
+          <td>{{ solicitud.tipoAnalisis }}</td>
           <td>{{ solicitud.nombreMp }}</td>
           <td>{{ solicitud.lote }}</td>
           <td>{{ solicitud.proveedor }}</td>
@@ -65,6 +67,125 @@
   <div class="d-flex justify-content-center mt-3">
     <pagination-controls (pageChange)="page = $event"></pagination-controls>
   </div>
+
+
+  <div class="container-fluid mt-4">
+    <!-- Botón para mostrar/ocultar informes -->
+    <button class="btn btn-primary mb-3" (click)="mostrarInformes = !mostrarInformes">
+      INFORMES
+    </button>
+
+    <div *ngIf="mostrarInformes">
+      <!-- Título del informe -->
+      <div class="row mb-4">
+        <div class="col">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="text-primary mb-2">Informe de Solicitudes de Laboratorio</h2>
+              <p class="text-muted">Seleccione un rango de fechas para generar el informe de solicitudes procesadas</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de fechas -->
+      <div class="row mb-3">
+        <div class="col-md-3">
+          <label for="fechaDesde" class="form-label">Fecha Desde</label>
+          <input
+            type="date"
+            id="fechaDesde"
+            class="form-control"
+            [(ngModel)]="fechaDesde"
+            [max]="fechaHasta || today"
+            style="border: 1px solid #007bff; background-color: #f8f9fa;">
+        </div>
+        <div class="col-md-3">
+          <label for="fechaHasta" class="form-label">Fecha Hasta</label>
+          <input
+            type="date"
+            id="fechaHasta"
+            class="form-control"
+            [(ngModel)]="fechaHasta"
+            [min]="fechaDesde"
+            [max]="today"
+            style="border: 1px solid #007bff; background-color: #f8f9fa;">
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <button
+            class="btn btn-primary w-100"
+            (click)="generarInforme()"
+            [disabled]="!fechaDesde || !fechaHasta"
+            style="font-weight: bold;">
+            <i class="bi bi-search me-2"></i>
+            Generar Informe
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading spinner -->
+      <div class="row mb-3" *ngIf="loading">
+        <div class="col text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje de error -->
+      <div class="alert alert-danger" *ngIf="error">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ error }}
+      </div>
+
+      <!-- Resultados del informe -->
+      <div class="card mt-3" *ngIf="informeData && informeData.length > 0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-list-check me-2"></i>Resultados encontrados: {{ informeData.length }}</span>
+          <div>
+            <button class="btn btn-success btn-sm me-2" (click)="generarExcel()">
+                <i class="bi bi-file-excel me-2"></i>Excel
+            </button>
+            <button class="btn btn-danger btn-sm" (click)="generarPDF()">
+                <i class="bi bi-file-pdf me-2"></i>PDF
+            </button>
+        </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="text-center">Fecha</th>
+                    <th class="text-center">Tipo Análisis</th>
+                    <th class="text-center">Nombre MP</th>
+                    <th class="text-center">Lote</th>
+                    <th class="text-center">Proveedor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let solicitud of informeData">
+                      <td class="text-center">{{ solicitud.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+                      <td class="text-center">{{ solicitud.tipoAnalisis }}</td>
+                      <td class="text-center">{{ solicitud.nombreMp }}</td>
+                      <td class="text-center">{{ solicitud.lote }}</td>
+                      <td class="text-center">{{ solicitud.proveedor }}</td>
+                  </tr>
+                </tbody>
+              </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje cuando no hay resultados -->
+      <div class="alert alert-warning mt-3" *ngIf="informeData && informeData.length === 0">
+        <i class="bi bi-info-circle me-2"></i>
+        No se encontraron solicitudes para el período seleccionado
+      </div>
+    </div>
+  </div>
+
+
   <!-- Modal para Ver Detalles -->
   <div class="modal fade" id="detalleModal" tabindex="-1" aria-labelledby="detalleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down modal-xl">
@@ -178,8 +299,15 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" (click)="finalizar()">Finalizar y enviar a Expediciones</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <div (click)="solicitudSeleccionada?.estado === 'En Laboratorio - Enviado a Almacén' ? mostrarMensaje() : null">
+            <button type="button"
+                    class="btn btn-primary"
+                    (click)="finalizar()"
+                    [disabled]="solicitudSeleccionada?.estado === 'En Laboratorio - Enviado a Almacén'">
+                Enviar a Project Manager
+            </button>
+        </div>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>

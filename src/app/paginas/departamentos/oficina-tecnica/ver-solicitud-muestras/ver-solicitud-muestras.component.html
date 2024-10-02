@@ -132,14 +132,13 @@
 
           <ng-container matColumnDef="estado">
             <th mat-header-cell *matHeaderCellDef> Estado </th>
-            <td mat-cell *matCellDef="let solicitud"
-                [ngClass]="{
-                  'estado-pendiente': solicitud.estado === 'En Laboratorio - Enviado a Almacén',
-                  'estado-almacen': solicitud.estado === 'En Expediciones',
-                  'estado-finalizado': solicitud.estado === 'Finalizado'
-                }">
-              {{ solicitud.estado }}
-            </td>
+            <td mat-cell *matCellDef="let solicitud" [ngClass]="{
+              'estado-finalizado': solicitud.estado === 'Finalizado',
+              'estado-almacen': solicitud.estado === 'En Laboratorio - Enviado a Almacen',
+              'estado-pendiente': solicitud.estado === 'Pendiente',
+              'estado-devuelto-almacen': solicitud.estado === 'En Laboratorio - Devuelto de Almacen',
+              'estado-en-proceso': solicitud.estado === 'En Proceso'
+            }">{{ solicitud.estado }}</td>
           </ng-container>
 
           <ng-container matColumnDef="acciones">
