@@ -15,6 +15,7 @@ export interface SolicitudMuestra {
   almacen?: boolean;
   estadoAlmacen?: string;
   mensajesNoLeidos?: number; // Hacemos este campo opcional
+
 }
 
 

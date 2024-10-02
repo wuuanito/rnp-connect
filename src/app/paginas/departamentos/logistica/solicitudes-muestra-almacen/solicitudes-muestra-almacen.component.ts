@@ -27,7 +27,6 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
   displayedColumns: string[] = ['solicitante', 'nombreMp', 'proveedor', 'estado'];
 
   // DataSource for each table
-  dataSourceExpediciones = new MatTableDataSource<SolicitudMuestra>([]);
   dataSourceAlmacen = new MatTableDataSource<SolicitudMuestra>([]);
 
   solicitudSeleccionada: SolicitudMuestra | null = null;
@@ -42,20 +41,13 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
   necesidadAlmacen: any = null;
 
   // Variables de paginación
-  pExpediciones: number = 1;
   pAlmacen: number = 1;
   itemsPerPage: number = 10;
 
   solicitudes: SolicitudMuestra[] = [];
   solicitudesAlmacen: SolicitudMuestra[] = [];
 
-  // Filters for Expediciones
-  filtrosExpediciones = {
-    solicitante: '',
-    nombreMp: '',
-    proveedor: '',
-    estado: ''
-  };
+
 
   // Filters for Almacén
   filtrosAlmacen = {
@@ -75,7 +67,6 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
   nombre = this.authService.getNameFromToken() || '';
 
   ngOnInit(): void {
-    this.obtenerSolicitudes();
     this.obtenerSolicitudesAlmacen();
   }
 
@@ -349,16 +340,7 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
     this.mostrarBotonBajar = false;
   }
 
-  get filteredSolicitudesExpediciones() {
-    return this.ordenarSolicitudes(this.solicitudes.filter(solicitud => {
-      return (
-        (!this.filtrosExpediciones.solicitante || solicitud.solicitante.toLowerCase().includes(this.filtrosExpediciones.solicitante.toLowerCase())) &&
-        (!this.filtrosExpediciones.nombreMp || solicitud.nombreMp.toLowerCase().includes(this.filtrosExpediciones.nombreMp.toLowerCase())) &&
-        (!this.filtrosExpediciones.proveedor || solicitud.proveedor.toLowerCase().includes(this.filtrosExpediciones.proveedor.toLowerCase())) &&
-        (!this.filtrosExpediciones.estado || solicitud.estado.toLowerCase().includes(this.filtrosExpediciones.estado.toLowerCase()))
-      );
-    }));
-  }
+
 
   get filteredSolicitudesAlmacen() {
     return this.ordenarSolicitudes(this.solicitudesAlmacen.filter(solicitud => {
@@ -370,14 +352,7 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
       );
     }));
   }
-  obtenerSolicitudes(): void {
-    this.solicitudService.getSolicitudExpediciones().subscribe(
-      (data: SolicitudMuestra[]) => {
-        this.solicitudes = this.ordenarSolicitudes(data);
-      },
-      error => console.error('Error al obtener solicitudes', error)
-    );
-  }
+
 
   obtenerSolicitudesAlmacen(): void {
     this.solicitudService.getSolicitudAlm().subscribe(
@@ -393,17 +368,6 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
     return this.nombre = this.authService.getNameFromToken() || '';
   }
 
-  cargarDetallesExpedicion(solicitud: SolicitudMuestra): void {
-    this.solicitudSeleccionada = solicitud;
-    if (this.solicitudSeleccionada && this.solicitudSeleccionada.idSolicitudMuestra) {
-      this.getFiles(this.solicitudSeleccionada.idSolicitudMuestra.toString());
-      this.obtenerMensajes();
-      this.iniciarPolling();
-
-    } else {
-      console.error('ID de solicitud no está definido o es inválido en cargarDetallesExpedicion.');
-    }
-  }
 
 
 
@@ -532,7 +496,6 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
           alert('Solicitud enviada devuelta a laboratorio');
           window.location.reload();
           this.showAlmacenOptions = false;
-          this.obtenerSolicitudes();
           this.obtenerSolicitudesAlmacen();
         },
         (error) => {
@@ -563,7 +526,6 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
           alert('Solicitud finalizada');
           window.location.reload();
           this.showAlmacenOptions = false;
-          this.obtenerSolicitudes();
           this.obtenerSolicitudesAlmacen();
         },
         (error) => {
@@ -573,15 +535,7 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
     }
   }
 
-  resetFiltrosExpediciones(): void {
-    this.filtrosExpediciones = {
-      solicitante: '',
-      nombreMp: '',
-      proveedor: '',
-      estado: ''
-    };
-    this.pExpediciones = 1;
-  }
+
 
   resetFiltrosAlmacen(): void {
     this.filtrosAlmacen = {

@@ -1,64 +1,67 @@
 <div class="container mt-5">
   <h2>Crear Solicitud de Muestra</h2>
   <form (ngSubmit)="onSubmit()" #solicitudForm="ngForm">
-    <div class="form-group">
-  <!-- Nuevo campo Directo Expediciones -->
-<div class="form-group">
-  <label>Directo Expediciones</label>
-  <div class="form-check">
-    <input type="radio" id="directoSi" class="form-check-input" [(ngModel)]="solicitud.expediciones" name="expediciones" [value]="true" required />
-    <label for="directoSi" class="form-check-label">Sí</label>
-  </div>
-  <div class="form-check">
-    <input type="radio" id="directoNo" class="form-check-input" [(ngModel)]="solicitud.expediciones" name="expediciones" [value]="false" required />
-    <label for="directoNo" class="form-check-label">No</label>
-  </div>
-</div>
-
-
-      <label for="solicitante">Solicitante</label>
-      <input type="text" id="solicitante" class="form-control" [(ngModel)]="solicitud.solicitante" name="solicitante" required />
+    <div class="form-row">
+      <div class="form-group">
+        <label>Directo Expediciones</label>
+        <div class="form-check form-check-inline">
+          <input type="radio" id="directoSi" class="form-check-input" [(ngModel)]="solicitud.expediciones" name="expediciones" [value]="true" required />
+          <label for="directoSi" class="form-check-label">Sí</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input type="radio" id="directoNo" class="form-check-input" [(ngModel)]="solicitud.expediciones" name="expediciones" [value]="false" required />
+          <label for="directoNo" class="form-check-label">No</label>
+        </div>
+      </div>
+      <hr /> <!-- Línea horizontal antes del botón -->
+      <div class="form-group col-md-6">
+        <label for="solicitante">Solicitante</label>
+        <input type="text" id="solicitante" class="form-control" [(ngModel)]="solicitud.solicitante" name="solicitante" required />
+      </div>
+      <div class="form-group col-md-6">
+        <label for="nombreMp">Nombre del MP</label>
+        <input type="text" id="nombreMp" class="form-control" [(ngModel)]="solicitud.nombreMp" name="nombreMp" required />
+      </div>
     </div>
-
-    <div class="form-group">
-      <label for="nombreMp">Nombre del MP</label>
-      <input type="text" id="nombreMp" class="form-control" [(ngModel)]="solicitud.nombreMp" name="nombreMp" required />
+    <hr /> <!-- Línea horizontal entre campos -->
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="lote">Lote</label>
+        <input type="text" id="lote" class="form-control" [(ngModel)]="solicitud.lote" name="lote" required />
+      </div>
+      <div class="form-group col-md-6">
+        <label for="proveedor">Proveedor</label>
+        <input type="text" id="proveedor" class="form-control" [(ngModel)]="solicitud.proveedor" name="proveedor" required />
+      </div>
     </div>
-
-    <div class="form-group">
-      <label for="lote">Lote</label>
-      <input type="text" id="lote" class="form-control" [(ngModel)]="solicitud.lote" name="lote" required />
+    <hr /> <!-- Línea horizontal entre campos -->
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="urgencia">Urgencia</label>
+        <select id="urgencia" class="form-control" [(ngModel)]="solicitud.urgencia" name="urgencia" required>
+          <option value="">Seleccione Urgencia</option>
+          <option value="Alta">Alta</option>
+          <option value="Media">Media</option>
+          <option value="Baja">Baja</option>
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="fecha">Fecha</label>
+        <input type="date" id="fecha" class="form-control" [(ngModel)]="solicitud.fecha" name="fecha" required />
+      </div>
     </div>
-
-    <div class="form-group">
-      <label for="proveedor">Proveedor</label>
-      <input type="text" id="proveedor" class="form-control" [(ngModel)]="solicitud.proveedor" name="proveedor" required />
+    <hr /> <!-- Línea horizontal entre campos -->
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="codigoArticulo">Código Artículo</label>
+        <input type="text" id="codigoArticulo" class="form-control" [(ngModel)]="solicitud.codigoArticulo" name="codigoArticulo" required />
+      </div>
+      <div class="form-group col-md-6">
+        <label for="comentarios">Comentarios</label>
+        <textarea id="comentarios" class="form-control" [(ngModel)]="solicitud.comentarios" name="comentarios"></textarea>
+      </div>
     </div>
-
-    <div class="form-group">
-      <label for="urgencia">Urgencia</label>
-      <select id="urgencia" class="form-control" [(ngModel)]="solicitud.urgencia" name="urgencia" required>
-        <option value="">Seleccione Urgencia</option>
-        <option value="Alta">Alta</option>
-        <option value="Media">Media</option>
-        <option value="Baja">Baja</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="fecha">Fecha</label>
-      <input type="date" id="fecha" class="form-control" [(ngModel)]="solicitud.fecha" name="fecha" required />
-    </div>
-
-    <div class="form-group">
-      <label for="codigoArticulo">Código Artículo</label>
-      <input type="text" id="codigoArticulo" class="form-control" [(ngModel)]="solicitud.codigoArticulo" name="codigoArticulo" required />
-    </div>
-
-    <div class="form-group">
-      <label for="comentarios">Comentarios</label>
-      <textarea id="comentarios" class="form-control" [(ngModel)]="solicitud.comentarios" name="comentarios"></textarea>
-    </div>
+    <hr /> <!-- Línea horizontal entre campos -->
 
     <button type="submit" class="btn btn-primary" [disabled]="!solicitudForm.form.valid">Crear Solicitud</button>
   </form>

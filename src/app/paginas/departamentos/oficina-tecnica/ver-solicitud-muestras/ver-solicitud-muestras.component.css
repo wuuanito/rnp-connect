@@ -81,3 +81,68 @@
     margin: 0;
   }
 }
+/* Estilos generales para diferenciar las tablas */
+table.mat-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+table.mat-table th, table.mat-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Diferencia de color de fondo entre las tablas */
+mat-tab-group mat-tab:nth-child(1) table {
+  background-color: #f9f9f9;
+}
+
+mat-tab-group mat-tab:nth-child(2) table {
+  background-color: #e9f7ef;
+}
+
+/* Alternar colores para las filas */
+table.mat-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Hover para todas las filas */
+table.mat-table tr:hover {
+  background-color: #ddd;
+}
+
+/* Resaltar estados por colores */
+table.mat-table td.estado-pendiente {
+  background-color: #ffeb3b; /* Amarillo para pendientes */
+  font-weight: bold;
+}
+
+table.mat-table td.estado-almacen {
+  background-color: #03a9f4; /* Azul claro para "Laboratorio-Almacen" */
+  font-weight: bold;
+  color: white;
+}
+
+table.mat-table td.estado-finalizado {
+  background-color: #4caf50; /* Verde para finalizados */
+  font-weight: bold;
+  color: white;
+}
+
+/* Estilos para los botones de acciones */
+.btn-info.btn-sm {
+  background-color: #2196f3;
+  border: none;
+  color: white;
+}
+
+.btn-info.btn-sm:hover {
+  background-color: #1976d2;
+}
+
+/* Estilo de tabla diferenciada: sombreado ligero */
+.mat-elevation-z8 {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
