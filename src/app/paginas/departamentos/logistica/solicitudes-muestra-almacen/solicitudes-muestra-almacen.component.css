@@ -1,128 +1,182 @@
-/* Ajuste del body para ocupar toda la pantalla y hacer que se vea corporativo */
-body {
-  background-color: #f8f9fa; /* Color de fondo suave y neutro */
-  font-family: 'Roboto', sans-serif; /* Fuente más corporativa */
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-
-/* Contenedor que abarca toda la página */
-.container-fluid {
-  width: 100%;
-  max-width: 1400px; /* Limitar el ancho máximo para grandes pantallas */
-  padding: 20px;
-  margin: 0 auto;
-}
-
-/* Ajustes de la tabla */
+/* Estilos para la tabla de solicitudes */
 .table-responsive {
-  background-color: white; /* Fondo blanco para un aspecto limpio */
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra ligera para la tabla */
-  padding: 20px;
-}
-
-/* Encabezado de tabla */
-table th {
-  background-color: #007bff;
-  color: white;
-  text-align: center;
-  vertical-align: middle;
-}
-
-table td {
-  vertical-align: middle;
-}
-
-/* Botones corporativos */
-.btn-info {
-  background-color: #007bff;
-  border-color: #007bff;
-  color: white;
-}
-
-.btn-info:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
-}
-
-.btn-primary {
-  background-color: #0056b3;
-  border-color: #0056b3;
-}
-
-.btn-primary:hover {
-  background-color: #004085;
-  border-color: #003366;
-}
-
-/* Botones secundarios */
-.btn-secondary {
-  background-color: #6c757d;
-  border-color: #6c757d;
-}
-
-.btn-secondary:hover {
-  background-color: #5a6268;
-  border-color: #545b62;
-}
-
-/* Estilos del modal */
-.modal-content {
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-  background-color: #0056b3;
-  color: white;
-}
-
-.modal-footer .btn {
-  min-width: 120px;
-}
-
-/* Chat panel styling */
-.chat-container {
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 10px;
-  height: 400px;
-  padding: 15px;
-  overflow-y: auto;
-}
-
-.chat-message {
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
-
-.message-sent {
-  background-color: #007bff;
-  color: white;
-  text-align: right;
-}
-
-.message-received {
-  background-color: #e9ecef;
-  color: black;
-  text-align: left;
-}
-
-/* Ajustes para botones en las tarjetas */
-.details-panel .btn {
   margin-top: 20px;
 }
 
-/* Estilos para input de archivos */
-.input-group input[type="file"] {
-  border: 2px solid #007bff;
-  border-radius: 5px;
+.mat-header-cell {
+  background-color: #007bff; /* Color de fondo del encabezado */
+  color: white; /* Color del texto del encabezado */
 }
 
-.input-group .btn-outline-secondary {
-  border-color: #007bff;
-  color: #007bff;
+.mat-cell {
+  font-size: 14px; /* Tamaño de fuente de las celdas */
+}
+
+/* Estilos para los estados */
+.bg-success {
+  background-color: #28a745 !important; /* Verde para Aprobado */
+}
+
+.bg-warning {
+  background-color: #ffc107 !important; /* Amarillo para Pendiente */
+}
+
+.bg-danger {
+  background-color: #dc3545 !important; /* Rojo para Rechazado */
+}
+
+.text-white {
+  color: white !important; /* Texto blanco */
+}
+
+.text-dark {
+  color: #343a40 !important; /* Texto oscuro */
+}
+/* Estilos para el modal */
+.modal-xl {
+  max-width: 90%;
+}
+
+/* Estilos para los paneles */
+.details-panel, .chat-panel {
+  overflow-y: auto;
+  max-height: 80vh; /* Ajusta según lo que necesites */
+}
+
+
+.details-panel {
+  border-right: 1px solid #dee2e6;
+  padding-right: 15px;
+}
+
+.chat-panel {
+  padding-left: 15px;
+}
+
+/* Estilos para el contenedor de chat */
+.chat-container {
+  height: calc(100% - 120px);
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+
+}
+
+/* Estilos para los mensajes */
+.chat-message {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  max-width: 80%;
+}
+
+/* Mensajes enviados (alineados a la derecha) */
+.message-sent {
+  background-color: #007bff;
+  color: #ffffff;
+  margin-left: auto;
+}
+
+/* Mensajes recibidos (alineados a la izquierda) */
+.message-received {
+  background-color: #e9ecef;
+}
+
+/* Estilos para el área de entrada de mensaje */
+.chat-panel .form-control {
+  resize: none;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 767px) {
+  .details-panel, .chat-panel {
+    height: auto;
+    max-height: 50vh;
+  }
+
+  .details-panel {
+    border-right: none;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+    padding-right: 0;
+  }
+
+  .chat-panel {
+    padding-left: 0;
+  }
+}
+@media (max-width: 768px) {
+  .modal-xl {
+    max-width: 100%;
+    margin: 0;
+  }
+}
+/* Estilos generales para diferenciar las tablas */
+table.mat-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+table.mat-table th, table.mat-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Diferencia de color de fondo entre las tablas */
+mat-tab-group mat-tab:nth-child(1) table {
+  background-color: #f9f9f9;
+}
+
+mat-tab-group mat-tab:nth-child(2) table {
+  background-color: #e9f7ef;
+}
+
+/* Alternar colores para las filas */
+table.mat-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Hover para todas las filas */
+table.mat-table tr:hover {
+  background-color: #ddd;
+}
+
+/* Resaltar estados por colores */
+table.mat-table td.estado-pendiente {
+  background-color: #ffeb3b; /* Amarillo para pendientes */
+  font-weight: bold;
+}
+
+table.mat-table td.estado-almacen {
+  background-color: #03a9f4; /* Azul claro para "Laboratorio-Almacen" */
+  font-weight: bold;
+  color: white;
+}
+
+table.mat-table td.estado-finalizado {
+  background-color: #4caf50; /* Verde para finalizados */
+  font-weight: bold;
+  color: white;
+}
+
+/* Estilos para los botones de acciones */
+.btn-info.btn-sm {
+  background-color: #2196f3;
+  border: none;
+  color: white;
+}
+
+.btn-info.btn-sm:hover {
+  background-color: #1976d2;
+}
+
+/* Estilo de tabla diferenciada: sombreado ligero */
+.mat-elevation-z8 {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

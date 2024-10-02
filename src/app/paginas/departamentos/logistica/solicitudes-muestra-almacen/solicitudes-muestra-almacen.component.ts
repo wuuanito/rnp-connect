@@ -14,20 +14,25 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import { TDocumentDefinitions, TableCell } from 'pdfmake/interfaces';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import { MatTableModule } from '@angular/material/table';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 @Component({
   selector: 'app-solicitudes-muestra-almacen',
   standalone: true,
-  imports: [DatePipe, CommonModule, FormsModule, NgxPaginationModule,MatPaginator],
+  imports: [DatePipe,MatInputModule,MatButtonModule, MatIconModule,MatTableModule, MatFormFieldModule,CommonModule, FormsModule, NgxPaginationModule,MatPaginator],
   templateUrl: './solicitudes-muestra-almacen.component.html',
-  styleUrl: './solicitudes-muestra-almacen.component.css'
+  styleUrl: './solicitudes-muestra-almacen.component.css',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
-  displayedColumns: string[] = ['solicitante', 'nombreMp', 'proveedor', 'estado'];
-
-  // DataSource for each table
-  dataSourceAlmacen = new MatTableDataSource<SolicitudMuestra>([]);
+  displayedColumns: string[] = ['solicitante', 'nombreMp', 'proveedor', 'estado', 'acciones'];
+  dataSource: MatTableDataSource<SolicitudMuestra> = new MatTableDataSource<SolicitudMuestra>();
 
   solicitudSeleccionada: SolicitudMuestra | null = null;
   mensajes: Mensaje[] = [];
@@ -48,6 +53,8 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
   solicitudesAlmacen: SolicitudMuestra[] = [];
 
 
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
 
   // Filters for Almacén
   filtrosAlmacen = {
@@ -62,13 +69,44 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
     private mensajeService: MensajeService,
     private authService: AuthService,
     private fileUploadService: UploadService
-  ) {}
+  ) {
+    this.dataSource = new MatTableDataSource<SolicitudMuestra>([]);
 
+  }
+  estadoSeleccionado: string | null = null;
+
+  toggleEstado(estado: string) {
+    this.estadoSeleccionado = this.estadoSeleccionado === estado ? null : estado;
+    if (this.estadoSeleccionado) {
+        this.filtrarPorEstado(this.estadoSeleccionado);
+    }
+}
+  //
+  restablecerFiltros() {
+    this.filtrosAlmacen = {
+      solicitante: '',
+      nombreMp: '',
+      proveedor: '', // Agregado
+      estado: '' // Agregado
+  };
+    this.filterHistory = []; // Limpiar historial de filtros
+    this.dataSource.filter = ''; // Restablecer el filtro de la tabla
+}
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.setupFilterPredicate();
+  }
   nombre = this.authService.getNameFromToken() || '';
 
   ngOnInit(): void {
     this.obtenerSolicitudesAlmacen();
   }
+
+  filtrarPorEstado(estado: string) {
+    this.filtrosAlmacen.estado = estado; // Establece el estado en los filtros
+    this.applyFilters(); // Llama a la función que aplica los filtros
+}
+
 
   private ordenarSolicitudes(solicitudes: SolicitudMuestra[]): SolicitudMuestra[] {
     return solicitudes.sort((a, b) => {
@@ -90,6 +128,59 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
       // Si los estados son iguales, ordenar por fecha (más reciente primero)
       return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
     });
+  }
+
+  private setupFilterPredicate() {
+    this.dataSource.filterPredicate = (data: SolicitudMuestra, filter: string) => {
+      const searchTerms = JSON.parse(filter);
+      return (!searchTerms.solicitante || data.solicitante.toLowerCase().includes(searchTerms.solicitante.toLowerCase())) &&
+             (!searchTerms.nombreMp || data.nombreMp.toLowerCase().includes(searchTerms.nombreMp.toLowerCase())) &&
+             (!searchTerms.proveedor || data.proveedor.toLowerCase().includes(searchTerms.proveedor.toLowerCase())) &&
+             (!searchTerms.estado || data.estado.toLowerCase().includes(searchTerms.estado.toLowerCase()));
+    };
+  }
+
+  filterHistory: { label: string, value: string }[] = [];
+  updateFilterHistory(label: string, value: string) {
+    // Actualizar historial de filtros
+    const existingFilterIndex = this.filterHistory.findIndex(f => f.label === label);
+    if (value) { // Solo agregar/actualizar si hay un valor
+      if (existingFilterIndex > -1) {
+        this.filterHistory[existingFilterIndex].value = value;
+      } else {
+        this.filterHistory.push({ label, value });
+      }
+    } else {
+      // Si el valor está vacío, remover del historial
+      if (existingFilterIndex > -1) {
+        this.filterHistory.splice(existingFilterIndex, 1);
+      }
+    }
+
+    // Aplicar filtros
+    this.applyFilters();
+  }
+  removeFilter(filtro: { label: string, value: string }) {
+    // Remover del historial
+    this.filterHistory = this.filterHistory.filter(f => f !== filtro);
+
+    // Limpiar el filtro correspondiente
+    this.filtrosAlmacen[filtro.label as keyof typeof this.filtrosAlmacen] = '';
+
+    // Reaplica los filtros
+    this.applyFilters();
+
+    // Resetear a la primera página
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+  }
+  applyFilters() {
+    this.dataSource.filter = JSON.stringify(this.filtrosAlmacen);
+
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
   }
 
   checkScrollPosition() {
@@ -357,12 +448,14 @@ export class SolicitudesMuestraAlmacenComponent implements OnInit, OnDestroy, Af
   obtenerSolicitudesAlmacen(): void {
     this.solicitudService.getSolicitudAlm().subscribe(
       (data: SolicitudMuestra[]) => {
-        this.solicitudesAlmacen = this.ordenarSolicitudes(data);
+        const sortedData = this.ordenarSolicitudes(data);
+        this.solicitudesAlmacen = sortedData;
+        this.dataSource.data = sortedData;
+        this.applyFilters();
       },
       error => console.error('Error al obtener solicitudes', error)
     );
   }
-
 
   obtenerNombreToken(): string | null {
     return this.nombre = this.authService.getNameFromToken() || '';
