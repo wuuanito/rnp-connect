@@ -15,18 +15,22 @@ import bootstrap from 'bootstrap';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-ver-solicitud-muestras-lab',
   standalone: true,
-  imports: [DatePipe,CommonModule,FormsModule,NgxPaginationModule],
+  imports: [DatePipe,CommonModule,FormsModule,NgxPaginationModule,MatTooltipModule],
   templateUrl: './ver-solicitud-muestras-lab.component.html',
   styleUrl: './ver-solicitud-muestras-lab.component.css'
 })
 export class VerSolicitudMuestrasLabComponent implements OnInit  {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
-
+  tooltips = {
+    expediciones: 'Project Manager → Expediciones',
+    laboratorio: 'Project Manager → Laboratorio (laboratorio → Almacén (si es necesario) → Project Manager))',
+    almacen: 'Project Manager → Almacén → Project Manager'
+  };
   solicitudes: SolicitudMuestra[] = [];
   solicitudSeleccionada: SolicitudMuestra | null = null;
   mensajes: Mensaje[] = [];
@@ -34,6 +38,7 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
   pollingSubscription: Subscription | undefined;
   files: any[] = [];
   page: number = 1;
+  pageLab: number = 1;
   itemsPerPage: number = 10;
   mostrarBotonBajar: boolean = false;
 
@@ -45,6 +50,38 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
     estado: ''
   };
   // Filtros
+  solicitud: SolicitudMuestra = {
+    solicitante: '',
+    nombreMp: '',
+    lote: '',
+    proveedor: '',
+    urgencia: '',
+    fecha: new Date(),
+    estado: "Pendiente",
+    codigoArticulo: '',
+    comentarios: '',
+    mensajes: [],
+    expediciones: false,
+    laboratorio: false,
+    almacen: false,
+    mensajesNoLeidos: 0
+  };
+  solicitudSoloLab: SolicitudMuestra = {
+    solicitante: '',
+    nombreMp: '',
+    lote: '',
+    proveedor: '',
+    urgencia: '',
+    fecha: new Date(),
+    estado: "Pendiente",
+    codigoArticulo: '',
+    comentarios: '',
+    mensajes: [],
+    expediciones: false,
+    laboratorio: false,
+    almacen: false,
+    mensajesNoLeidos: 0
+  };
 
   constructor(
     private solicitudService: MuestrasService,
@@ -53,10 +90,59 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
     private fileUploadService: UploadService
   ) {}
   mostrarInformes: boolean = false; // Inicializa la variable para controlar la visibilidad de los informes
+  mostrarCreacion: boolean = false; // Inicializa la variable para controlar la visibilidad de los informes
+  selectedLaboratorioOption: string = ''; // Almacena la opción del desplegable
+
+  onSubmit() {
+    console.log('Opción seleccionada del laboratorio:', this.selectedLaboratorioOption); // Verifica el valor aquí
+
+    const solicitudParaCrear = {
+        ...this.solicitud,
+        selectedLaboratorioOption: this.selectedLaboratorioOption,
+        idSolicitudMuestra: undefined
+    };
+
+    this.solicitudService.createSolicitudLabAlm(solicitudParaCrear).subscribe({
+        next: (response) => {
+            console.log('Solicitud creada:', response);
+            alert('Solicitud creada correctamente');
+            window.location.reload();
+        },
+        error: (error) => {
+            console.error('Error al crear la solicitud', error);
+        }
+    });
+}
+selectedOption: string = 'almacen';  // Inicializamos con 'almacen' para que esté seleccionado por defecto
 
   nombre = this.authService.getNameFromToken() || '';
   ngOnInit(): void {
     this.obtenerSolicitudes();
+    this.obtenerSolicitudesAlmacen();
+    this.obtenerSolicitudesSoloLab(); // Agregamos los paréntesis
+  }
+
+
+  onOptionChange(option: string) {
+    this.selectedOption = option;
+
+    // Resetear todas las opciones
+    this.solicitud.expediciones = false;
+    this.solicitud.laboratorio = false;
+    this.solicitud.almacen = false;
+
+    // Activar solo la opción seleccionada
+    switch(option) {
+      case 'expediciones':
+        this.solicitud.expediciones = true;
+        break;
+      case 'laboratorio':
+        this.solicitud.laboratorio = true;
+        break;
+      case 'almacen':
+        this.solicitud.almacen = true;
+        break;
+    }
   }
 
   fechaDesde: string = '';
@@ -129,6 +215,12 @@ export class VerSolicitudMuestrasLabComponent implements OnInit  {
     // Guardar el PDF
     doc.save(`Informe de Solicitudes de Laboratorio - ${this.fechaDesde} a ${this.fechaHasta}.pdf`);
 }
+
+  crearSolicitudAlmacen(): void {
+    // Aquí se implementaría la lógica para crear una solicitud al almacén
+    console.log('Crear solicitud al almacén');
+  }
+
 
 // Generar Excel
 generarExcel(): void {
@@ -399,6 +491,9 @@ generarExcel(): void {
   }
 
 //funcion finalizar para finalizar la solicitud de la muestra
+pageLaboratorio: number = 1;
+pageAlmacen: number = 1;
+pageSoloLab: number = 1;
 
 finalizar(){
 
@@ -415,6 +510,97 @@ finalizar(){
   );
 
   }
+
+
+  solicitudesAlmacen: SolicitudMuestra[] = [];
+  filtrosAlmacen = {
+    solicitante: '',
+    nombreMp: '',
+    proveedor: '',
+    estado: ''
+  };
+
+  solicitudesSoloLab: SolicitudMuestra[] = [];
+  filtrosSoloLab = {
+    solicitante: '',
+    nombreMp: '',
+    proveedor: '',
+    estado: ''
+  };
+  obtenerSolicitudesAlmacen(): void {
+    this.solicitudService.getSolicitudLab().subscribe(
+      (data: SolicitudMuestra[]) => {
+        this.solicitudesAlmacen = data;
+      },
+      error => console.error('Error al obtener solicitudes de almacén', error)
+    );
+  }
+
+  obtenerSolicitudesSoloLab(): void {
+    this.solicitudService.getSolicitudesSoloLab().subscribe(
+      (data: SolicitudMuestra[]) => {
+        this.solicitudesSoloLab = data; // Corregimos la asignación
+      },
+      error => console.error('Error al obtener solicitudes de solo laboratorio', error)
+    );
+  }
+
+  get filteredSolicitudesAlmacen() {
+    return this.solicitudesAlmacen.filter(solicitud => {
+      return (
+        solicitud.solicitante.toLowerCase().includes(this.filtrosAlmacen.solicitante.toLowerCase()) &&
+        solicitud.nombreMp.toLowerCase().includes(this.filtrosAlmacen.nombreMp.toLowerCase()) &&
+        solicitud.proveedor.toLowerCase().includes(this.filtrosAlmacen.proveedor.toLowerCase()) &&
+        (this.filtrosAlmacen.estado === '' || solicitud.estado.toLowerCase() === this.filtrosAlmacen.estado.toLowerCase())
+      );
+    });
+  }
+  tablaSeleccionada: string = 'muestras';  // Inicializar con 'muestras' como valor predeterminado
+
+  get filteredSolicitudesSoloLab() {
+    return this.solicitudesSoloLab.filter(solicitud => {
+      return (
+        solicitud.solicitante.toLowerCase().includes(this.filtrosSoloLab.solicitante.toLowerCase()) &&
+        solicitud.nombreMp.toLowerCase().includes(this.filtrosSoloLab.nombreMp.toLowerCase()) &&
+        solicitud.proveedor.toLowerCase().includes(this.filtrosSoloLab.proveedor.toLowerCase()) &&
+        (this.filtrosSoloLab.estado === '' || solicitud.estado.toLowerCase() === this.filtrosSoloLab.estado.toLowerCase())
+      );
+    });
+  }
+
+  // Método modificado para cargar detalles según el origen
+  onPageChangeLab(page: number): void {
+    this.pageLab = page;
+    this.paginationConfigLab.currentPage = page;
+  }
+
+  onPageChangeAlmacen(page: number): void {
+    this.pageAlmacen = page;
+    this.paginationConfigAlmacen.currentPage = page;
+  }
+
+  onPageChangeSoloLab(page: number): void {
+    this.pageSoloLab = page;
+    this.paginationConfigSoloLab.currentPage = page;
+  }
+
+  paginationConfigLab = {
+    id: 'paginationLab',
+    itemsPerPage: 10,
+    currentPage: 1
+  };
+
+  paginationConfigAlmacen = {
+    id: 'paginationAlmacen',
+    itemsPerPage: 10,
+    currentPage: 1
+  };
+
+  paginationConfigSoloLab = {
+    id: 'paginationSoloLab',
+    itemsPerPage: 10,
+    currentPage: 1
+  };
 
 }
 

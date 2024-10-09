@@ -1,102 +1,129 @@
-<div class="container-fluid py-4">
-  <h1 class="mb-4">Bolsa de Horas - Proveedores</h1>
 
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Resumen de Horas</h5>
-          <div class="row">
-            <div class="col-sm-4">
-              <div class="text-center">
-                <h6>Total Horas</h6>
-                <p class="h3">1000</p>
-              </div>
+
+  <!-- Main Content Tabs -->
+  <mat-tab-group class="bg-white shadow-lg rounded-lg p-4">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="mr-2 text-gray-500">schedule</mat-icon>
+        <span class="text-gray-700">Registro de Horas</span>
+      </ng-template>
+
+      <!-- New Time Record Form -->
+      <mat-card class="mt-6 bg-gray-100 shadow-md rounded-lg">
+        <mat-card-header class="bg-gray-800 text-white p-4">
+          <mat-card-title class="text-lg font-semibold">Nuevo Registro de Horas</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="p-6">
+          <form [formGroup]="timeRecordForm" (ngSubmit)="submitTimeRecord()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <mat-form-field appearance="outline">
+              <mat-label>Proveedor</mat-label>
+              <mat-select formControlName="providerId" required>
+                <mat-option *ngFor="let provider of providers" [value]="provider.id">
+                  {{provider.name}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="date" required>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Horas</mat-label>
+              <input matInput type="number" formControlName="hours" required min="0.5" step="0.5">
+              <mat-icon matSuffix>watch_later</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Descripción</mat-label>
+              <textarea matInput formControlName="description" required rows="2"></textarea>
+              <mat-icon matSuffix>description</mat-icon>
+            </mat-form-field>
+
+            <div class="md:col-span-2 text-center">
+              <button mat-raised-button color="primary" type="submit"
+                      [disabled]="!timeRecordForm.valid"
+                      class="w-full md:w-auto px-6 py-3 font-semibold tracking-wide">
+                <mat-icon class="mr-2">add_circle</mat-icon>
+                Registrar Horas
+              </button>
             </div>
-            <div class="col-sm-4">
-              <div class="text-center">
-                <h6>Horas Usadas</h6>
-                <p class="h3">450</p>
-              </div>
-            </div>
-            <div class="col-sm-4">
-              <div class="text-center">
-                <h6>Horas Disponibles</h6>
-                <p class="h3">550</p>
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Provider Records List -->
+      <mat-accordion class="mt-6">
+        <mat-expansion-panel *ngFor="let provider of providers">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="flex items-center text-gray-700">
+              <mat-icon class="mr-2 text-blue-600">business</mat-icon>
+              {{provider.name}}
+            </mat-panel-title>
+            <mat-panel-description class="flex items-center gap-4 text-gray-600">
+              <mat-chip-set>
+                <mat-chip color="primary">Total: {{formatHours(provider.totalHours)}}h</mat-chip>
+                <mat-chip color="accent">Activas: {{formatHours(provider.activeHours)}}h</mat-chip>
+              </mat-chip-set>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="grid gap-4 mt-4">
+            <div *ngFor="let record of provider.records"
+                 class="p-4 border border-gray-300 rounded-lg hover:shadow-md transition-shadow bg-white"
+                 [class.opacity-50]="record.isHidden">
+              <div class="flex justify-between items-start">
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg font-semibold">{{record.hours}} horas</span>
+                    <span class="text-sm text-gray-500">
+                      {{record.date | date:'dd/MM/yyyy HH:mm'}}
+                    </span>
+                  </div>
+                  <p class="text-gray-600">{{record.description}}</p>
+                </div>
+                <button mat-icon-button color="warn"
+                        [disabled]="record.isHidden"
+                        (click)="hideHours(provider.id, record.id)"
+                        matTooltip="Ocultar registro">
+                  <mat-icon>visibility_off</mat-icon>
+                </button>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Registrar Horas</h5>
-          <form>
-            <div class="mb-3">
-              <label for="providerSelect" class="form-label">Proveedor</label>
-              <select class="form-select" id="providerSelect">
-                <option selected>Seleccionar proveedor</option>
-                <option value="1">Proveedor A</option>
-                <option value="2">Proveedor B</option>
-                <option value="3">Proveedor C</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="hoursInput" class="form-label">Horas</label>
-              <input type="number" class="form-control" id="hoursInput" min="0">
-            </div>
-            <div class="mb-3">
-              <label for="descriptionInput" class="form-label">Descripción</label>
-              <textarea class="form-control" id="descriptionInput" rows="3"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Registrar Horas</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </mat-tab>
 
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">Detalle de Proveedores</h5>
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Proveedor</th>
-              <th>Horas Contratadas</th>
-              <th>Horas Usadas</th>
-              <th>Horas Disponibles</th>
-              <th>Última Actualización</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Proveedor A</td>
-              <td>500</td>
-              <td>200</td>
-              <td>300</td>
-              <td>2024-07-15</td>
-            </tr>
-            <tr>
-              <td>Proveedor B</td>
-              <td>300</td>
-              <td>150</td>
-              <td>150</td>
-              <td>2024-07-14</td>
-            </tr>
-            <tr>
-              <td>Proveedor C</td>
-              <td>200</td>
-              <td>100</td>
-              <td>100</td>
-              <td>2024-07-13</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="mr-2 text-gray-500">business</mat-icon>
+        <span class="text-gray-700">Gestión de Proveedores</span>
+      </ng-template>
+
+      <!-- Provider Management Section -->
+      <mat-card class="mt-6 bg-gray-100 shadow-md rounded-lg">
+        <mat-card-header class="bg-gray-800 text-white p-4">
+          <mat-card-title class="text-lg font-semibold">Nuevo Proveedor</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="p-6">
+          <form [formGroup]="providerForm" (ngSubmit)="addProvider()" class="flex gap-6 items-end">
+            <mat-form-field appearance="outline" class="flex-grow">
+              <mat-label>Nombre del Proveedor</mat-label>
+              <input matInput formControlName="name" required>
+              <mat-icon matSuffix>domain</mat-icon>
+            </mat-form-field>
+            <button mat-raised-button color="primary" type="submit"
+                    [disabled]="!providerForm.valid"
+                    class="h-14 px-6 font-semibold tracking-wide">
+              <mat-icon class="mr-2">add_circle</mat-icon>
+              Agregar Proveedor
+            </button>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+  </mat-tab-group>

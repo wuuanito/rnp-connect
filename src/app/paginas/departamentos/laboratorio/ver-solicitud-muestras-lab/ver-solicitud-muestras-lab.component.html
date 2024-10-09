@@ -1,72 +1,240 @@
-<div class="container-fluid mt-5">
-  <h2 class="mb-4">Ver Solicitudes de Muestra</h2>
+<div class="page-container">
+  <header class="header">
+    <div class="content-wrapper text-center py-4" style="background-color: #f4f4f4; color: black;">
+      <h1 class="fw-bold">LABORATORIO</h1>
+    </div>
+  </header>
 
-  <!-- Filtros -->
-  <div class="row mb-3">
-    <div class="col-md-3">
-      <input type="text" class="form-control" [(ngModel)]="filtros.solicitante" placeholder="Filtrar por solicitante">
-    </div>
-    <div class="col-md-3">
-      <input type="text" class="form-control" [(ngModel)]="filtros.nombreMp" placeholder="Filtrar por nombre MP">
-    </div>
-    <div class="col-md-3">
-      <input type="text" class="form-control" [(ngModel)]="filtros.proveedor" placeholder="Filtrar por proveedor">
-    </div>
-    <div class="col-md-3">
-      <select class="form-select" [(ngModel)]="filtros.estado">
-        <option value="">Todos los estados</option>
-        <option value="pendiente">Pendiente</option>
-        <option value="en proceso">En proceso</option>
-        <option value="finalizado">Finalizado</option>
+  <main class="content-wrapper container mt-5">
+
+    <!-- Selector de tabla -->
+    <div class="text-center mb-4">
+      <label for="tableSelector" class="form-label fs-5 fw-bold">Ver:</label>
+      <select id="tableSelector" class="form-select w-auto mx-auto" [(ngModel)]="tablaSeleccionada">
+        <option value="muestras">Solicitudes de Muestras</option>
+        <option value="almacen">Solicitudes a Almacén</option>
       </select>
     </div>
-  </div>
 
-  <!-- Tabla de Solicitudes -->
-  <div class="table-responsive">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Solicitante</th>
-          <th>Tipo de Analisis</th>
-          <th>Nombre MP</th>
-          <th>Lote</th>
-          <th>Proveedor</th>
-          <th>Urgencia</th>
-          <th>Fecha</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let solicitud of filteredSolicitudes | paginate: { itemsPerPage: itemsPerPage, currentPage: page }">
-          <td>{{ solicitud.solicitante }}</td>
-          <td>{{ solicitud.tipoAnalisis }}</td>
-          <td>{{ solicitud.nombreMp }}</td>
-          <td>{{ solicitud.lote }}</td>
-          <td>{{ solicitud.proveedor }}</td>
-          <td>{{ solicitud.urgencia }}</td>
-          <td>{{ solicitud.fecha | date }}</td>
-          <td>{{ solicitud.estado }}</td>
-          <td>
-            <button
-              class="btn btn-info btn-sm"
-              data-bs-toggle="modal"
-              data-bs-target="#detalleModal"
-              (click)="cargarDetalles(solicitud)"
-            >
-              Ver
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- Tabla de Solicitudes de Muestras -->
+    <section *ngIf="tablaSeleccionada === 'muestras'" class="section-card">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h2 class="fw-bold">Solicitudes de Muestras</h2>
+        </div>
+        <div class="card-body">
+          <div class="filters-container mb-3 d-flex justify-content-between">
+            <input type="text" class="form-control" [(ngModel)]="filtros.solicitante" placeholder="Filtrar por solicitante">
+            <input type="text" class="form-control" [(ngModel)]="filtros.nombreMp" placeholder="Filtrar por nombre MP">
+            <input type="text" class="form-control" [(ngModel)]="filtros.proveedor" placeholder="Filtrar por proveedor">
+          </div>
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead class="table-primary">
+                <tr>
+                  <th class="fw-bold">Solicitante</th>
+                  <th class="fw-bold">Tipo de Análisis</th>
+                  <th class="fw-bold">Nombre MP</th>
+                  <th class="fw-bold">Lote</th>
+                  <th class="fw-bold">Proveedor</th>
+                  <th class="fw-bold">Urgencia</th>
+                  <th class="fw-bold">Fecha</th>
+                  <th class="fw-bold">Estado</th>
+                  <th class="fw-bold">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let solicitud of filteredSolicitudesAlmacen | paginate: paginationConfigAlmacen">
+                  <td class="fw-bold">{{ solicitud.solicitante }}</td>
+                  <td class="fw-bold">{{ solicitud.tipoAnalisis }}</td>
+                  <td class="fw-bold">{{ solicitud.nombreMp }}</td>
+                  <td class="fw-bold">{{ solicitud.lote }}</td>
+                  <td class="fw-bold">{{ solicitud.proveedor }}</td>
+                  <td class="fw-bold">{{ solicitud.urgencia }}</td>
+                  <td class="fw-bold">{{ solicitud.fecha | date }}</td>
+                  <td>
+                    <span [ngClass]="{
+                        'badge': true,
+                        'bg-danger': solicitud.estado.toLowerCase() === 'rechazada',
+                        'bg-warning': solicitud.estado.toLowerCase() === 'pendiente',
+                        'bg-info': solicitud.estado.toLowerCase() === 'en laboratorio - enviado a almacén',
+                        'bg-success': solicitud.estado.toLowerCase() === 'finalizado'
 
-  <!-- Paginación -->
-  <div class="d-flex justify-content-center mt-3">
-    <pagination-controls (pageChange)="page = $event"></pagination-controls>
-  </div>
+                      }" class="fw-bold">
+                      {{ solicitud.estado }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#detalleModal" (click)="cargarDetalles(solicitud)">
+                      Ver
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <pagination-controls [id]="paginationConfigAlmacen.id" (pageChange)="onPageChangeAlmacen($event)"></pagination-controls>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabla de Solicitudes de Almacén -->
+    <section *ngIf="tablaSeleccionada === 'almacen'" class="section-card">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h2 class="fw-bold">Solicitudes de Laboratorio a Almacén</h2>
+        </div>
+        <div class="card-body">
+          <div class="filters-container mb-3 d-flex justify-content-between">
+            <input type="text" class="form-control" [(ngModel)]="filtrosSoloLab.solicitante" placeholder="Filtrar por solicitante">
+            <input type="text" class="form-control" [(ngModel)]="filtrosSoloLab.nombreMp" placeholder="Filtrar por nombre MP">
+            <input type="text" class="form-control" [(ngModel)]="filtrosSoloLab.proveedor" placeholder="Filtrar por proveedor">
+          </div>
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead class="table-primary">
+                <tr>
+                  <th class="fw-bold">Solicitante</th>
+                  <th class="fw-bold">Nombre MP</th>
+                  <th class="fw-bold">Lote</th>
+                  <th class="fw-bold">Proveedor</th>
+                  <th class="fw-bold">Urgencia</th>
+                  <th class="fw-bold">Fecha</th>
+                  <th class="fw-bold">Estado</th>
+                  <th class="fw-bold">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let solicitud of filteredSolicitudesSoloLab | paginate: paginationConfigSoloLab">
+                  <td class="fw-bold">{{ solicitud.solicitante }}</td>
+                  <td class="fw-bold">{{ solicitud.nombreMp }}</td>
+                  <td class="fw-bold">{{ solicitud.lote }}</td>
+                  <td class="fw-bold">{{ solicitud.proveedor }}</td>
+                  <td class="fw-bold">{{ solicitud.urgencia }}</td>
+                  <td class="fw-bold">{{ solicitud.fecha | date }}</td>
+                  <td>
+                    <span [ngClass]="{
+                        'badge': true,
+                        'bg-danger': solicitud.estado.toLowerCase() === 'rechazada',
+                        'bg-warning': solicitud.estado.toLowerCase() === 'pendiente',
+                        'bg-info': solicitud.estado.toLowerCase() === 'en laboratorio - enviado a almacén',
+                        'bg-success': solicitud.estado.toLowerCase() === 'finalizado'
+                      }" class="fw-bold">
+                      {{ solicitud.estado }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#detalleModalLabAlma" (click)="cargarDetalles(solicitud)">
+                      Ver
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <pagination-controls [id]="paginationConfigSoloLab.id" (pageChange)="onPageChangeSoloLab($event)"></pagination-controls>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+
+  <div class="container mt-5">
+    <button class="btn btn-primary mb-3" (click)="mostrarCreacion = !mostrarCreacion">
+      Crear Solicitud a Almacen
+    </button>
+
+    <div *ngIf="mostrarCreacion">
+      <h2>Crear Solicitud de Muestra</h2>
+      <form (ngSubmit)="onSubmit()" #solicitudForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+
+
+            <div class="form-check">
+              <input type="radio"
+                     id="almacenNo"
+                     class="form-check-input"
+                     [(ngModel)]="selectedOption"
+                     name="options"
+                     value="almacen"
+                     (change)="onOptionChange('almacen')" />
+              <label for="almacenNo" class="form-check-label">Almacen</label>
+
+            </div>
+          </div>
+          <hr />
+          <div *ngIf="selectedOption === 'laboratorio'" class="mt-2">
+            <label for="laboratorioOptions" class="form-label"><strong>Tipo de análisis:</strong> </label>
+            <select id="laboratorioOptions" class="form-select" [(ngModel)]="selectedLaboratorioOption" name="laboratorioOptions">
+                <option value="" disabled selected>-- Seleccione --</option>
+                <option value="HOMOLOGACION">HOMOLOGACION</option>
+                <option value="DISGREGACION">DISGREGACION</option>
+                <option value="POLVO">POLVO</option>
+                <option value="LIQUIDO">LIQUIDO</option>
+                <option value="CAPSULAS">CAPSULAS</option>
+                <option value="COMPRIMIDOS">COMPRIMIDOS</option>
+                <option value="OTROS">OTROS</option>
+            </select>
+            <hr>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="solicitante">Solicitante</label>
+            <input type="text" id="solicitante" class="form-control" [(ngModel)]="solicitud.solicitante" name="solicitante" required />
+          </div>
+          <div class="form-group col-md-6">
+            <label for="nombreMp">Nombre del MP</label>
+            <input type="text" id="nombreMp" class="form-control" [(ngModel)]="solicitud.nombreMp" name="nombreMp" required />
+          </div>
+        </div>
+        <hr />
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="lote">Lote</label>
+            <input type="text" id="lote" class="form-control" [(ngModel)]="solicitud.lote" name="lote" required />
+          </div>
+          <div class="form-group col-md-6">
+            <label for="proveedor">Proveedor</label>
+            <input type="text" id="proveedor" class="form-control" [(ngModel)]="solicitud.proveedor" name="proveedor" required />
+          </div>
+        </div>
+        <hr />
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="urgencia">Urgencia</label>
+            <select id="urgencia" class="form-control" [(ngModel)]="solicitud.urgencia" name="urgencia" required>
+              <option value="">Seleccione Urgencia</option>
+              <option value="Alta">Alta</option>
+              <option value="Media">Media</option>
+              <option value="Baja">Baja</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="fecha">Fecha</label>
+            <input type="date" id="fecha" class="form-control" [(ngModel)]="solicitud.fecha" name="fecha" required />
+          </div>
+        </div>
+        <hr />
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="codigoArticulo">Código Artículo</label>
+            <input type="text" id="codigoArticulo" class="form-control" [(ngModel)]="solicitud.codigoArticulo" name="codigoArticulo" required />
+          </div>
+          <div class="form-group col-md-6">
+            <label for="comentarios">Comentarios</label>
+            <textarea id="comentarios" class="form-control" [(ngModel)]="solicitud.comentarios" name="comentarios"></textarea>
+          </div>
+        </div>
+        <hr />
+
+        <button type="submit" class="btn btn-primary" [disabled]="!solicitudForm.form.valid">Crear Solicitud</button>
+      </form>
+    </div>
+
 
 
   <div class="container-fluid mt-4">
@@ -304,11 +472,120 @@
                     class="btn btn-primary"
                     (click)="finalizar()"
                     [disabled]="solicitudSeleccionada?.estado === 'En Laboratorio - Enviado a Almacén'">
-                Enviar a Project Manager
+                Devolver / Finalizar
             </button>
         </div>
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal fade" id="detalleModalLabAlma" tabindex="-1" aria-labelledby="detalleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down modal-xl">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="detalleModalLabel">Detalles de la Solicitud</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-4">
+          <!-- Panel izquierdo: Detalles de la Solicitud -->
+          <div class="col-lg-6 details-panel mb-4 mb-lg-0">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h6 class="card-title mb-4">Detalles de la Solicitud</h6>
+                <dl class="row">
+                  <dt class="col-sm-4">Solicitante:</dt>
+                  <dd class="col-sm-8">{{ solicitudSeleccionada?.solicitante }}</dd>
+                  <dt class="col-sm-4">Nombre del MP:</dt>
+                  <dd class="col-sm-8">{{ solicitudSeleccionada?.nombreMp }}</dd>
+                  <dt class="col-sm-4">Lote:</dt>
+                  <dd class="col-sm-8">{{ solicitudSeleccionada?.lote }}</dd>
+                  <dt class="col-sm-4">Proveedor:</dt>
+                  <dd class="col-sm-8">{{ solicitudSeleccionada?.proveedor }}</dd>
+                  <dt class="col-sm-4">Urgencia:</dt>
+                  <dd class="col-sm-8">{{ solicitudSeleccionada?.urgencia }}</dd>
+                  <dt class="col-sm-4">Fecha:</dt>
+                  <dd class="col-sm-8">{{ solicitudSeleccionada?.fecha | date }}</dd>
+                  <dt class="col-sm-4">Estado:</dt>
+                  <dd class="col-sm-8">{{ solicitudSeleccionada?.estado }}</dd>
+                  <dt class="col-sm-4">Código Artículo:</dt>
+                  <dd class="col-sm-8">{{ solicitudSeleccionada?.codigoArticulo }}</dd>
+                  <dt class="col-sm-4">Comentarios:</dt>
+                  <dd class="col-sm-8">{{ solicitudSeleccionada?.comentarios }}</dd>
+                </dl>
+
+              </div>
+            </div>
+            <div class="card mt-4 shadow-sm">
+              <div class="card-body">
+                <h6 class="card-title mb-3">Subir Archivo</h6>
+                <div class="input-group mb-3">
+                  <input
+                    type="file"
+                    class="form-control"
+                    (change)="onFileSelected($event)"
+                  />
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    (click)="onUpload()"
+                  >
+                    Subir
+                  </button>
+                </div>
+                <div *ngIf="archivos.length > 0">
+                  <h6 class="mt-4">Archivos:</h6>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel derecho: Conversación -->
+          <div class="col-lg-6 chat-panel">
+            <h6>Conversación</h6>
+            <div class="chat-container mb-3" #chatContainer>
+              <div *ngIf="mensajes.length === 0" class="text-center">No hay mensajes.</div>
+              <div *ngFor="let mensaje of mensajes" class="chat-message"
+                   [ngClass]="{
+                     'message-sent': mensaje.remitente === obtenerNombreToken(),
+                     'message-received': mensaje.remitente !== obtenerNombreToken()
+                   }">
+                <p><strong>{{ mensaje.remitente }}:</strong></p>
+                <p>{{ mensaje.contenido }}</p>
+                <small class="text-muted">{{ mensaje.fecha | date:'short' }}</small>
+              </div>
+            </div>
+            <div class="mt-3">
+              <textarea class="form-control mb-2" [(ngModel)]="nuevoMensaje" rows="3" placeholder="Escribe tu mensaje aquí..."></textarea>
+              <button class="btn btn-primary" (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim()">Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div (click)="solicitudSeleccionada?.estado === 'En Laboratorio - Enviado a Almacén' ? mostrarMensaje() : null">
+          <button type="button"
+                  class="btn btn-primary"
+                  (click)="finalizar()"
+                  [disabled]="solicitudSeleccionada?.estado === 'En Laboratorio - Enviado a Almacén'">
+              Devolver / Finalizar
+          </button>
+      </div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>

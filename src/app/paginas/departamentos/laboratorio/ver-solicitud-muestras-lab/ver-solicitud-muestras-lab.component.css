@@ -1,4 +1,6 @@
 /* Estilos para el modal */
+
+
 .modal-xl {
   max-width: 95%;
 }
@@ -154,4 +156,7 @@
     text-transform: uppercase;
     font-weight: bold;
   }
+}
+.fw-bold {
+  font-weight: bold !important;
 }

@@ -14,12 +14,21 @@ export class MuestrasService {
   constructor(private http: HttpClient) { }
 
   getSolicitudes(): Observable<SolicitudMuestra[]> {
+    return this.http.get<SolicitudMuestra[]>(`${this.apiUrl}/solicitudMuestrasOT`);
+  }
+  getSolicitudesSoloLab(): Observable<SolicitudMuestra[]> {
+    return this.http.get<SolicitudMuestra[]>(`${this.apiUrl}/solicitudMuestrasSoloLab`);
+  }
+  getSolicitudesLab(): Observable<SolicitudMuestra[]> {
     return this.http.get<SolicitudMuestra[]>(`${this.apiUrl}/solicitudMuestras`);
   }
-
   createSolicitud(solicitud: Omit<SolicitudMuestra, 'idSolicitudMuestra'>): Observable<SolicitudMuestra> {
     return this.http.post<SolicitudMuestra>(`${this.apiUrl}/solicitudMuestras`, solicitud);
   }
+  createSolicitudLabAlm(solicitud: Omit<SolicitudMuestra, 'idSolicitudMuestra'>): Observable<SolicitudMuestra> {
+    return this.http.post<SolicitudMuestra>(`${this.apiUrl}/solicitudMuestrasLabAlm`, solicitud);
+  }
+
 
   getSolicitudExpediciones(): Observable<SolicitudMuestra[]> {
     return this.http.get<SolicitudMuestra[]>(`${this.apiUrl}/solicitudMuestras/expediciones`);
