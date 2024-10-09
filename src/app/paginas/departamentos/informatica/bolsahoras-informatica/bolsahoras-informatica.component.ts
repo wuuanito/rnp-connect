@@ -83,19 +83,37 @@ export class BolsahorasInformaticaComponent implements OnInit {
     this.loadProviders();
   }
 
+  getTotalHours(provider: Provider): string {
+    const total = provider.records.reduce((sum, record) => {
+      const hours = typeof record.hours === 'string' ? parseFloat(record.hours) : record.hours;
+      return sum + (isNaN(hours) ? 0 : hours);
+    }, 0);
+    return total.toFixed(2);
+  }
 
+  // Método mejorado para formatear y calcular horas activas
+  getActiveHours(provider: Provider): string {
+    const active = provider.records
+      .filter(record => !record.isHidden)
+      .reduce((sum, record) => {
+        const hours = typeof record.hours === 'string' ? parseFloat(record.hours) : record.hours;
+        return sum + (isNaN(hours) ? 0 : hours);
+      }, 0);
+    return active.toFixed(2);
+  }
   loadProviders(): void {
     this.timeService.getProviders().subscribe({
       next: (data) => {
         this.providers = data.map(provider => ({
           ...provider,
-          totalHours: this.parseNumber(provider.totalHours),
-          activeHours: this.parseNumber(provider.activeHours),
+          totalHours: this.parseNumber(this.getTotalHours(provider)),
+          activeHours: this.parseNumber(this.getActiveHours(provider)),
           records: provider.records.map(record => ({
             ...record,
             hours: this.parseNumber(record.hours)
           }))
         }));
+        this.cdr.detectChanges(); // Forzar la detección de cambios
       },
       error: (error) => {
         this.showError('Error al cargar proveedores');

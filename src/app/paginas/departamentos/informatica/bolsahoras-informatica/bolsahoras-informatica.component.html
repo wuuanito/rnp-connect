@@ -65,8 +65,12 @@
             </mat-panel-title>
             <mat-panel-description class="flex items-center gap-4 text-gray-600">
               <mat-chip-set>
-                <mat-chip color="primary">Total: {{formatHours(provider.totalHours)}}h</mat-chip>
-                <mat-chip color="accent">Activas: {{formatHours(provider.activeHours)}}h</mat-chip>
+                <mat-chip highlighted color="primary">
+                  Total: {{formatHours(provider.totalHours)}}h
+                </mat-chip>
+                <mat-chip highlighted color="accent">
+                  Activas: {{formatHours(provider.activeHours)}}h
+                </mat-chip>
               </mat-chip-set>
             </mat-panel-description>
           </mat-expansion-panel-header>

@@ -131,13 +131,22 @@ export class BolsaHorasService {
 
   // Helper methods
   private calculateTotalHours(records: TimeRecord[]): number {
-    return records.reduce((total, record) => total + record.hours, 0);
+    const total = records.reduce((sum, record) => {
+      // Asegurarse de que hours sea un número
+      const hours = typeof record.hours === 'string' ? parseFloat(record.hours) : record.hours;
+      return sum + (isNaN(hours) ? 0 : hours);
+    }, 0);
+    return parseFloat(total.toFixed(2)); // Redondear a 2 decimales
   }
 
   private calculateActiveHours(records: TimeRecord[]): number {
-    return records
+    const active = records
       .filter(record => !record.isHidden)
-      .reduce((total, record) => total + record.hours, 0);
+      .reduce((sum, record) => {
+        const hours = typeof record.hours === 'string' ? parseFloat(record.hours) : record.hours;
+        return sum + (isNaN(hours) ? 0 : hours);
+      }, 0);
+    return parseFloat(active.toFixed(2)); // Redondear a 2 decimales
   }
 
   private handleError(error: any) {
