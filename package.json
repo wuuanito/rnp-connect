@@ -40,6 +40,7 @@
     "ngx-bootstrap": "^18.0.2",
     "ngx-mat-timepicker": "^18.0.0",
     "ngx-pagination": "^6.0.3",
+    "ngx-socket-io": "^4.7.0",
     "ngx-toastr": "^19.0.0",
     "pdfmake": "^0.2.12",
     "rxjs": "~7.8.0",

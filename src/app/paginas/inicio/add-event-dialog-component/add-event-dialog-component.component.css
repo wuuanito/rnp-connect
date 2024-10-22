@@ -45,3 +45,14 @@ mat-dialog-title {
   font-weight: bold;
   margin-bottom: 20px;
 }
+.fc-timegrid-slot {
+  height: 40px !important;
+}
+
+.fc-timegrid-event {
+  min-height: 30px;
+}
+
+.fc-time-grid-event.fc-short {
+  min-height: 20px;
+}

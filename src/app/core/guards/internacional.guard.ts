@@ -7,7 +7,7 @@ export const internacionalGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const snackBar = inject(MatSnackBar);
   const role = authService.getRoleFromToken();
-  if (role === 'informatico' || role === 'internacional ') {
+  if (role === 'informatico' || role === 'internacional') {
     return true;
   } else {
     snackBar.open('No tienes permisos para acceder a esta página', 'Cerrar', {
